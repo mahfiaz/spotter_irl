@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <Group
+      location = "container:"
+      name = "Objects">
+      <FileRef
+         location = "group:../engine/action.py">
+      </FileRef>
+      <FileRef
+         location = "group:../engine/code.py">
+      </FileRef>
+      <FileRef
+         location = "group:../engine/event.py">
+      </FileRef>
+      <FileRef
+         location = "group:../engine/player.py">
+      </FileRef>
+      <FileRef
+         location = "group:../engine/round.py">
+      </FileRef>
+      <FileRef
+         location = "group:../engine/team.py">
+      </FileRef>
+   </Group>
+   <FileRef
+      location = "group:../game_engine.py">
+   </FileRef>
+   <FileRef
+      location = "group:../game_config.py">
+   </FileRef>
+   <FileRef
+      location = "group:../reset_db.py">
+   </FileRef>
+</Workspace>
