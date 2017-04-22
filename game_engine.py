@@ -5,6 +5,7 @@ import datetime
 import time
 import random
 import game_config
+#from enum import Enum
 
 dateformat = '%Y-%m-%d %H:%M:%S'
 
@@ -19,6 +20,85 @@ except:
     print ("Error. Unable to connect to the database. If losing data is acceptable, try running 'python reset_db.py'")
 #    return False
 cur = connection.cursor()
+
+def enum(*args):
+    enums = dict(zip(args, range(len(args))))
+    return type('Enum', (), enums)
+
+
+EventType = enum('spawn', 'wasHit', 'wasHeadshotted', 'didHit', 'didHeadshot', 'missedHit', 'alreadyDead', 'didHitTeamMate')
+
+print(EventType.wasHit)
+
+class Event():
+    currentRoundId = 0
+
+    def initOnce(cursor):
+        Event.cur = cursor
+        Event.createDataTable()
+
+    def createDataTable():
+        Event.cur.execute("""CREATE TABLE event_list (
+            round_id int,
+            player_id int,
+            event_type int,
+            extra_data VARCHAR(64) DEFAULT '',
+            timestamp TIMESTAMP)""")
+
+    def roundId():
+        return Event.currentRoundId
+
+    def setRoundId(roundId):
+        Event.currentRoundId = roundId
+
+    def addHit(hitterId, victimId):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
+            VALUES (%s, %s, %s), (%s, %s, %s)""", (Event.roundId(), hitterId, EventType.didHit, Event.roundId(), victimId, EventType.wasHit))
+
+    def addHeadshot(hitterId, victimId):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
+            VALUES (%s, %s, %s), (%s, %s, %s)""", (Event.roundId(), hitterId, EventType.didHeadshot, Event.roundId(), victimId, EventType.wasHeadshotted))
+
+    def addMissedHit(hitterId, code):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
+            VALUES (%s, %s, %s, %s)""", (Event.roundId(), hitterId, EventType.missedHit, code))
+
+    def addAlreadyDeadHit(hitterId, code):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
+            VALUES (%s, %s, %s, %s)""", (Event.roundId(), hitterId, EventType.alreadyDead, code))
+
+    def addSpawn(spawnerId):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
+            VALUES (%s, %s, %s, %s)""", (Event.roundId(), spawnerId, EventType.spawn))
+
+    def addHitTeamMate(hitterId):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
+            VALUES (%s, %s, %s)""", (Event.roundId(), hitterId, EventType.didHitTeamMate))
+
+    def getPlayerDidHitCuont(playerId):
+        Event.cur.execute("""SELECT COUNT(*) AS event_type
+            FROM event_list
+            WHERE (player_id = %s AND event_type = %s)""",
+            (playerId, EventType.didHit))
+        return Event.cur.fetchone()
+
+    def getPlayerDidTotalHitCuont(playerId):
+        Event.cur.execute("""SELECT COUNT(*) AS event_type
+            FROM event_list
+            WHERE (player_id = %s AND event_type IN (%s, %s))""",
+            (playerId, EventType.didHit, EventType.didHeadshot))
+        return Event.cur.fetchone()
+
+    def addTestEvents():
+        Event.setRoundId(1)
+        Event.addHit(2, 3)
+        Event.addHeadshot(3, 2)
+        Event.addHeadshot(2, 4)
+        Event.addMissedHit(1, 6956)
+        Event.addAlreadyDeadHit(1, 3392)
+        Event.addHitTeamMate(1)
+        Event.addHit(2, 4)
+        print("event test",Event.getPlayerDidHitCuont(2), Event.getPlayerDidTotalHitCuont(2))
 
 class Round():
 
@@ -125,6 +205,17 @@ class Player:
             print("not entirely unique player. not added")
         return False
 
+    def getIdByName(playerName):
+        Player.cur.execute("""SELECT player_id FROM player_data
+            WHERE player_name = %s""", [playerName])
+        return Player.cur.fetchone()
+
+    def getNameById(playerId):
+        Player.cur.execute("""SELECT player_name FROM player_data
+            WHERE player_id = %s""", [playerId])
+        return Player.cur.fetchone()
+
+
     def print():
         Player.cur.execute("""SELECT * FROM player_data """)
         rows = Player.cur.fetchall()
@@ -147,7 +238,7 @@ class Team:
         Team.createTeamPlayersTable()
 
     def createTeamTable():
-        Team.cur.execute("""CREATE TABLE team (
+        Team.cur.execute("""CREATE TABLE team_list (
             team_id serial PRIMARY KEY,
             team_name VARCHAR(30) NOT NULL,
             round_id int)""")
@@ -156,8 +247,67 @@ class Team:
         Team.cur.execute("""CREATE TABLE team_players (
             player_id int,
             team_id int,
-            added timestamp)""")
+            added timestamp DEFAULT NOW() )""")
 
+    def add(teamName):
+        teamId = Team.getIdByName(teamName)
+        if not teamId:
+            Team.cur.execute("""INSERT INTO team_list (team_name)
+                VALUES (%s)""", [teamName])
+            print("Team ", teamName, " added.")
+            return
+        else:
+            print("Warning! Team ", teamName, " already exists.")
+            return False
+
+    def getIdByName(teamName):
+        Team.cur.execute("""SELECT team_id
+            FROM team_list
+            WHERE team_name = %s""", [teamName])
+        return Team.cur.fetchone()
+
+    def getNameById(teamId):
+        Team.cur.execute("""SELECT team_name
+            FROM team_list
+            WHERE team_id = %s""", [teamId])
+        return Team.cur.fetchone()
+
+    def getTeamsList():
+        Team.cur.execute("""SELECT (team_players.team_id, player_data.player_id, player_data.player_name)
+            FROM team_players JOIN player_data ON (team_players.player_id = player_data.player_id)
+            WHERE team_players.team_id IN
+            (SELECT team_id FROM team_list)""")
+        teams = Team.cur.fetchall()
+        print(teams)
+        return teams
+
+    def getPlayerTeamId(playerId):
+        Team.cur.execute("""SELECT team_id 
+            FROM team_players 
+            WHERE player_id = %s""", [playerId])
+        return Team.cur.fetchone()
+
+    def removePlayer(playerId):
+        if Team.getPlayerTeamId(playerId):
+            Team.cur.execute("""DELETE FROM team_players
+                WHERE player_id = %s""", [playerId])
+
+    def addPlayer(playerId, teamId):
+        Team.removePlayer(playerId)
+        Team.cur.execute("""INSERT INTO team_players (player_id, team_id)
+            VALUES (%s, %s)""", (playerId, teamId))
+        print("Player ", Player.getNameById(playerId), " added to ", Team.getNameById(teamId))
+
+    def addTestTeams():
+        Team.add("Sinised")
+        Team.add("Punased")
+        Team.add("Sinised")
+
+    def addPlayersToTeams():
+        Team.addPlayer(Player.getIdByName('Ets2'), Team.getIdByName('Sinised'))
+        Team.addPlayer(Player.getIdByName('Vollts'), Team.getIdByName('Sinised'))
+        Team.addPlayer(Player.getIdByName('KalleLalle'), Team.getIdByName('Punased'))
+        Team.addPlayer(Player.getIdByName('Vollts2'), Team.getIdByName('Punased'))
 
 
 class Code:
@@ -173,33 +323,29 @@ class Code:
             player_id int,
             added timestamp DEFAULT NOW())""")
 
-    def findShotCode(code):
+    def whoWasHitId(code):
         Code.cur.execute("""SELECT shot_id, player_id
             FROM shot_code
             WHERE shot_value = %s""", [code])
-        found = Code.cur.fetchone()
-        if found:
-            return found
-        return False
+        return Code.cur.fetchone()
 
     def generateShotCode(playerId):
         fail = True
-        newCode = 0
         while fail:
-            new_code = random.randint(1000,9999)
-            fail = Code.findShotCode(newCode)
+            newCode = random.randint(1000,9999)
+            fail = Code.findWhoWasShot(newCode)
         Code.cur.execute("""INSERT INTO shot_code (shot_value, player_id)
             VALUES (%s, %s)""", (newCode, playerId))
         Code.cur.execute("""SELECT shot_id
             FROM shot_code 
-            WHERE shot_value = %s""", [new_code])
-        id = cur.fetchone()
+            WHERE shot_value = %s""", [newCode])
+        shotId = cur.fetchone()
         Code.cur.execute("""UPDATE player_data
             SET player_shot_id = %s
-            WHERE player_id = %s""", (id, playerId))
+            WHERE player_id = %s""", (shotId, playerId))
 
     def findWhoWasShot(code):
-        found = Code.findShotCode(code)
+        found = Code.whoWasHitId(code)
         if found:
             shotId, playerId = found
             Code.cur.execute("""UPDATE shot_code
@@ -227,10 +373,18 @@ def main():
     Round.initOnce(cursor)
     Player.initOnce(cursor)
     Code.initOnce(cursor)
+    Team.initOnce(cursor)
+    Event.initOnce(cursor)
 
     Round.addTestRounds()
     Player.addTestPlayers()
     Player.add("Vollts2", "3593", "ille2@gmail.ocom")
+
+    Team.addTestTeams()
+    Team.addPlayersToTeams()
+    Team.getTeamsList()
+
+    Event.addTestEvents()
 
     Round.print()
     print("round active", Round.isActive())
