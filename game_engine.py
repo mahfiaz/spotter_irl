@@ -5,21 +5,20 @@ import datetime
 import time
 import random
 import game_config
-#from enum import Enum
 
 dateformat = '%Y-%m-%d %H:%M:%S'
 
-#def connectDB():
-database, host = (game_config.connection_dbname, game_config.connection_host)
-user, password = (game_config.connection_user, game_config.connection_password)
-connParams = "dbname='" + database + "' user='" + user + "' host='" + host + "' password='" + password + "'"
-try:
-    connection = psycopg2.connect(connParams)
-#    return connection
-except:
-    print ("Error. Unable to connect to the database. If losing data is acceptable, try running 'python reset_db.py'")
-#    return False
-cur = connection.cursor()
+def connectDB():
+    database, host = (game_config.connection_dbname, game_config.connection_host)
+    user, password = (game_config.connection_user, game_config.connection_password)
+    connParams = "dbname='" + database + "' user='" + user + "' host='" + host + "' password='" + password + "'"
+    try:
+        connection = psycopg2.connect(connParams)
+        return connection
+    except:
+        print ("Error. Unable to connect to the database. If losing data is acceptable, try running 'python reset_db.py'")
+        return False
+
 
 def enum(*args):
     enums = dict(zip(args, range(len(args))))
@@ -364,11 +363,10 @@ class Code:
 
 
 def main():
-#    connection = connectDB()
-#    if not connection:
-#        return
-#    cursor = connection.cursor()
-    cursor = cur
+    connection = connectDB()
+    if not connection:
+        return
+    cursor = connection.cursor()
 
     Round.initOnce(cursor)
     Player.initOnce(cursor)
