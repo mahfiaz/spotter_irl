@@ -25,7 +25,7 @@ def enum(*args):
     return type('Enum', (), enums)
 
 
-EventType = enum('spawn', 'wasHit', 'wasHeadshotted', 'didHit', 'didHeadshot', 'missedHit', 'alreadyDead', 'didHitTeamMate')
+EventType = enum('spawn', 'wasHit', 'wasHeadshotted', 'didHit', 'didHeadshot', 'missedHit', 'alreadyDead', 'didHitTeamMate', 'strangeSms')
 
 print(EventType.wasHit)
 
@@ -41,7 +41,7 @@ class Event():
             round_id int,
             player_id int,
             event_type int,
-            extra_data VARCHAR(64) DEFAULT '',
+            extra_data VARCHAR(160) DEFAULT '',
             timestamp TIMESTAMP)""")
 
     def roundId():
@@ -58,6 +58,10 @@ class Event():
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
             VALUES (%s, %s, %s), (%s, %s, %s)""", (Event.roundId(), hitterId, EventType.didHeadshot, Event.roundId(), victimId, EventType.wasHeadshotted))
 
+    def addHitTeamMate(hitterId, victimId):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
+            VALUES (%s, %s, %s), (%s, %s, %s)""", (Event.roundId(), hitterId, EventType.didHitTeamMate, Event.roundId(), victimId, EventType.wasHit))
+
     def addMissedHit(hitterId, code):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
             VALUES (%s, %s, %s, %s)""", (Event.roundId(), hitterId, EventType.missedHit, code))
@@ -70,9 +74,14 @@ class Event():
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
             VALUES (%s, %s, %s, %s)""", (Event.roundId(), spawnerId, EventType.spawn))
 
-    def addHitTeamMate(hitterId):
-        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
-            VALUES (%s, %s, %s)""", (Event.roundId(), hitterId, EventType.didHitTeamMate))
+    def addSuicide(victimId):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
+            VALUES (%s, %s, %s)""", (Event.roundId(), victimId, EventType.wasHit))
+
+
+#    def addStrangeSms(number, message):
+#        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
+#            VALUES (%s, %s, %s, %s)""", (Event.roundId(), number, EventType.strangeSms, message))
 
     def getPlayerDidHitCuont(playerId):
         Event.cur.execute("""SELECT COUNT(*) AS event_type
@@ -95,7 +104,7 @@ class Event():
         Event.addHeadshot(2, 4)
         Event.addMissedHit(1, 6956)
         Event.addAlreadyDeadHit(1, 3392)
-        Event.addHitTeamMate(1)
+        Event.addHitTeamMate(1, 2)
         Event.addHit(2, 4)
         print("event test",Event.getPlayerDidHitCuont(2), Event.getPlayerDidTotalHitCuont(2))
 
@@ -199,7 +208,7 @@ class Player:
         if not rows:
             Player.cur.execute("""INSERT INTO player_data (player_name, player_mobile, player_email) VALUES (%s, %s, %s)""", (name, mobile, email))
             print("Player added.", name, mobile, email)
-            return True
+            return Player.getIdByName(name)
         else:
             print("not entirely unique player. not added")
         return False
@@ -207,6 +216,16 @@ class Player:
     def getIdByName(playerName):
         Player.cur.execute("""SELECT player_id FROM player_data
             WHERE player_name = %s""", [playerName])
+        return Player.cur.fetchone()
+
+    def getIdByMobile(mobile):
+        Player.cur.execute("""SELECT player_id FROM player_data
+            WHERE player_mobile = %s""", [mobile])
+        return Player.cur.fetchone()
+
+    def getMobileById(playerId):
+        Player.cur.execute("""SELECT player_mobile FROM player_data
+            WHERE player_id = %s""", [playerId])
         return Player.cur.fetchone()
 
     def getNameById(playerId):
@@ -254,7 +273,7 @@ class Team:
             Team.cur.execute("""INSERT INTO team_list (team_name)
                 VALUES (%s)""", [teamName])
             print("Team ", teamName, " added.")
-            return
+            return Team.getIdByName(teamName)
         else:
             print("Warning! Team ", teamName, " already exists.")
             return False
@@ -279,6 +298,12 @@ class Team:
         teams = Team.cur.fetchall()
         print(teams)
         return teams
+
+    def getStats():
+        pass
+
+    def updateStats():
+        pass
 
     def getPlayerTeamId(playerId):
         Team.cur.execute("""SELECT team_id 
@@ -322,44 +347,100 @@ class Code:
             player_id int,
             added timestamp DEFAULT NOW())""")
 
-    def whoWasHitId(code):
-        Code.cur.execute("""SELECT shot_id, player_id
+    def getOwnerId(code):
+        Code.cur.execute("""SELECT player_id
             FROM shot_code
             WHERE shot_value = %s""", [code])
         return Code.cur.fetchone()
 
-    def generateShotCode(playerId):
+    def getCodeIdByPlayerId(playerId):
+        Code.cur.execute("""SELECT player_shot_id
+            FROM player_data
+            WHERE player_id = %s""", [playerId])
+        return Code.cur.fetchone()
+
+    def getShotId(code):
+        Code.cur.execute("""SELECT shot_id
+            FROM shot_code
+            WHERE shot_value = %s""", [code])
+        return Code.cur.fetchone()
+
+    def getCodeById(shotId):
+        Code.cur.execute("""SELECT shot_value
+            FROM shot_code
+            WHERE shot_id = %s""", [shotId])
+        return Code.cur.fetchone()
+
+    def generateNewShotCode(playerId):
         fail = True
         while fail:
             newCode = random.randint(1000,9999)
-            fail = Code.findWhoWasShot(newCode)
+            fail = Code.getOwnerId(newCode)
         Code.cur.execute("""INSERT INTO shot_code (shot_value, player_id)
             VALUES (%s, %s)""", (newCode, playerId))
-        Code.cur.execute("""SELECT shot_id
-            FROM shot_code 
-            WHERE shot_value = %s""", [newCode])
-        shotId = cur.fetchone()
+        newShotId = Code.getShotId(newCode)
         Code.cur.execute("""UPDATE player_data
             SET player_shot_id = %s
-            WHERE player_id = %s""", (shotId, playerId))
+            WHERE player_id = %s""", (newShotId, playerId))
+        return newShotId
 
-    def findWhoWasShot(code):
-        found = Code.whoWasHitId(code)
-        if found:
-            shotId, playerId = found
-            Code.cur.execute("""UPDATE shot_code
-                SET player_id = NULL
-                WHERE shot_id = %s""", shotId)
-            Code.cur.execute("""UPDATE player_data
-                SET player_shot_id = %s
-                WHERE player_id = %s""", (shotId, playerId))
-            return playerId
+
+class Action:
+
+    def handleCode(mobile, code):
+        senderId = Player.getIdByMobile(mobile)
+        victimId = Code.getOwnerId(code)
+        if not senderId:
+            print("this player has not been signed up for the game", mobile)
+            # send back sms "come to the base and sign up"
+            #Event.addStrangeSms(mobile, code)
+            return
+        if not victimId:
+            print("missed hit")
+            Event.addMissedHit(senderId, code)
+            return
+        if senderId == victimId:
+            print("suicide")
+            Event.addSuicide(victimId)
+            Action.shotVictim(senderId)
+            # suicide sms
+            return
+        if Team.getPlayerTeamId(senderId) == Team.getPlayerTeamId(victimId):
+            print("teammate")
+            Event.addHitTeamMate(senderId, victimId)
+            Action.shotVictim(victimId)
+            # friendly fire warning sms
+            return
         else:
-            return False
+            print("normal hit")
+            Event.addHit(senderId, victimId)
+            Action.shotVictim(victimId)
+            # sms: successful shot
 
+    def shotVictim(victimId):
+        Code.generateNewShotCode(victimId)
+        Team.updateStats()
 
+#    def headshotVictim(victimId):
 
+    def addPlayer(name, mobile, email):
+        newPlayerId = Player.add(name, mobile, email)
+        Code.generateNewShotCode(newPlayerId)
 
+    def addTestAction():
+        Code.generateNewShotCode(1)
+        Code.generateNewShotCode(2)
+        Code.generateNewShotCode(3)
+        Code.generateNewShotCode(4)
+
+        Action.handleCode(Player.getMobileById(1), Code.getCodeById(Code.getCodeIdByPlayerId(1)))
+        Action.handleCode(Player.getMobileById(4), Code.getCodeById(Code.getCodeIdByPlayerId(1)))
+        Action.handleCode(Player.getMobileById(4), Code.getCodeById(Code.getCodeIdByPlayerId(1)))
+        Action.handleCode(Player.getMobileById(1), Code.getCodeById(Code.getCodeIdByPlayerId(2)))
+        Action.handleCode(Player.getMobileById(1), Code.getCodeById(Code.getCodeIdByPlayerId(3)))
+        Action.handleCode(Player.getMobileById(1), Code.getCodeById(Code.getCodeIdByPlayerId(4)))
+        Action.handleCode('3253234', Code.getCodeById(Code.getCodeIdByPlayerId(4)))
+        Action.handleCode(Player.getMobileById(1), 4745)
 
 
 def main():
@@ -378,15 +459,16 @@ def main():
     Player.addTestPlayers()
     Player.add("Vollts2", "3593", "ille2@gmail.ocom")
 
+    Round.print()
+    print("round active", Round.isActive())
+    Player.print()
+
     Team.addTestTeams()
     Team.addPlayersToTeams()
     Team.getTeamsList()
 
     Event.addTestEvents()
-
-    Round.print()
-    print("round active", Round.isActive())
-    Player.print()
+    Action.addTestAction()
 
 
 if __name__ == "__main__":
