@@ -34,7 +34,7 @@ class Round():
     def getActive():
         Round.cur.execute("""SELECT round_id, round_name
             FROM round_data 
-            WHERE (round_start <= NOW() AND round_end > NOW())""")
+            WHERE (round_start <= statement_timestamp() AND round_end > statement_timestamp())""")
         active = Round.cur.fetchone()
         if active:
             id, name = active

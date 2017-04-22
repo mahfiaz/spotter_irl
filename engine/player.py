@@ -1,3 +1,5 @@
+import random
+
 class Player:
 
     def initOnce(cursor):
@@ -13,7 +15,7 @@ class Player:
             player_shot_id int DEFAULT 0,
             player_headshotcode_id int DEFAULT 0,
             player_respawn_code int DEFAULT 0,
-            player_created timestamp DEFAULT NOW() )""")
+            player_created timestamp DEFAULT statement_timestamp() )""")
 
     def add(name, mobile, email):
         Player.cur.execute("""SELECT (player_name, player_mobile, player_email)
@@ -49,8 +51,10 @@ class Player:
             WHERE player_id = %s""", [playerId])
         return Player.cur.fetchone()
 
+
+
     def regenerateRespawnCode(playerId):
-        Code.cur.execute("""UPDATE player_data
+        Player.cur.execute("""UPDATE player_data
             SET player_respawn_code = %s
             WHERE player_id = %s""", (random.randint(100,999), playerId))
 
@@ -58,6 +62,8 @@ class Player:
         Player.cur.execute("""SELECT player_respawn_code FROM player_data
             WHERE player_id = %s""", [playerId])
         return Player.cur.fetchone() == code
+
+
 
     def print():
         Player.cur.execute("""SELECT * FROM player_data """)

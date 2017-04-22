@@ -3,7 +3,9 @@ def enum(*args):
     return type('Enum', (), enums)
 
 
-EventType = enum('spawn', 'wasHit', 'wasHeadshotted', 'didHit', 'didHeadshot', 'missedHit', 'alreadyDead', 'didHitTeamMate', 'strangeSms')
+EventType = enum('spawn', 'didHit', 'didHeadshot', 'missedHit', 'didHitDead', 'didHitTeamMate', 'wasHit', 'wasHeadshotted', 'wasSuicidal', 'strangeSms')
+
+print("Events", EventType.spawn, EventType.didHit )
 
 class Event():
     currentRoundId = 0
@@ -18,7 +20,7 @@ class Event():
             player_id int,
             event_type int,
             extra_data VARCHAR(160) DEFAULT '',
-            timestamp TIMESTAMP)""")
+            timestamp TIMESTAMP DEFAULT statement_timestamp() )""")
 
     def roundId():
         return Event.currentRoundId
@@ -44,16 +46,26 @@ class Event():
 
     def addAlreadyDeadHit(hitterId, code):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
-            VALUES (%s, %s, %s, %s)""", (Event.roundId(), hitterId, EventType.alreadyDead, code))
+            VALUES (%s, %s, %s, %s)""", (Event.roundId(), hitterId, EventType.didHitDead, code))
 
     def addSpawn(spawnerId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
-            VALUES (%s, %s, %s, %s)""", (Event.roundId(), spawnerId, EventType.spawn))
+            VALUES (%s, %s, %s)""", (Event.roundId(), spawnerId, EventType.spawn))
 
     def addSuicide(victimId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
-            VALUES (%s, %s, %s)""", (Event.roundId(), victimId, EventType.wasHit))
+            VALUES (%s, %s, %s)""", (Event.roundId(), victimId, EventType.wasSuicidal))
 
+    def isPlayerAlive(playerId):
+        Event.cur.execute("""SELECT event_type
+            FROM event_list
+            WHERE player_id = %s
+            ORDER BY timestamp DESC""", [playerId])
+        event = Event.cur.fetchall()
+        if event:
+            ev = event[0][0]
+            return not (ev == EventType.wasHit or ev == EventType.wasHeadshotted or ev == EventType.wasSuicidal)
+        return False
 
 #    def addStrangeSms(number, message):
 #        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)

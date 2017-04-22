@@ -11,7 +11,7 @@ class Code:
             shot_id serial PRIMARY KEY,
             shot_value int unique,
             player_id int,
-            added timestamp DEFAULT NOW())""")
+            added timestamp DEFAULT statement_timestamp())""")
 
     def getOwnerId(code):
         Code.cur.execute("""SELECT player_id

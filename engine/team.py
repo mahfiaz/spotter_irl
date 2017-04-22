@@ -18,7 +18,7 @@ class Team:
         Team.cur.execute("""CREATE TABLE team_players (
             player_id int,
             team_id int,
-            added timestamp DEFAULT NOW() )""")
+            added timestamp DEFAULT statement_timestamp() )""")
 
     def add(teamName):
         teamId = Team.getIdByName(teamName)

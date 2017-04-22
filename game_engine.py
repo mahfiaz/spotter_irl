@@ -55,7 +55,7 @@ def main():
     Team.addPlayersToTeams()
     Team.getTeamsList()
 
-    Event.addTestEvents()
+#    Event.addTestEvents()
     Action.addTestAction()
 
 
@@ -64,3 +64,4 @@ if __name__ == "__main__":
 
 #TODO
 # respawning implementation
+# timestamps and ascending-descending sorting not working.
