@@ -32,6 +32,7 @@ class Action:
         if not victimId:
             print(senderId, "had a missed hit")
             Event.addFailedSpot(senderId, code)
+            Action.updateStats()
             return
         if victimJailed:
             print(victimId, "victim jailed.", senderId, " is using old information")
@@ -40,13 +41,13 @@ class Action:
         if senderId == victimId:
             print(senderId, "exposed self to authorities")
             Event.addExposeSelf(victimId)
-            Team.updateStats()
+            Action.updateStats()
             # suicide sms
             return
-        if Team.getPlayerTeamId(senderId) == Team.getPlayerTeamId(victimId):
+        if Team.getPlayerTeamId(senderId, Round.getActiveId()) == Team.getPlayerTeamId(victimId, Round.getActiveId()):
             print(senderId, " did hit teammate ", victimId)
             Event.addSpotMate(senderId, victimId)
-            Team.updateStats()
+            Action.updateStats()
             # friendly fire warning sms
             return
         else:
@@ -58,13 +59,15 @@ class Action:
                 print(senderId, " touched ", victimId)
                 Event.addTouch(senderId, victimId)
                 # sms: successful touch
-            Team.updateStats()
+            Action.updateStats()
+
+    def updateStats():
+        pass
 
     def addPlayer(name, mobile, email):
         newPlayerId = Player.add(name, mobile, email)
         Event.addPlayer(newPlayerId)
         return newPlayerId
-#        Code.generateNewCodes(newPlayerId)
 
     def _flee(playerId):
         if Event.isPlayerJailed(playerId):
@@ -82,6 +85,48 @@ class Action:
             Action._flee(playerId)
         else:
             print("sorry, this fleeing code did not match!")
+
+    def getPlayerStats(playerId, roundId):
+#        roundId, name = Round.getActiveId()
+        stats = [{
+            'name'              : Player.getNameById(playerId)[0],
+            'totalSpots'        : Event.getPlayerSpotTotalCount(playerId, roundId),
+            'touchCount'        : Event.getPlayerTouchCount(playerId, roundId),
+            'jailed'            : Event.getPlayerJailedCount(playerId, roundId),
+            'teamDisloyality'   : Event.getPlayerDisloyalityCount(playerId, roundId),
+            'accuracy'          : Event.getSpottingAccuracy(playerId, roundId),
+            'lastActivity'      : Event.getPlayerLastActivity(playerId)
+        }]
+        return stats
+
+    def getTeamStats(teamId, roundId):
+        players = Team.getTeamPlayerIdList(teamId)
+        teamStats = []
+        for player in players:
+            teamStats += Action.getPlayerStats(player, roundId)
+        return teamStats
+
+    def getAllStats(roundId):
+        teams = Team.getTeamsIdNameList(roundId)
+        print(teams)
+        roundStats = []
+        for team in teams:
+            id, name = team
+            roundStats += [{
+            'teamName'          : name,
+            'players'           : Action.getTeamStats(id, roundId)}]
+        return roundStats
+
+    def addTestTeams():
+        Team.add("Sinised", Round.getActiveId())
+        Team.add("Punased", Round.getActiveId())
+        Team.add("Sinised", Round.getActiveId())
+
+    def addPlayersToTeams():
+        Team.addPlayer(1, Team.getIdByName('Sinised', Round.getActiveId()))
+        Team.addPlayer(2, Team.getIdByName('Sinised', Round.getActiveId()))
+        Team.addPlayer(3, Team.getIdByName('Punased', Round.getActiveId()))
+        Team.addPlayer(4, Team.getIdByName('Punased', Round.getActiveId()))
 
     def addTestPlayers():
         dataDict = ({"name":"Ets2", "mobile":"111", "email":"ets@gail.cm"},
@@ -105,7 +150,7 @@ class Action:
 
         print("1-1")
         Action.handleCode(Player.getMobileById(1), Code.getSpotCodeByPlayerId(1))
-
+        Action.fleePlayerWithCode(4, Player.getFleeingCode(4))
         Player.printDetailed()
 
         time.sleep(1)
@@ -132,6 +177,7 @@ class Action:
         Player.printDetailed()
         time.sleep(1)
 
+        Action.fleePlayerWithCode(1, Player.getFleeingCode(1))
         Action.fleePlayerWithCode(3, Player.getFleeingCode(3))
         print("1-H3", Code.getTouchCodeByPlayerId(3))
         Action.handleCode(Player.getMobileById(1), Code.getTouchCodeByPlayerId(3))
@@ -142,7 +188,4 @@ class Action:
 
         Action.handleCode(Player.getMobileById(1), Code.getSpotCodeByPlayerId(4))
         Player.printDetailed()
-
-#        time.sleep()
-#        Action.handleCode('3253234', Code._getSpotCodeById(Code._getCodeIdByPlayerId(4)))
-#        Action.handleCode(Player.getMobileById(1), 4745)
+        

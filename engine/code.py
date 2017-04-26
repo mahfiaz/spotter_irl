@@ -53,11 +53,15 @@ class Code:
 
     def getTouchCodeByPlayerId(playerId):
         codeId = Code._getCodeIdByPlayerId(playerId)
-        return Code._getTouchCodeById(codeId)
+        code = Code._getTouchCodeById(codeId)
+        if code:
+            return code[0]
 
     def getSpotCodeByPlayerId(playerId):
         codeId = Code._getCodeIdByPlayerId(playerId)
-        return Code._getSpotCodeById(codeId)
+        code = Code._getSpotCodeById(codeId)
+        if code:
+            return code[0]
 
 
     def _getSpotCodeById(spotId):
@@ -67,7 +71,7 @@ class Code:
         return Code.cur.fetchone()
 
     def _getTouchCodeById(touchId):
-        Code.cur.execute("""SELECT spot_code
+        Code.cur.execute("""SELECT touch_code
             FROM code_list
             WHERE code_id = %s""", [touchId])
         return Code.cur.fetchone()

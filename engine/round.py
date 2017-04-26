@@ -31,7 +31,7 @@ class Round():
             print("Error: New round has overlapping time. not added", name, time_start, time_end)
             return False
 
-    def getActive():
+    def getActiveId():
         Round.cur.execute("""SELECT round_id, round_name
             FROM round_data 
             WHERE (round_start <= statement_timestamp() AND round_end > statement_timestamp())""")
@@ -43,7 +43,7 @@ class Round():
             return False
 
     def isActive():
-        if Round.getActive():
+        if Round.getActiveId():
             return True
         else:
             return False
@@ -52,7 +52,7 @@ class Round():
         Round.cur.execute("""SELECT round_id, round_name, round_start, round_end
             FROM round_data """)
         rows = Round.cur.fetchall()
-        active = Round.getActive()
+        active = Round.getActiveId()
         print("Rounds:")
         for row in rows:
             id, name, time1, time2 = row

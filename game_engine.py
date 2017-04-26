@@ -56,13 +56,15 @@ def main():
     Round.print()
     print("round active", Round.isActive())
 
-    Team.addTestTeams()
-    Team.addPlayersToTeams()
-    Team.getTeamsList()
+    Action.addTestTeams()
+    Action.addPlayersToTeams()
+    Team.getTeamsIdNameList(Round.getActiveId())
 
-#    Event.addTestEvents()
+    Event.addTestEvents(Round.getActiveId())
 
     Action.addTestAction()
+
+    print(Action.getAllStats(Round.getActiveId()))
     #Action.addTestAction2()
 
 #    while True:
@@ -78,3 +80,4 @@ if __name__ == "__main__":
 # if new round starts - start it at event too Event.setRoundId
 # get full team stats as JSON. Saved in file
 # return variables some are duples (var,)
+# event analysis on rounds

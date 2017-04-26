@@ -20,21 +20,19 @@ class Team:
             team_id int,
             added timestamp DEFAULT statement_timestamp() )""")
 
-    def add(teamName):
-        teamId = Team.getIdByName(teamName)
-        if not teamId:
-            Team.cur.execute("""INSERT INTO team_list (team_name)
-                VALUES (%s)""", [teamName])
+    def add(teamName, roundId):
+        if not Team.getIdByName(teamName, roundId):
+            Team.cur.execute("""INSERT INTO team_list (team_name, round_id)
+                VALUES (%s, %s)""", (teamName, roundId))
             print("Team ", teamName, " added.")
-            return Team.getIdByName(teamName)
+            return Team.getIdByName(teamName, roundId)
         else:
             print("Warning! Team ", teamName, " already exists.")
-            return False
 
-    def getIdByName(teamName):
+    def getIdByName(teamName, roundId):
         Team.cur.execute("""SELECT team_id
             FROM team_list
-            WHERE team_name = %s""", [teamName])
+            WHERE round_id = %s AND team_name = %s""", (roundId, teamName))
         return Team.cur.fetchone()
 
     def getNameById(teamId):
@@ -43,44 +41,50 @@ class Team:
             WHERE team_id = %s""", [teamId])
         return Team.cur.fetchone()
 
-    def getTeamsList():
-        Team.cur.execute("""SELECT team_players.team_id, player_data.player_id, player_data.player_name
-            FROM team_players JOIN player_data ON (team_players.player_id = player_data.player_id)
-            WHERE team_players.team_id IN
-            (SELECT team_id FROM team_list)""")
+    def _getRoundIdByTeamId(teamId):
+        Team.cur.execute("""SELECT round_id
+            FROM team_list
+            WHERE team_id = %s""", [teamId])
+        return Team.cur.fetchone()
+
+
+#    def getTeamsList():
+#        Team.cur.execute("""SELECT team_players.team_id, player_data.player_id, player_data.player_name
+#            FROM team_players JOIN player_data ON (team_players.player_id = player_data.player_id)
+#            WHERE team_players.team_id IN
+#            (SELECT team_id FROM team_list)""")
+#        teams = Team.cur.fetchall()
+#        return teams
+
+    def getTeamPlayerIdList(teamId):
+        Team.cur.execute("""SELECT player_id
+            FROM team_players
+            WHERE team_id = %s""", [teamId])
         teams = Team.cur.fetchall()
         return teams
 
-    def getStats():
-        pass
+#team_id, team_name
+#WHERE round_id = %s
+    def getTeamsIdNameList(roundId):
+        Team.cur.execute("""SELECT team_id, team_name
+            FROM team_list""")
+        return Team.cur.fetchall()
 
-    def updateStats():
-        pass
-
-    def getPlayerTeamId(playerId):
+    def getPlayerTeamId(playerId, roundId):
         Team.cur.execute("""SELECT team_id 
             FROM team_players 
-            WHERE player_id = %s""", [playerId])
+            WHERE player_id = %s AND team_id IN 
+            (SELECT team_id FROM team_list WHERE round_id = %s)""", (playerId, roundId))
         return Team.cur.fetchone()
 
-    def removePlayer(playerId):
-        if Team.getPlayerTeamId(playerId):
+    def removePlayer(playerId, roundId):
+        if Team.getPlayerTeamId(playerId, roundId):
             Team.cur.execute("""DELETE FROM team_players
-                WHERE player_id = %s""", [playerId])
+                WHERE round_id = %s AND player_id = %s""", (roundId, playerId))
 
     def addPlayer(playerId, teamId):
-        Team.removePlayer(playerId)
+        Team.removePlayer(playerId, Team._getRoundIdByTeamId(teamId))
         Team.cur.execute("""INSERT INTO team_players (player_id, team_id)
             VALUES (%s, %s)""", (playerId, teamId))
         print("Player ", Player.getNameById(playerId), " added to ", Team.getNameById(teamId))
 
-    def addTestTeams():
-        Team.add("Sinised")
-        Team.add("Punased")
-        Team.add("Sinised")
-
-    def addPlayersToTeams():
-        Team.addPlayer(1, Team.getIdByName('Sinised'))
-        Team.addPlayer(2, Team.getIdByName('Sinised'))
-        Team.addPlayer(3, Team.getIdByName('Punased'))
-        Team.addPlayer(4, Team.getIdByName('Punased'))
