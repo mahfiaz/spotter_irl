@@ -8,9 +8,9 @@ class Round():
 
     def initOnce(cursor):
         Round.cur = cursor
-        Round.createDataTable()
+        Round._createDataTable()
 
-    def createDataTable():
+    def _createDataTable():
         Round.cur.execute("""CREATE TABLE round_data (
             round_id serial PRIMARY KEY,
             round_name VARCHAR(30) NOT NULL,

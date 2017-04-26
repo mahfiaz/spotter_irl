@@ -3,18 +3,16 @@ def enum(*args):
     return type('Enum', (), enums)
 
 
-EventType = enum('spawn', 'didHit', 'didHeadshot', 'missedHit', 'didHitDead', 'didHitTeamMate', 'wasHit', 'wasHeadshotted', 'wasSuicidal', 'strangeSms')
-
-print("Events", EventType.spawn, EventType.didHit )
+EventType = enum('didFlee', 'didSpot', 'didTouch', 'failedSpot', 'didSpotJailed', 'didSpotMate', 'wasSpotted', 'wasTouched', 'wasAdded', 'wasExposingSelf', 'obscureMessage')
 
 class Event():
     currentRoundId = 0
 
     def initOnce(cursor):
         Event.cur = cursor
-        Event.createDataTable()
+        Event._createDataTable()
 
-    def createDataTable():
+    def _createDataTable():
         Event.cur.execute("""CREATE TABLE event_list (
             round_id int,
             player_id int,
@@ -22,41 +20,45 @@ class Event():
             extra_data VARCHAR(160) DEFAULT '',
             timestamp TIMESTAMP DEFAULT statement_timestamp() )""")
 
-    def roundId():
+    def _roundId():
         return Event.currentRoundId
 
     def setRoundId(roundId):
         Event.currentRoundId = roundId
 
-    def addHit(hitterId, victimId):
-        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
-            VALUES (%s, %s, %s), (%s, %s, %s)""", (Event.roundId(), hitterId, EventType.didHit, Event.roundId(), victimId, EventType.wasHit))
-
-    def addHeadshot(hitterId, victimId):
-        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
-            VALUES (%s, %s, %s), (%s, %s, %s)""", (Event.roundId(), hitterId, EventType.didHeadshot, Event.roundId(), victimId, EventType.wasHeadshotted))
-
-    def addHitTeamMate(hitterId, victimId):
-        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
-            VALUES (%s, %s, %s), (%s, %s, %s)""", (Event.roundId(), hitterId, EventType.didHitTeamMate, Event.roundId(), victimId, EventType.wasHit))
-
-    def addMissedHit(hitterId, code):
-        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
-            VALUES (%s, %s, %s, %s)""", (Event.roundId(), hitterId, EventType.missedHit, code))
-
-    def addAlreadyDeadHit(hitterId, code):
-        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
-            VALUES (%s, %s, %s, %s)""", (Event.roundId(), hitterId, EventType.didHitDead, code))
-
-    def addSpawn(spawnerId):
+    def addPlayer(playerId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
-            VALUES (%s, %s, %s)""", (Event.roundId(), spawnerId, EventType.spawn))
+            VALUES (%s, %s, %s)""", (Event._roundId(), playerId, EventType.wasAdded))
 
-    def addSuicide(victimId):
+    def addSpot(hitterId, victimId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
-            VALUES (%s, %s, %s)""", (Event.roundId(), victimId, EventType.wasSuicidal))
+            VALUES (%s, %s, %s), (%s, %s, %s)""", (Event._roundId(), hitterId, EventType.didSpot, Event._roundId(), victimId, EventType.wasSpotted))
 
-    def isPlayerAlive(playerId):
+    def addTouch(hitterId, victimId):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
+            VALUES (%s, %s, %s), (%s, %s, %s)""", (Event._roundId(), hitterId, EventType.didTouch, Event._roundId(), victimId, EventType.wasTouched))
+
+    def addSpotMate(hitterId, victimId):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
+            VALUES (%s, %s, %s), (%s, %s, %s)""", (Event._roundId(), hitterId, EventType.didSpotMate, Event._roundId(), victimId, EventType.wasSpotted))
+
+    def addFailedSpot(hitterId, code):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
+            VALUES (%s, %s, %s, %s)""", (Event._roundId(), hitterId, EventType.failedSpot, code))
+
+    def addAlreadyJailedSpot(hitterId, code):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
+            VALUES (%s, %s, %s, %s)""", (Event._roundId(), hitterId, EventType.didSpotJailed, code))
+
+    def addFlee(playerId):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
+            VALUES (%s, %s, %s)""", (Event._roundId(), playerId, EventType.didFlee))
+
+    def addExposeSelf(victimId):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
+            VALUES (%s, %s, %s)""", (Event._roundId(), victimId, EventType.wasExposingSelf))
+
+    def isPlayerJailed(playerId):
         Event.cur.execute("""SELECT event_type
             FROM event_list
             WHERE player_id = %s
@@ -64,34 +66,39 @@ class Event():
         event = Event.cur.fetchall()
         if event:
             ev = event[0][0]
-            return not (ev == EventType.wasHit or ev == EventType.wasHeadshotted or ev == EventType.wasSuicidal)
-        return False
+            return ev == EventType.wasSpotted or ev == EventType.wasTouched or ev == EventType.wasExposingSelf or ev == EventType.wasAdded
+        return True
 
-#    def addStrangeSms(number, message):
+#    def addoObscureMessage(number, message):
 #        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
-#            VALUES (%s, %s, %s, %s)""", (Event.roundId(), number, EventType.strangeSms, message))
+#            VALUES (%s, %s, %s, %s)""", (Event._roundId(), number, EventType.obscureMessage, message))
 
-    def getPlayerDidHitCuont(playerId):
+    def getPlayerSpotCount(playerId):
         Event.cur.execute("""SELECT COUNT(*) AS event_type
             FROM event_list
             WHERE (player_id = %s AND event_type = %s)""",
-            (playerId, EventType.didHit))
-        return Event.cur.fetchone()
+            (playerId, EventType.didSpot))
+        return Event.cur.fetchone()[0]
 
-    def getPlayerDidTotalHitCuont(playerId):
+    def getPlayerTouchCount(playerId):
         Event.cur.execute("""SELECT COUNT(*) AS event_type
             FROM event_list
             WHERE (player_id = %s AND event_type IN (%s, %s))""",
-            (playerId, EventType.didHit, EventType.didHeadshot))
-        return Event.cur.fetchone()
+            (playerId, EventType.didSpot, EventType.didTouch))
+        return Event.cur.fetchone()[0]
+
+#    def getPlayerJailedCount(playerId):
+
+#    def getPlayerDisloyalityCount(playerId):
+
 
     def addTestEvents():
         Event.setRoundId(1)
-        Event.addHit(2, 3)
-        Event.addHeadshot(3, 2)
-        Event.addHeadshot(2, 4)
-        Event.addMissedHit(1, 6956)
-        Event.addAlreadyDeadHit(1, 3392)
-        Event.addHitTeamMate(1, 2)
-        Event.addHit(2, 4)
-        print("event test",Event.getPlayerDidHitCuont(2), Event.getPlayerDidTotalHitCuont(2))
+        Event.addSpot(2, 3)
+        Event.addTouch(3, 2)
+        Event.addTouch(2, 4)
+        Event.addFailedSpot(1, 6956)
+        Event.addAlreadyJailedSpot(1, 3392)
+        Event.addSpotMate(1, 2)
+        Event.addSpot(2, 4)
+        print("event test spots/Touches",Event.getPlayerSpotCount(2), Event.getPlayerTouchCount(2)) 

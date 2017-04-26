@@ -27,9 +27,18 @@ def connectDB():
 
 
 
-
-
-
+def processInput():
+    userText = input("Enter command [spot] [flee]: ")
+    if 'flee' in userText:
+        id = input("enter id: ")
+        if Player.getNameById(id):
+            Action._flee(id)
+            Player.printDetailed()
+    if 'spot' in userText:
+        mobile = input("enter mobile: ")
+        code = input("enter code: ")
+        Action.handleCode(mobile, code)
+        Player.printDetailed()
 
 def main():
     connection = connectDB()
@@ -37,31 +46,35 @@ def main():
         return
     cursor = connection.cursor()
 
-    Round.initOnce(cursor)
-    Player.initOnce(cursor)
-    Code.initOnce(cursor)
-    Team.initOnce(cursor)
-    Event.initOnce(cursor)
+    Action.initAllOnce(cursor)
 
     Round.addTestRounds()
-    Player.addTestPlayers()
-    Player.add("Vollts2", "3593", "ille2@gmail.ocom")
+    Player.printDetailed()
+    Action.addTestPlayers()
+    Player.printDetailed()
 
     Round.print()
     print("round active", Round.isActive())
-    Player.print()
 
     Team.addTestTeams()
     Team.addPlayersToTeams()
     Team.getTeamsList()
 
 #    Event.addTestEvents()
+
     Action.addTestAction()
+    #Action.addTestAction2()
+
+#    while True:
+#        processInput()
+
 
 
 if __name__ == "__main__":
     main()
 
 #TODO
-# respawning implementation
-# timestamps and ascending-descending sorting not working.
+# private members _underscore
+# if new round starts - start it at event too Event.setRoundId
+# get full team stats as JSON. Saved in file
+# return variables some are duples (var,)

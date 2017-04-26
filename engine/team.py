@@ -5,16 +5,16 @@ class Team:
 
     def initOnce(cursor):
         Team.cur = cursor
-        Team.createTeamTable()
-        Team.createTeamPlayersTable()
+        Team._createTeamTable()
+        Team._createTeamPlayersTable()
 
-    def createTeamTable():
+    def _createTeamTable():
         Team.cur.execute("""CREATE TABLE team_list (
             team_id serial PRIMARY KEY,
             team_name VARCHAR(30) NOT NULL,
             round_id int)""")
 
-    def createTeamPlayersTable():
+    def _createTeamPlayersTable():
         Team.cur.execute("""CREATE TABLE team_players (
             player_id int,
             team_id int,
@@ -44,12 +44,11 @@ class Team:
         return Team.cur.fetchone()
 
     def getTeamsList():
-        Team.cur.execute("""SELECT (team_players.team_id, player_data.player_id, player_data.player_name)
+        Team.cur.execute("""SELECT team_players.team_id, player_data.player_id, player_data.player_name
             FROM team_players JOIN player_data ON (team_players.player_id = player_data.player_id)
             WHERE team_players.team_id IN
             (SELECT team_id FROM team_list)""")
         teams = Team.cur.fetchall()
-        print(teams)
         return teams
 
     def getStats():
@@ -81,7 +80,7 @@ class Team:
         Team.add("Sinised")
 
     def addPlayersToTeams():
-        Team.addPlayer(Player.getIdByName('Ets2'), Team.getIdByName('Sinised'))
-        Team.addPlayer(Player.getIdByName('Vollts'), Team.getIdByName('Sinised'))
-        Team.addPlayer(Player.getIdByName('KalleLalle'), Team.getIdByName('Punased'))
-        Team.addPlayer(Player.getIdByName('Vollts2'), Team.getIdByName('Punased'))
+        Team.addPlayer(1, Team.getIdByName('Sinised'))
+        Team.addPlayer(2, Team.getIdByName('Sinised'))
+        Team.addPlayer(3, Team.getIdByName('Punased'))
+        Team.addPlayer(4, Team.getIdByName('Punased'))
