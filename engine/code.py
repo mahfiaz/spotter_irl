@@ -21,23 +21,33 @@ class Code:
         return isinstance(code, int) and (code > 99999 and code < 1000000)
 
     def getVictimIdByCode(code):
+        result = 0
         if Code._isValidSpotCodeFormat(code):
-            return Code._getSpotCodeOwnerId(code)
+            result = Code._getSpotCodeOwnerId(code)
         if Code._isValidTouchCodeFormat(code):
-            return Code._getTouchCodeOwnerId(code)
+            result = Code._getTouchCodeOwnerId(code)
+        if result:
+            playerId, codeId = result
+            playerId = (playerId,)
+            codeId = (codeId,)
+            return playerId, Code._isActiveCode(playerId, codeId)
 
     def _getSpotCodeOwnerId(code):
-        Code.cur.execute("""SELECT player_id
+        Code.cur.execute("""SELECT player_id, code_id
             FROM code_list
             WHERE spot_code = %s""", [code])
         return Code.cur.fetchone()
 
     def _getTouchCodeOwnerId(code):
-        Code.cur.execute("""SELECT player_id
+        Code.cur.execute("""SELECT player_id, code_id
             FROM code_list
             WHERE touch_code = %s""", [code])
         return Code.cur.fetchone()
 
+    def _isActiveCode(playerId, codeId):
+        otherCodeId = Code._getCodeIdByPlayerId(playerId)
+        assert type(codeId) == type(otherCodeId)
+        return otherCodeId == codeId
 
     def _getCodeIdByPlayerId(playerId):
         Code.cur.execute("""SELECT player_code_id

@@ -1,12 +1,13 @@
+from .round import Round
+
 def enum(*args):
     enums = dict(zip(args, range(len(args))))
     return type('Enum', (), enums)
 
 
-EventType = enum('didFlee', 'didSpot', 'didTouch', 'failedSpot', 'didSpotJailed', 'didSpotMate', 'wasSpotted', 'wasTouched', 'wasAdded', 'wasExposingSelf', 'obscureMessage', 'unregisteredMessage')
+EventType = enum('didFlee', 'didSpot', 'didTouch', 'failedSpot', 'didSpotJailed', 'didSpotMate', 'wasSpotted', 'wasTouched', 'wasAdded', 'wasExposingSelf', 'wasAimedOldCode', 'obscureMessage', 'unregisteredMessage')
 
 class Event():
-    currentRoundId = 0
 
     def initOnce(cursor):
         Event.cur = cursor
@@ -20,43 +21,41 @@ class Event():
             extra_data VARCHAR(160) DEFAULT '',
             timestamp TIMESTAMP DEFAULT statement_timestamp() )""")
 
-    def _roundId():
-        return Event.currentRoundId
-
-    def setRoundId(roundId):
-        Event.currentRoundId = roundId
-
     def addPlayer(playerId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
-            VALUES (%s, %s, %s)""", (Event._roundId(), playerId, EventType.wasAdded))
+            VALUES (%s, %s, %s)""", (Round.getActiveId(), playerId, EventType.wasAdded))
 
     def addSpot(hitterId, victimId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
-            VALUES (%s, %s, %s), (%s, %s, %s)""", (Event._roundId(), hitterId, EventType.didSpot, Event._roundId(), victimId, EventType.wasSpotted))
+            VALUES (%s, %s, %s), (%s, %s, %s)""", (Round.getActiveId(), hitterId, EventType.didSpot, Round.getActiveId(), victimId, EventType.wasSpotted))
 
     def addTouch(hitterId, victimId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
-            VALUES (%s, %s, %s), (%s, %s, %s)""", (Event._roundId(), hitterId, EventType.didTouch, Event._roundId(), victimId, EventType.wasTouched))
+            VALUES (%s, %s, %s), (%s, %s, %s)""", (Round.getActiveId(), hitterId, EventType.didTouch, Round.getActiveId(), victimId, EventType.wasTouched))
 
     def addSpotMate(hitterId, victimId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
-            VALUES (%s, %s, %s), (%s, %s, %s)""", (Event._roundId(), hitterId, EventType.didSpotMate, Event._roundId(), victimId, EventType.wasSpotted))
+            VALUES (%s, %s, %s), (%s, %s, %s)""", (Round.getActiveId(), hitterId, EventType.didSpotMate, Round.getActiveId(), victimId, EventType.wasSpotted))
 
     def addFailedSpot(hitterId, code):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
-            VALUES (%s, %s, %s, %s)""", (Event._roundId(), hitterId, EventType.failedSpot, code))
+            VALUES (%s, %s, %s, %s)""", (Round.getActiveId(), hitterId, EventType.failedSpot, code))
+
+    def addWasAimedWithOldCode(victimId, code):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
+            VALUES (%s, %s, %s, %s)""", (Round.getActiveId(), victimId, EventType.wasAimedOldCode, code))
 
     def addAlreadyJailedSpot(hitterId, code):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
-            VALUES (%s, %s, %s, %s)""", (Event._roundId(), hitterId, EventType.didSpotJailed, code))
+            VALUES (%s, %s, %s, %s)""", (Round.getActiveId(), victimId, EventType.didSpotJailed, code))
 
     def addFlee(playerId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
-            VALUES (%s, %s, %s)""", (Event._roundId(), playerId, EventType.didFlee))
+            VALUES (%s, %s, %s)""", (Round.getActiveId(), playerId, EventType.didFlee))
 
     def addExposeSelf(victimId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
-            VALUES (%s, %s, %s)""", (Event._roundId(), victimId, EventType.wasExposingSelf))
+            VALUES (%s, %s, %s)""", (Round.getActiveId(), victimId, EventType.wasExposingSelf))
 
     def isPlayerJailed(playerId):
         Event.cur.execute("""SELECT event_type
@@ -71,11 +70,11 @@ class Event():
 
     def addObscureMessage(playerId, message):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
-            VALUES (%s, %s, %s, %s)""", (Event._roundId(), playerId, EventType.obscureMessage, message))
+            VALUES (%s, %s, %s, %s)""", (Round.getActiveId(), playerId, EventType.obscureMessage, message))
 
     def addUnregisteredMessage(mobile, message):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
-            VALUES (%s, %s, %s, %s)""", (Event._roundId(), mobile, EventType.unregisteredMessage, message))
+            VALUES (%s, %s, %s, %s)""", (Round.getActiveId(), mobile, EventType.unregisteredMessage, message))
 
     def getPlayerSpotTotalCount(playerId, roundId):
         Event.cur.execute("""SELECT COUNT(*) AS event_type
@@ -126,8 +125,7 @@ class Event():
         if timestamp:
             return timestamp[0][0]
 
-    def addTestEvents(roundId):
-        Event.setRoundId(roundId)
+    def addTestEvents():
         Event.addSpot(2, 3)
         Event.addTouch(3, 2)
         Event.addTouch(2, 4)
@@ -135,4 +133,4 @@ class Event():
         Event.addAlreadyJailedSpot(1, 3392)
         Event.addSpotMate(1, 2)
         Event.addSpot(2, 4)
-        print("event test allSpots/Touches",Event.getPlayerSpotTotalCount(2, Event._roundId()), Event.getPlayerTouchCount(2, Event._roundId()))
+        print("event test allSpots/Touches",Event.getPlayerSpotTotalCount(2, Round.getActiveId()), Event.getPlayerTouchCount(2, Round.getActiveId()))

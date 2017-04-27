@@ -60,7 +60,7 @@ def main():
     Action.addPlayersToTeams()
     Team.getTeamsIdNameList(Round.getActiveId())
 
-    Event.addTestEvents(Round.getActiveId())
+#    Event.addTestEvents()
 
     Action.addTestAction()
 
@@ -81,3 +81,4 @@ if __name__ == "__main__":
 # get full team stats as JSON. Saved in file
 # return variables some are duples (var,)
 # event analysis on rounds
+#equality ! check types

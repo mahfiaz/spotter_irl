@@ -17,46 +17,55 @@ class Action:
 
     def handleCode(mobile, code):
         senderId = Player.getMobileOwnerId(mobile)
-        victimId = Code.getVictimIdByCode(code)
         senderJailed = Event.isPlayerJailed(senderId)
-        victimJailed = Event.isPlayerJailed(victimId)
         if not senderId:
             print("this player has not been signed up for the game", mobile)
             # send back sms "come to the base and sign up"
             #Event.addStrangeSms(mobile, code)
             return
+        if not Round.updateActiveId():
+            print("currently no active round. no action goes through")
+            #send sms round starts at....
+            addObscureMessage(senderId, code)
+            return
+        victimId, codeValid = Code.getVictimIdByCode(code)
+        victimJailed = Event.isPlayerJailed(victimId)
         if senderJailed:
-            print(senderId, " jailed, could not spot anybody")
+            print(senderId[0], " jailed, could not spot anybody")
             # sms: teleport to the base.
             return
         if not victimId:
-            print(senderId, "had a missed hit")
+            print(senderId[0], "had a missed hit")
             Event.addFailedSpot(senderId, code)
             Action.updateStats()
             return
+        if not codeValid:
+            print(victimId, "is either wearing old codes or ", senderId, " has a longtime memory")
+            Event.addWasAimedWithOldCode(victimId, code)
+            return
         if victimJailed:
-            print(victimId, "victim jailed.", senderId, " is using old information")
+            print(victimId[0], "victim jailed.", senderId[0], " is using old information")
             # sms victim: teleport to the base
             return
         if senderId == victimId:
-            print(senderId, "exposed self to authorities")
+            print(senderId[0], "exposed self to authorities")
             Event.addExposeSelf(victimId)
             Action.updateStats()
             # suicide sms
             return
         if Team.getPlayerTeamId(senderId, Round.getActiveId()) == Team.getPlayerTeamId(victimId, Round.getActiveId()):
-            print(senderId, " did hit teammate ", victimId)
+            print(senderId[0], " did hit teammate ", victimId)
             Event.addSpotMate(senderId, victimId)
             Action.updateStats()
             # friendly fire warning sms
             return
         else:
             if Code._isValidSpotCodeFormat(code):
-                print(senderId, " spotted ", victimId)
+                print(senderId[0], " spotted ", victimId[0])
                 Event.addSpot(senderId, victimId)
                 # sms: successful spotting
             elif Code._isValidTouchCodeFormat(code):
-                print(senderId, " touched ", victimId)
+                print(senderId[0], " touched ", victimId[0])
                 Event.addTouch(senderId, victimId)
                 # sms: successful touch
             Action.updateStats()
@@ -137,30 +146,32 @@ class Action:
             Action.addPlayer(each['name'], each['mobile'], each['email'])
         Player.printDetailed()
 
-    def addTestAction():
-        for playerId in Player.getAllPlayerIds():
-            Code.generateNewCodes(playerId)
+#    def addTestAction():
+#        for playerId in Player.getAllPlayerIds():
+#            Code.generateNewCodes(playerId)
 #            Action._flee(playerId)
-        Player.printDetailed()
-        Action.addTestAction2()
+#        Player.printDetailed()
+#        Action.addTestAction2()
 
-    def addTestAction2():
+    def addTestAction():
         Player.printDetailed()
-        Action.fleePlayerWithCode(1, Player.getFleeingCode(1))
+
+        for playerId in Player.getAllPlayerIds():
+            Action.fleePlayerWithCode(playerId, Player.getFleeingCode(playerId))
 
         print("1-1")
         Action.handleCode(Player.getMobileById(1), Code.getSpotCodeByPlayerId(1))
         Action.fleePlayerWithCode(4, Player.getFleeingCode(4))
         Player.printDetailed()
 
-        time.sleep(1)
+        time.sleep(0.1)
         print("4-1")
         Action.handleCode(Player.getMobileById(4), Code.getSpotCodeByPlayerId(1))
         Player.printDetailed()
         Action.fleePlayerWithCode(1, Player.getFleeingCode(1))
         Player.printDetailed()
 
-        time.sleep(1)
+        time.sleep(0.1)
 
         print("4-1")
         Action.handleCode(Player.getMobileById(4), Code.getSpotCodeByPlayerId(1))
@@ -168,14 +179,14 @@ class Action:
         Action.fleePlayerWithCode(4, Player.getFleeingCode(4))
         Player.printDetailed()
 
-        time.sleep(1)
+        time.sleep(0.1)
         print("1-2")
         Action.handleCode(Player.getMobileById(1), Code.getSpotCodeByPlayerId(2))
         Player.printDetailed()
         Action.fleePlayerWithCode(2, Player.getFleeingCode(2))
         Action.fleePlayerWithCode(2, Player.getFleeingCode(1))
         Player.printDetailed()
-        time.sleep(1)
+        time.sleep(0.1)
 
         Action.fleePlayerWithCode(1, Player.getFleeingCode(1))
         Action.fleePlayerWithCode(3, Player.getFleeingCode(3))
@@ -184,7 +195,7 @@ class Action:
         Player.printDetailed()
         Action.fleePlayerWithCode(1, Player.getFleeingCode(1))
         Player.printDetailed()
-        time.sleep(1)
+        time.sleep(0.1)
 
         Action.handleCode(Player.getMobileById(1), Code.getSpotCodeByPlayerId(4))
         Player.printDetailed()

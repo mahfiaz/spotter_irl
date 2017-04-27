@@ -5,6 +5,7 @@ import game_config
 dateformat = game_config.database_dateformat
 
 class Round():
+    _activeId = 0
 
     def initOnce(cursor):
         Round.cur = cursor
@@ -31,16 +32,15 @@ class Round():
             print("Error: New round has overlapping time. not added", name, time_start, time_end)
             return False
 
-    def getActiveId():
-        Round.cur.execute("""SELECT round_id, round_name
+    def updateActiveId():
+        Round.cur.execute("""SELECT round_id
             FROM round_data 
             WHERE (round_start <= statement_timestamp() AND round_end > statement_timestamp())""")
-        active = Round.cur.fetchone()
-        if active:
-            id, name = active
-            return id
-        else:
-            return False
+        Round._activeId = Round.cur.fetchone()
+        return Round._activeId
+
+    def getActiveId():
+        return Round._activeId
 
     def isActive():
         if Round.getActiveId():
