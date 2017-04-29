@@ -32,4 +32,10 @@
    <FileRef
       location = "group:../reset_db.py">
    </FileRef>
+   <FileRef
+      location = "group:../test.py">
+   </FileRef>
+   <FileRef
+      location = "group:../connect.py">
+   </FileRef>
 </Workspace>

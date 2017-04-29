@@ -32,8 +32,7 @@ class Player:
             Player._generateFleeingCode(newId)
             return newId
         else:
-            print("not entirely unique player. not added")
-        return False
+            print("Error.", name ,"not entirely unique player. Not added!")
 
     def getIdByName(playerName):
         Player.cur.execute("""SELECT player_id FROM player_data

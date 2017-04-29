@@ -124,13 +124,3 @@ class Event():
         timestamp = Event.cur.fetchall()
         if timestamp:
             return timestamp[0][0]
-
-    def addTestEvents():
-        Event.addSpot(2, 3)
-        Event.addTouch(3, 2)
-        Event.addTouch(2, 4)
-        Event.addFailedSpot(1, 6956)
-        Event.addAlreadyJailedSpot(1, 3392)
-        Event.addSpotMate(1, 2)
-        Event.addSpot(2, 4)
-        print("event test allSpots/Touches",Event.getPlayerSpotTotalCount(2, Round.getActiveId()), Event.getPlayerTouchCount(2, Round.getActiveId()))

@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
-import psycopg2
-import datetime
-import time
-import random
-import game_config
+#import game_config
+
+import connect
 
 from engine.event import *
 from engine.action import *
@@ -12,18 +10,6 @@ from engine.code import *
 from engine.player import *
 from engine.round import *
 from engine.team import *
-
-
-def connectDB():
-    database, host = (game_config.connection_dbname, game_config.connection_host)
-    user, password = (game_config.connection_user, game_config.connection_password)
-    connParams = "dbname='" + database + "' user='" + user + "' host='" + host + "' password='" + password + "'"
-    try:
-        connection = psycopg2.connect(connParams)
-        return connection
-    except:
-        print ("Error. Unable to connect to the database. If losing data is acceptable, try running 'python reset_db.py'")
-        return False
 
 
 
@@ -41,7 +27,7 @@ def processInput():
         Player.printDetailed()
 
 def main():
-    connection = connectDB()
+    connection = connect.connectDB()
     if not connection:
         return
     cursor = connection.cursor()
@@ -77,6 +63,7 @@ if __name__ == "__main__":
 
 #TODO
 # private members _underscore
+# round start-end timer - respawn timer etc
 # if new round starts - start it at event too Event.setRoundId
 # get full team stats as JSON. Saved in file
 # return variables some are duples (var,)

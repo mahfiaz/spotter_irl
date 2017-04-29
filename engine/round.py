@@ -1,5 +1,7 @@
-import time
 import datetime
+import time
+from threading import Timer
+
 import game_config
 
 dateformat = game_config.database_dateformat
@@ -32,12 +34,69 @@ class Round():
             print("Error: New round has overlapping time. not added", name, time_start, time_end)
             return False
 
+    def _getStartTimeOfNext():
+        Round.cur.execute("""SELECT round_start
+            FROM round_data 
+            WHERE (round_start > statement_timestamp())
+            ORDER BY round_start ASC""")
+        return Round.cur.fetchone()
+
+    def _getEndTimeOfActive():
+        Round.cur.execute("""SELECT round_end
+            FROM round_data 
+            WHERE round_id = %s""", [Round.getActiveId()])
+        return Round.cur.fetchone()
+
+    def getActiveName():
+        Round.cur.execute("""SELECT round_name
+            FROM round_data 
+            WHERE round_id = %s""", [Round.getActiveId()])
+        return Round.cur.fetchone()
+
     def updateActiveId():
         Round.cur.execute("""SELECT round_id
             FROM round_data 
             WHERE (round_start <= statement_timestamp() AND round_end > statement_timestamp())""")
-        Round._activeId = Round.cur.fetchone()
+        activeId = Round.cur.fetchone()
+        Round._checkRoundChange(activeId)
         return Round._activeId
+
+    def _minutesLeftCall(left):
+        print("Round", Round.getActiveName(), "is ending. minutes left:", left)
+
+    def _roundOverCall():
+        print("Round", Round.getActiveName(), "is over. Get to the base!")
+        Round.updateActiveId()
+
+    def _checkRoundChange(newActiveId):
+        if Round._activeId != newActiveId:
+            if Round.existingId(newActiveId):
+                Round._roundStart(newActiveId)
+            else:
+                Round._roundEnd()
+
+    def _roundStartCall():
+        Round.updateActiveId()
+        print("Round", Round.getActiveName(), "started!")
+
+    def _roundEnd():
+        next = Round._getStartTimeOfNext()
+        if next:
+            delay = next[0] - datetime.datetime.now()
+            Timer(delay.total_seconds() + 1, Round._roundStartCall, ()).start()
+
+
+    def _roundStart(newActiveId):
+        Round._activeId = newActiveId
+        ends = Round._getEndTimeOfActive()[0]
+        early5 = ends - datetime.timedelta(seconds = 2)
+        early1 = ends - datetime.timedelta(seconds = 1)
+        if datetime.datetime.now() < early5:
+            Timer((early5 - datetime.datetime.now()).total_seconds(), Round._minutesLeftCall, (2,)).start()
+        if datetime.datetime.now() < early1:
+            Timer((early1 - datetime.datetime.now()).total_seconds(), Round._minutesLeftCall, (1,)).start()
+        if datetime.datetime.now() < ends:
+            Timer((ends - datetime.datetime.now()).total_seconds(), Round._roundOverCall, ()).start()
 
     def getActiveId():
         return Round._activeId
@@ -47,6 +106,13 @@ class Round():
             return True
         else:
             return False
+
+    def existingId(roundId):
+        Round.cur.execute("""SELECT round_id
+            FROM round_data 
+            WHERE round_id = %s""", [roundId])
+        if Round.cur.fetchone():
+            return True
 
     def print():
         Round.cur.execute("""SELECT round_id, round_name, round_start, round_end
@@ -60,19 +126,4 @@ class Round():
             if id == active:
                 indicator = " * "
             print(indicator, id, name, time1, time2)
-
-    def addTestRounds():
-        time.strftime(dateformat)
-        time1 = format(datetime.datetime.now() + datetime.timedelta(hours = -2), dateformat)
-        time2 = format(datetime.datetime.now() + datetime.timedelta(hours = -1), dateformat)
-        time3 = format(datetime.datetime.now() + datetime.timedelta(hours = 0), dateformat)
-        time4 = format(datetime.datetime.now() + datetime.timedelta(hours = 1), dateformat)
-
-        dataDict = ({"name":"eelmine mäng", "time_start":time1, "time_end":time2},
-                {"name":"praegune mäng", "time_start":time2, "time_end":time3},
-                {"name":"järgmine mäng", "time_start":time3, "time_end":time4})
-        Round.add("eelmine mäng", time1, time2)
-        Round.add("praegune mäng", time2, time3)
-        Round.add("järgmine mäng", time3, time4)
-        Round.add("vale mäng", time2, time4)
 

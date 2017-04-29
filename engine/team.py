@@ -1,5 +1,6 @@
 #import player
 from .player import Player
+from .round import Round
 
 class Team:
 
@@ -21,13 +22,16 @@ class Team:
             added timestamp DEFAULT statement_timestamp() )""")
 
     def add(teamName, roundId):
+        if not Round.existingId(roundId):
+            print("Error. Team", teamName, "not added, because roundId", roundId, "doesn't exist.")
+            return
         if not Team.getIdByName(teamName, roundId):
             Team.cur.execute("""INSERT INTO team_list (team_name, round_id)
                 VALUES (%s, %s)""", (teamName, roundId))
-            print("Team ", teamName, " added.")
+            print("Team", teamName, "added.")
             return Team.getIdByName(teamName, roundId)
         else:
-            print("Warning! Team ", teamName, " already exists.")
+            print("Warning! Team", teamName, "not added, it already exists.")
 
     def getIdByName(teamName, roundId):
         Team.cur.execute("""SELECT team_id
@@ -65,7 +69,7 @@ class Team:
 
 #team_id, team_name
 #WHERE round_id = %s
-    def getTeamsIdNameList(roundId):
+    def getTeamsIdNameList():
         Team.cur.execute("""SELECT team_id, team_name
             FROM team_list""")
         return Team.cur.fetchall()
