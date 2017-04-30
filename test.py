@@ -34,22 +34,24 @@ def addTestRounds():
 
 
 def addTestTeams():
-    teamCount = len(Team.getTeamsIdNameList(Round.getActiveId()))
+    teamCount = len(Team.getTeamsIdList(Round.getActiveId()))
+    # shouldnt add, because roundId invalid
     Team.add(teamName1, roundId = 0)
-    assert len(Team.getTeamsIdNameList(Round.getActiveId())) == teamCount
+    assert len(Team.getTeamsIdList(Round.getActiveId())) == teamCount
 
+    # shouldnt add, because roundId invalid
     Team.add(teamName2, roundId = 0)
-    assert len(Team.getTeamsIdNameList(Round.getActiveId())) == teamCount
+    assert len(Team.getTeamsIdList(Round.getActiveId())) == teamCount
 
     Team.add(teamName1, roundId = Round.getActiveId())
-    assert len(Team.getTeamsIdNameList(Round.getActiveId())) == teamCount + 1
+    assert len(Team.getTeamsIdList(Round.getActiveId())) == teamCount + 1
 
     Team.add(teamName2, roundId = Round.getActiveId())
-    assert len(Team.getTeamsIdNameList(Round.getActiveId())) == teamCount + 2
+    assert len(Team.getTeamsIdList(Round.getActiveId())) == teamCount + 2
 
     # should not add, because name is not unique
     Team.add(teamName1, roundId = Round.getActiveId())
-    assert len(Team.getTeamsIdNameList(Round.getActiveId())) == teamCount + 2
+    assert len(Team.getTeamsIdList(Round.getActiveId())) == teamCount + 2
 
 
 def addTestPlayers():
@@ -78,8 +80,8 @@ def addTestPlayers():
 def addPlayersToTeams():
     players = Player.getAllPlayerIds()
     for pl1, pl2 in zip(players[0::2], players[1::2]):
-        Team.addPlayer(pl1, Team.getIdByName(teamName1, Round.getActiveId()))
-        Team.addPlayer(pl2, Team.getIdByName(teamName2, Round.getActiveId()))
+        Team.addPlayer(pl1, Team._getIdByName(teamName1, Round.getActiveId()))
+        Team.addPlayer(pl2, Team._getIdByName(teamName2, Round.getActiveId()))
 
 
 def addTestAction():
@@ -162,7 +164,7 @@ def main():
     addTestPlayers()
     addPlayersToTeams()
     addTestAction()
-    print(Action.getAllStats(Round.getActiveId()))
+    print(Action.getRoundStats())
 
 if __name__ == "__main__":
     main()

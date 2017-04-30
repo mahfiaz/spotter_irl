@@ -1,10 +1,12 @@
 import random
-
+import game_config
+import math
 
 from .event import Event
 
 class Player:
 
+# init
     def initOnce(cursor):
         Player.cur = cursor
         Player._createDataTable()
@@ -19,6 +21,7 @@ class Player:
             player_fleeing_code int DEFAULT 0,
             player_created timestamp DEFAULT statement_timestamp() )""")
 
+# modify
     def add(name, mobile, email):
         Player.cur.execute("""SELECT player_name, player_mobile, player_email
             FROM player_data 
@@ -28,13 +31,14 @@ class Player:
         if not rows:
             Player.cur.execute("""INSERT INTO player_data (player_name, player_mobile, player_email) VALUES (%s, %s, %s)""", (name, mobile, email))
             print("Player added.", name, mobile, email)
-            newId = Player.getIdByName(name)
+            newId = Player._getIdByName(name)
             Player._generateFleeingCode(newId)
             return newId
         else:
             print("Error.", name ,"not entirely unique player. Not added!")
 
-    def getIdByName(playerName):
+# gets
+    def _getIdByName(playerName):
         Player.cur.execute("""SELECT player_id FROM player_data
             WHERE player_name = %s""", [playerName])
         return Player.cur.fetchone()
@@ -54,10 +58,12 @@ class Player:
             WHERE player_id = %s""", [playerId])
         return Player.cur.fetchone()
 
+# flee
     def _generateFleeingCode(playerId):
+        codeMax = math.pow(10, game_config.player_fleeingCodeDigits)
         Player.cur.execute("""UPDATE player_data
             SET player_fleeing_code = %s
-            WHERE player_id = %s""", (random.randint(100,999), playerId))
+            WHERE player_id = %s""", (random.randint(codeMax / 10, codeMax - 1), playerId))
 
     def checkFleeingCode(playerId, code):
         return Player.getFleeingCode(playerId) == code
@@ -67,6 +73,7 @@ class Player:
             WHERE player_id = %s""", [playerId])
         return Player.cur.fetchone()
 
+# list
     def getAllPlayerIds():
         Player.cur.execute("""SELECT player_id FROM player_data """)
         return Player.cur.fetchall()
@@ -79,6 +86,7 @@ class Player:
         for player in rows:
             print(" - ", player[1], player[2], player[3])
 
+# print
     def printDetailed():
         Player.cur.execute("""SELECT player_data.player_id, player_data.player_name, player_data.player_mobile, team_players.team_id, player_data.player_fleeing_code, code_list.spot_code, code_list.touch_code
             FROM player_data 

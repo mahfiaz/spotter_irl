@@ -5,18 +5,29 @@ from .round import Round
 from .team import Team
 import game_config
 
+import json
 import time
 from threading import Timer
 
 class Action:
 
+# init
     def initAllOnce(cursor):
         Round.initOnce(cursor)
         Player.initOnce(cursor)
         Code.initOnce(cursor)
         Team.initOnce(cursor)
         Event.initOnce(cursor)
+        Round.setCallbacks(roundStarted = Action._roundStartedCall, roundEnding = Action._roundEndingCall, roundEnded = Action._roundEndedCall)
 
+# modify
+    def addPlayer(name, mobile, email):
+        newPlayerId = Player.add(name, mobile, email)
+        if newPlayerId:
+            Event.addPlayer(newPlayerId)
+        return newPlayerId
+
+# handle code
     def handleCode(mobile, code):
         senderId = Player.getMobileOwnerId(mobile)
         senderJailed = Event.isPlayerJailed(senderId)
@@ -72,15 +83,12 @@ class Action:
                 # sms: successful touch
             Action.updateStats()
 
-    def updateStats():
-        roundSecondsLeft = Round.getActiveSecondsLeft()
-        pass
-
-    def addPlayer(name, mobile, email):
-        newPlayerId = Player.add(name, mobile, email)
-        if newPlayerId:
-            Event.addPlayer(newPlayerId)
-        return newPlayerId
+# flee
+    def fleePlayerWithCode(playerId, fleeingCode):
+        if Player.checkFleeingCode(playerId, fleeingCode):
+            Action._flee(playerId)
+        else:
+            print("sorry, this fleeing code did not match!")
 
     def _fleeTimerCall(playerId):
         print(playerId, ", your fleeing protection is over, make the codes visible!")
@@ -97,14 +105,13 @@ class Action:
             print(playerId, "In liberty, couldnt flee!")
             return False
 
-    def fleePlayerWithCode(playerId, fleeingCode):
-        if Player.checkFleeingCode(playerId, fleeingCode):
-            Action._flee(playerId)
-        else:
-            print("sorry, this fleeing code did not match!")
+# stats
+    def updateStats():
+#        roundSecondsLeft = Round.getActiveSecondsLeft()
+        stats = Action._calcAllStats(Round.getActiveId())
+        Action._storeStats(stats)
 
     def getPlayerStats(playerId, roundId):
-#        roundId, name = Round.getActiveId()
         stats = [{
             'name'              : Player.getNameById(playerId)[0],
             'totalSpots'        : Event.getPlayerSpotTotalCount(playerId, roundId),
@@ -112,7 +119,7 @@ class Action:
             'jailed'            : Event.getPlayerJailedCount(playerId, roundId),
             'teamDisloyality'   : Event.getPlayerDisloyalityCount(playerId, roundId),
             'accuracy'          : Event.getSpottingAccuracy(playerId, roundId),
-            'lastActivity'      : Event.getPlayerLastActivity(playerId)
+            'lastActivity'      : Event.getPlayerLastActivity(playerId).strftime(game_config.database_dateformat)
         }]
         return stats
 
@@ -123,18 +130,38 @@ class Action:
             teamStats += Action.getPlayerStats(player, roundId)
         return teamStats
 
-    def getAllStats(roundId):
-#        print(teams)
-        teams = Team.getTeamsIdNameList(roundId)
+    def _calcAllStats(roundId):
+        teamIds = Team.getTeamsIdList(roundId)
         allTeams = []
-        for team in teams:
-            id, name = team
+        for id in teamIds:
             allTeams.append([{
-                'teamName'      : name,
+                'teamId'        : id,
+                'teamName'      : Team.getNameById(id),
                 'players'       : Action.getTeamStats(id, roundId)}])
         roundStats = [{
             'roundId'           : roundId,
             'roundName'         : Round.getName(roundId),
+            'roundEnd'          : Round._getEndTimeOfActive().strftime(game_config.database_dateformat),
             'teams'             : allTeams}]
         return roundStats
+
+    def _storeStats(stats):
+        if stats:
+            with open('stats.json', 'w') as jsonFile:
+                json.dump(stats, jsonFile)
+
+    def getRoundStats():
+        with open('stats.json') as jsonFile:
+            stats = json.load(jsonFile)[0]
+            return stats
+
+# round calls
+    def _roundStartedCall():
+        print("Round", Round.getName(Round.getActiveId())[0], "started!")
+
+    def _roundEndingCall(left):
+        print("Round", Round.getName(Round.getActiveId())[0], "is ending. minutes left:", left)
+
+    def _roundEndedCall():
+        print("Round", Round.getName(Round.getActiveId())[0], "is over. Get to the base!")
 

@@ -9,6 +9,7 @@ EventType = enum('didFlee', 'didSpot', 'didTouch', 'failedSpot', 'didSpotJailed'
 
 class Event():
 
+# init
     def initOnce(cursor):
         Event.cur = cursor
         Event._createDataTable()

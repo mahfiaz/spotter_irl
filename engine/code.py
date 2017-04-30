@@ -1,7 +1,11 @@
+import math
 import random
+
+import game_config
 
 class Code:
 
+# init
     def initOnce(cursor):
         Code.cur = cursor
         Code._createDataTable()
@@ -14,12 +18,7 @@ class Code:
             player_id int,
             added timestamp DEFAULT statement_timestamp())""")
 
-    def _isValidSpotCodeFormat(code):
-        return isinstance(code, int) and (code > 999 and code < 10000)
-
-    def _isValidTouchCodeFormat(code):
-        return isinstance(code, int) and (code > 99999 and code < 1000000)
-
+# gets
     def getVictimIdByCode(code):
         result = 0
         if Code._isValidSpotCodeFormat(code):
@@ -31,6 +30,27 @@ class Code:
             playerId = (playerId,)
             codeId = (codeId,)
             return playerId, Code._isActiveCode(playerId, codeId)
+
+    def getTouchCodeByPlayerId(playerId):
+        codeId = Code._getCodeIdByPlayerId(playerId)
+        code = Code._getTouchCodeById(codeId)
+        if code:
+            return code[0]
+
+    def getSpotCodeByPlayerId(playerId):
+        codeId = Code._getCodeIdByPlayerId(playerId)
+        code = Code._getSpotCodeById(codeId)
+        if code:
+            return code[0]
+
+# internals
+    def _isValidSpotCodeFormat(code):
+        codeMax = math.pow(10, game_config.code_spotCodeDigits)
+        return isinstance(code, int) and (code > (codeMax / 10) and code < (codeMax - 1))
+
+    def _isValidTouchCodeFormat(code):
+        codeMax = math.pow(10, game_config.code_touchCodeDigits)
+        return isinstance(code, int) and (code > (codeMax / 10) and code < (codeMax - 1))
 
     def _getSpotCodeOwnerId(code):
         Code.cur.execute("""SELECT player_id, code_id
@@ -61,19 +81,6 @@ class Code:
             WHERE spot_code = %s""", [code])
         return Code.cur.fetchone()
 
-    def getTouchCodeByPlayerId(playerId):
-        codeId = Code._getCodeIdByPlayerId(playerId)
-        code = Code._getTouchCodeById(codeId)
-        if code:
-            return code[0]
-
-    def getSpotCodeByPlayerId(playerId):
-        codeId = Code._getCodeIdByPlayerId(playerId)
-        code = Code._getSpotCodeById(codeId)
-        if code:
-            return code[0]
-
-
     def _getSpotCodeById(spotId):
         Code.cur.execute("""SELECT spot_code
             FROM code_list
@@ -86,7 +93,7 @@ class Code:
             WHERE code_id = %s""", [touchId])
         return Code.cur.fetchone()
 
-
+# generate
     def generateNewCodes(playerId):
         spotCode = Code._generateSpotCode()
         touchCode = Code._generateTouchCode()
@@ -99,16 +106,18 @@ class Code:
         return codeId
 
     def _generateSpotCode():
+        codeMax = math.pow(10, game_config.code_spotCodeDigits)
         fail = True
         while fail:
-            newCode = random.randint(1000,9999)
+            newCode = random.randint(codeMax / 10, codeMax - 1)
             fail = Code._getSpotCodeOwnerId(newCode)
         return newCode
 
     def _generateTouchCode():
+        codeMax = math.pow(10, game_config.code_touchCodeDigits)
         fail = True
         while fail:
-            newCode = random.randint(100000,999999)
+            newCode = random.randint(codeMax / 10, codeMax - 1)
             fail = Code._getTouchCodeOwnerId(newCode)
         return newCode
 

@@ -44,13 +44,12 @@ def main():
 
     Action.addTestTeams()
     Action.addPlayersToTeams()
-    Team.getTeamsIdNameList(Round.getActiveId())
 
 #    Event.addTestEvents()
 
     Action.addTestAction()
 
-    print(Action.getAllStats(Round.getActiveId()))
+    print(Action._calcAllStats(Round.getActiveId()))
     #Action.addTestAction2()
 
 #    while True:
@@ -63,9 +62,7 @@ if __name__ == "__main__":
 
 #TODO
 # private members _underscore
-# round start-end timer - respawn timer etc
 # if new round starts - start it at event too Event.setRoundId
-# get full team stats as JSON. Saved in file
 # return variables some are duples (var,)
 # event analysis on rounds
 #equality ! check types

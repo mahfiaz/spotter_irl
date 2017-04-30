@@ -8,7 +8,11 @@ dateformat = game_config.database_dateformat
 
 class Round():
     _activeId = 0
-
+    _callRoundStarted = None
+    _callRoundEnding = None
+    _callRoundEnded = None
+    
+# init
     def initOnce(cursor):
         Round.cur = cursor
         Round._createDataTable()
@@ -20,6 +24,7 @@ class Round():
             round_start TIMESTAMP,
             round_end TIMESTAMP)""")
 
+# modify
     def add(name, time_start, time_end):
         Round.cur.execute("""SELECT round_name
             FROM round_data 
@@ -33,6 +38,7 @@ class Round():
         else:
             print("Error: New round has overlapping time. not added", name, time_start, time_end)
 
+# state
     def getActiveId():
         return Round._activeId
 
@@ -60,7 +66,7 @@ class Round():
     def getActiveSecondsLeft():
         ends = Round._getEndTimeOfActive()
         if ends:
-            return (ends[0] - datetime.datetime.now()).total_seconds()
+            return (ends - datetime.datetime.now()).total_seconds()
 
     def _getStartTimeOfNext():
         Round.cur.execute("""SELECT round_start
@@ -73,8 +79,9 @@ class Round():
         Round.cur.execute("""SELECT round_end
             FROM round_data 
             WHERE round_id = %s""", [Round.getActiveId()])
-        return Round.cur.fetchone()
-
+        ends = Round.cur.fetchone()
+        if ends:
+            return ends[0]
 # round automatic restarting and finishing
     def updateActiveId():
         Round.cur.execute("""SELECT round_id
@@ -99,7 +106,7 @@ class Round():
 
     def _roundStart(newActiveId):
         Round._activeId = newActiveId
-        ends = Round._getEndTimeOfActive()[0]
+        ends = Round._getEndTimeOfActive()
         early5 = ends - datetime.timedelta(seconds = 2)
         early1 = ends - datetime.timedelta(seconds = 1)
         if datetime.datetime.now() < early5:
@@ -109,18 +116,27 @@ class Round():
         if datetime.datetime.now() < ends:
             Timer((ends - datetime.datetime.now()).total_seconds(), Round._roundOverCall, ()).start()
 
-#callbacks
+# callbacks
+    def setCallbacks(roundStarted, roundEnding, roundEnded):
+        Round._callRoundStarted = roundStarted
+        Round._callRoundEnding = roundEnding
+        Round._callRoundEnded = roundEnded
+
     def _roundStartCall():
         Round.updateActiveId()
-        print("Round", Round.getName(Round.getActiveId())[0], "started!")
+        if Round._callRoundStarted:
+            Round._callRoundStarted()
+
     def _minutesLeftCall(left):
-        print("Round", Round.getName(Round.getActiveId())[0], "is ending. minutes left:", left)
+        if Round._callRoundEnding:
+            Round._callRoundEnding(left)
 
     def _roundOverCall():
-        print("Round", Round.getName(Round.getActiveId())[0], "is over. Get to the base!")
         Round.updateActiveId()
+        if Round._callRoundEnded:
+            Round._callRoundEnded()
 
-#print
+# print
     def print():
         Round.cur.execute("""SELECT round_id, round_name, round_start, round_end
             FROM round_data """)
