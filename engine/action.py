@@ -229,11 +229,13 @@ class Action:
         else:
             if Code._isValidSpotCodeFormat(code):
                 Event.addSpot(senderId, victimId)
+                Action.updateStats()
                 Sms.spotted(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
             elif Code._isValidTouchCodeFormat(code):
                 Event.addTouch(senderId, victimId)
+                Action.updateStats()
                 Sms.touched(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
-            Action.updateStats()
+
 
 # flee
     def fleePlayerWithCode(fleeingCode):
@@ -264,39 +266,51 @@ class Action:
 #        roundSecondsLeft = Round.getActiveSecondsLeft()
         stats = Action._calcAllStats(Round.getActiveId())
         Action._storeStats(stats)
+        Action.printRoundStats(stats)
+#        print(stats)
 
     def getPlayerStats(playerId, roundId):
-        stats = [{
-            'name'              : Player.getNameById(playerId)[0],
+        stats = {
+            'name'              : Player.getNameById(playerId),
             'totalSpots'        : Event.getPlayerSpotTotalCount(playerId, roundId),
             'touchCount'        : Event.getPlayerTouchCount(playerId, roundId),
             'jailed'            : Event.getPlayerJailedCount(playerId, roundId),
-            'teamDisloyality'   : Event.getPlayerDisloyalityCount(playerId, roundId),
-            'accuracy'          : Event.getSpottingAccuracy(playerId, roundId),
+            'disloyality'   : Event.getPlayerDisloyalityCount(playerId, roundId),
             'lastActivity'      : Event.getPlayerLastActivity(playerId).strftime(game_config.database_dateformat)
-        }]
+        }
         return stats
 
     def getTeamStats(teamId, roundId):
         players = Team.getTeamPlayerIdList(teamId)
-        teamStats = []
+        teamStats = {
+            'name'              : Team.getNameById(teamId),
+            'totalSpots'        : 0,
+            'touchCount'        : 0,
+            'jailed'            : 0,
+            'disloyality'   : 0}
+        playerStats = []
         for player in players:
-            teamStats += Action.getPlayerStats(player, roundId)
+            person = Action.getPlayerStats(player, roundId)
+            playerStats.append(person)
+            teamStats['totalSpots'] += person['totalSpots']
+            teamStats['touchCount'] += person['touchCount']
+            teamStats['jailed'] += person['jailed']
+            teamStats['disloyality'] += person['disloyality']
+        teamStats['score'] = teamStats['totalSpots'] + teamStats['touchCount'] - teamStats['jailed'] - teamStats['disloyality']
+        teamStats['players'] = playerStats
         return teamStats
 
     def _calcAllStats(roundId):
         teamIds = Team.getTeamsIdList(roundId)
         allTeams = []
         for id in teamIds:
-            allTeams.append([{
-                'teamId'        : id,
-                'teamName'      : Team.getNameById(id),
-                'players'       : Action.getTeamStats(id, roundId)}])
-        roundStats = [{
+            allTeams.append(Action.getTeamStats(id, roundId))
+        roundStats = {
             'roundId'           : roundId,
             'roundName'         : Round.getName(roundId),
-            'roundEnd'          : Round._getEndTimeOfActive().strftime(game_config.database_dateformat),
-            'teams'             : allTeams}]
+            'roundStart'        : Round.getStartTime(roundId).strftime(game_config.database_dateformat),
+            'roundEnd'          : Round.getEndTime(roundId).strftime(game_config.database_dateformat),
+            'teams'             : allTeams}
         return roundStats
 
     def _storeStats(stats):
@@ -308,6 +322,9 @@ class Action:
         with open('stats.json') as jsonFile:
             stats = json.load(jsonFile)[0]
             return stats
+
+    def printRoundStats(stats):
+        print( json.dumps(stats, sort_keys=False, indent=4) )
 
 # round calls
     def _roundStartedCall():

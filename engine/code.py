@@ -21,29 +21,23 @@ class Code:
 
 # gets
     def getVictimIdByCode(code):
-        result = 0
+        result = None
         if Code._isValidSpotCodeFormat(code):
             result = Code._getSpotCodeOwnerId(code)
         if Code._isValidTouchCodeFormat(code):
             result = Code._getTouchCodeOwnerId(code)
         if result:
             playerId, codeId = result
-            playerId = (playerId,)
-            codeId = (codeId,)
             return playerId, Code._isActiveCode(playerId, codeId)
         return None, None
 
     def getTouchCodeByPlayerId(playerId):
         codeId = Code._getCodeIdByPlayerId(playerId)
-        code = Code._getTouchCodeById(codeId)
-        if code:
-            return code[0]
+        return Code._getTouchCodeById(codeId)
 
     def getSpotCodeByPlayerId(playerId):
         codeId = Code._getCodeIdByPlayerId(playerId)
-        code = Code._getSpotCodeById(codeId)
-        if code:
-            return code[0]
+        return Code._getSpotCodeById(codeId)
 
 # internals
     def _isValidSpotCodeFormat(code):
@@ -59,16 +53,17 @@ class Code:
         Code.cur.execute("""SELECT player_id, code_id
             FROM code_list
             WHERE spot_code = %s""", [code])
-        return iterateZero(Code.cur.fetchone())
+        return Code.cur.fetchone()
 
     def _getTouchCodeOwnerId(code):
         Code.cur.execute("""SELECT player_id, code_id
             FROM code_list
             WHERE touch_code = %s""", [code])
-        return iterateZero(Code.cur.fetchone())
+        return Code.cur.fetchone()
 
     def _isActiveCode(playerId, codeId):
         otherCodeId = Code._getCodeIdByPlayerId(playerId)
+#        print(codeId, otherCodeId)
         assert type(codeId) == type(otherCodeId)
         return otherCodeId == codeId
 

@@ -51,6 +51,7 @@ if __name__ == "__main__":
 
 #TODO
 # input validation
+# get event list
 # multilingual support
 # add player to team - removes from other teams
 # stats to sms

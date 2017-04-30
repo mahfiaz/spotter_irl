@@ -82,6 +82,18 @@ class Round():
             WHERE round_id = %s""", [Round.getActiveId()])
         return iterateZero(Round.cur.fetchone())
 
+    def getStartTime(id):
+        Round.cur.execute("""SELECT round_start
+            FROM round_data 
+            WHERE round_id = %s""", (id,))
+        return iterateZero(Round.cur.fetchone())
+
+    def getEndTime(id):
+        Round.cur.execute("""SELECT round_end
+            FROM round_data 
+            WHERE round_id = %s""", (id,))
+        return iterateZero(Round.cur.fetchone())
+
 # round automatic restarting and finishing
     def updateActiveId():
         Round.cur.execute("""SELECT round_id
@@ -101,7 +113,7 @@ class Round():
     def _roundEnd():
         next = Round._getStartTimeOfNext()
         if next:
-            delay = next[0] - datetime.datetime.now()
+            delay = next - datetime.datetime.now()
             Timer(delay.total_seconds() + 1, Round._roundStartCall, ()).start()
 
     def _roundStart(newActiveId):

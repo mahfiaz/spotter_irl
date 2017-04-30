@@ -128,15 +128,3 @@ class Event():
             (playerId, EventType.didSpotMate, EventType.wasExposingSelf, roundId))
         return iterateZero(Event.cur.fetchone())
 
-    def getSpottingAccuracy(playerId, roundId):
-        success = Event.getPlayerSpotTotalCount(playerId, roundId)
-        Event.cur.execute("""SELECT COUNT(*) AS event_type
-            FROM event_list
-            WHERE (player_id = %s AND event_type IN (%s, %s, %s, %s, %s, %s) AND round_id = %s)""",
-            (playerId, EventType.didSpot, EventType.didSpotJailed, EventType.didTouch,
-            EventType.failedSpot, EventType.didSpotMate, EventType.wasExposingSelf, roundId))
-        all = iterateZero(Event.cur.fetchone())
-        if all:
-            return success / all
-        return 0
-

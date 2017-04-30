@@ -30,7 +30,7 @@ def addTestRoundsShort():
     Round.add("fifth", time5, time6)
     Round.add("sixth", time6, time7)
     Round.updateActiveId()
-    assert Round.getActiveId()[0] == 3
+    assert Round.getActiveId() == 3
 
 def addTestRoundsNormal():
     time.strftime(dateformat)
@@ -189,6 +189,7 @@ def testWithInput():
     addTestPlayers()
     addPlayersToTeams()
     fleeAllPlayers()
+    Action.updateStats()
     stop = False
     while not stop:
         stop = processInput()
