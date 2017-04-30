@@ -13,7 +13,7 @@ teamName1 = "Sinised"
 teamName2 = "Punased"
 
 
-def addTestRounds():
+def addTestRoundsShort():
     time.strftime(dateformat)
     time1 = format(datetime.datetime.now() + datetime.timedelta(seconds = -20), dateformat)
     time2 = format(datetime.datetime.now() + datetime.timedelta(seconds = -10), dateformat)
@@ -31,6 +31,14 @@ def addTestRounds():
     Round.add("sixth", time6, time7)
     Round.updateActiveId()
     assert Round.getActiveId()[0] == 3
+
+def addTestRoundsNormal():
+    time.strftime(dateformat)
+    time3 = format(datetime.datetime.now() + datetime.timedelta(seconds = -2), dateformat)
+    time4 = format(datetime.datetime.now() + datetime.timedelta(seconds = 10 * 60), dateformat)
+
+    Round.add("third", time3, time4)
+    Round.updateActiveId()
 
 
 def addTestTeams():
@@ -83,89 +91,124 @@ def addPlayersToTeams():
         Team.addPlayer(pl1, Team._getIdByName(teamName1, Round.getActiveId()))
         Team.addPlayer(pl2, Team._getIdByName(teamName2, Round.getActiveId()))
 
-
-def addTestAction():
-    # all players flee (spawn)
+def fleeAllPlayers():
     for playerId in Player.getAllPlayerIds():
-        Action.fleePlayerWithCode(playerId, Player.getFleeingCode(playerId))
+        Action.fleePlayerWithCode(Player.getFleeingCode(playerId))
     Player.printDetailed()
 
+def addTestAction():
     print("Not registered test")
-    Action.handleCode("4678", Code.getSpotCodeByPlayerId(1))
+    Action.handleCodeValidate("4678", Code.getSpotCodeByPlayerId(1))
 
     print("1-1")
     disloyality1 = Event.getPlayerDisloyalityCount(1, Round.getActiveId())
-    Action.handleCode(Player.getMobileById(1), Code.getSpotCodeByPlayerId(1))
+    Action.handleCodeValidate(Player.getMobileById(1), Code.getSpotCodeByPlayerId(1))
     assert Event.getPlayerDisloyalityCount(1, Round.getActiveId()) == disloyality1 + 1
-    Action.fleePlayerWithCode(4, Player.getFleeingCode(4))
+    Action.fleePlayerWithCode(Player.getFleeingCode(4))
     Player.printDetailed()
     time.sleep(0.1)
 
     print("4-1")
     spotsTotal4 = Event.getPlayerSpotTotalCount(4, Round.getActiveId())
-    Action.handleCode(Player.getMobileById(4), Code.getSpotCodeByPlayerId(1))
+    Action.handleCodeValidate(Player.getMobileById(4), Code.getSpotCodeByPlayerId(1))
     assert Event.getPlayerSpotTotalCount(4, Round.getActiveId()) == spotsTotal4
     Player.printDetailed()
-    Action.fleePlayerWithCode(1, Player.getFleeingCode(1))
+    Action.fleePlayerWithCode(Player.getFleeingCode(1))
     time.sleep(0.1)
 
     print("4-1")
     spotsTotal4 = Event.getPlayerSpotTotalCount(4, Round.getActiveId())
     jailed1 = Event.getPlayerJailedCount(1, Round.getActiveId())
-    Action.handleCode(Player.getMobileById(4), Code.getSpotCodeByPlayerId(1))
+    Action.handleCodeValidate(Player.getMobileById(4), Code.getSpotCodeByPlayerId(1))
     assert Event.getPlayerSpotTotalCount(4, Round.getActiveId()) == spotsTotal4 + 1
     assert Event.getPlayerJailedCount(1, Round.getActiveId()) == jailed1 + 1
     Player.printDetailed()
-    Action.fleePlayerWithCode(4, Player.getFleeingCode(4))
+    Action.fleePlayerWithCode(Player.getFleeingCode(4))
     time.sleep(0.1)
 
     print("1-3")
     spotsTotal1 = Event.getPlayerSpotTotalCount(1, Round.getActiveId())
-    Action.handleCode(Player.getMobileById(1), Code.getSpotCodeByPlayerId(3))
+    Action.handleCodeValidate(Player.getMobileById(1), Code.getSpotCodeByPlayerId(3))
     assert Event.getPlayerSpotTotalCount(1, Round.getActiveId()) == spotsTotal1
-    Action.fleePlayerWithCode(1, Player.getFleeingCode(1))
+    Action.fleePlayerWithCode(Player.getFleeingCode(1))
 
     print("1-3 teammate")
     spotsTotal1 = Event.getPlayerSpotTotalCount(1, Round.getActiveId())
     disloyality1 = Event.getPlayerDisloyalityCount(1, Round.getActiveId())
-    Action.handleCode(Player.getMobileById(1), Code.getSpotCodeByPlayerId(3))
+    Action.handleCodeValidate(Player.getMobileById(1), Code.getSpotCodeByPlayerId(3))
     assert Event.getPlayerSpotTotalCount(1, Round.getActiveId()) == spotsTotal1
     print(Event.getPlayerDisloyalityCount(1, Round.getActiveId()), disloyality1)
     assert Event.getPlayerDisloyalityCount(1, Round.getActiveId()) == disloyality1 + 1
 
 
-    Action.fleePlayerWithCode(2, Player.getFleeingCode(2))
-    Action.fleePlayerWithCode(2, Player.getFleeingCode(1))
+    Action.fleePlayerWithCode(Player.getFleeingCode(2))
+    Action.fleePlayerWithCode(Player.getFleeingCode(1))
     Player.printDetailed()
-    Action.fleePlayerWithCode(1, Player.getFleeingCode(1))
-    Action.fleePlayerWithCode(3, Player.getFleeingCode(3))
+    Action.fleePlayerWithCode(Player.getFleeingCode(1))
+    Action.fleePlayerWithCode(Player.getFleeingCode(3))
     time.sleep(0.1)
 
     print("1-H4", Code.getTouchCodeByPlayerId(4))
     touchTotal1 = Event.getPlayerTouchCount(1, Round.getActiveId())
-    Action.handleCode(Player.getMobileById(1), Code.getTouchCodeByPlayerId(4))
+    Action.handleCodeValidate(Player.getMobileById(1), Code.getTouchCodeByPlayerId(4))
     assert Event.getPlayerTouchCount(1, Round.getActiveId()) == touchTotal1 + 1
-    Action.fleePlayerWithCode(1, Player.getFleeingCode(1))
+    Action.fleePlayerWithCode(Player.getFleeingCode(1))
     Player.printDetailed()
     time.sleep(0.1)
 
+def processInput():
+    userText = input("Enter command [a] [s] [f] [q]: ")
+    if 'f' in userText:
+        jailCode = input("enter jail code: ")
+        Action.fleePlayerWithCode(jailCode)
+        Player.printDetailed()
+    if 's' in userText:
+        mobile = input("enter mobile: ")
+        code = input("enter code: ")
+        Action.handleCodeValidate(mobile, code)
+        Player.printDetailed()
+    if 'a' in userText:
+        name = input("enter name: ")
+        mobile = input("enter mobile: ")
+        email = input("enter email: ")
+        Action.addPlayer(name, mobile, email)
+        Player.printDetailed()
+    if 'q' in userText:
+        return True
 
-
-
-def main():
+def testWithInput():
     connection = connect.connectDB()
     if not connection:
         return
     cursor = connection.cursor()
 
     Action.initAllOnce(cursor)
-    addTestRounds()
+#    addTestRoundsShort()
+    addTestRoundsNormal()
+    addTestTeams()
+    addTestPlayers()
+    addPlayersToTeams()
+    fleeAllPlayers()
+    stop = False
+    while not stop:
+        stop = processInput()
+    return
+
+def quickTest():
+    connection = connect.connectDB()
+    if not connection:
+        return
+    cursor = connection.cursor()
+
+    Action.initAllOnce(cursor)
+    addTestRoundsShort()
     addTestTeams()
     addTestPlayers()
     addPlayersToTeams()
     addTestAction()
     print(Action.getRoundStats())
+    print("toretre", Player.getMobileById(1))
 
 if __name__ == "__main__":
-    main()
+    testWithInput()
 

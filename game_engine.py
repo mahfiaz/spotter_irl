@@ -13,18 +13,7 @@ from engine.team import *
 
 
 
-def processInput():
-    userText = input("Enter command [spot] [flee]: ")
-    if 'flee' in userText:
-        id = input("enter id: ")
-        if Player.getNameById(id):
-            Action._flee(id)
-            Player.printDetailed()
-    if 'spot' in userText:
-        mobile = input("enter mobile: ")
-        code = input("enter code: ")
-        Action.handleCode(mobile, code)
-        Player.printDetailed()
+
 
 def main():
     connection = connect.connectDB()
@@ -61,6 +50,10 @@ if __name__ == "__main__":
     main()
 
 #TODO
+# input validation
+# multilingual support
+# add player to team - removes from other teams
+# stats to sms
 # private members _underscore
 # if new round starts - start it at event too Event.setRoundId
 # return variables some are duples (var,)

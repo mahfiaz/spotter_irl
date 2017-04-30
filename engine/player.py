@@ -2,6 +2,8 @@ import random
 import game_config
 import math
 
+import psycopg2
+
 from .event import Event
 
 class Player:
@@ -30,12 +32,9 @@ class Player:
         rows = Player.cur.fetchall()
         if not rows:
             Player.cur.execute("""INSERT INTO player_data (player_name, player_mobile, player_email) VALUES (%s, %s, %s)""", (name, mobile, email))
-            print("Player added.", name, mobile, email)
             newId = Player._getIdByName(name)
             Player._generateFleeingCode(newId)
             return newId
-        else:
-            print("Error.", name ,"not entirely unique player. Not added!")
 
 # gets
     def _getIdByName(playerName):
@@ -45,8 +44,20 @@ class Player:
 
     def getNameById(playerId):
         Player.cur.execute("""SELECT player_name FROM player_data
-            WHERE player_id = %s""", [playerId])
-        return Player.cur.fetchone()
+            WHERE player_id = %s""", (playerId,))
+        try:
+            name = Player.cur.fetchone()
+            return name
+        except psycopg2.ProgrammingError:
+            Player.cur.execute("""SELECT player_name FROM player_data WHERE player_id = %s""", (playerId,))
+            try:
+                name = Player.cur.fetchone()
+                return name
+            except psycopg2.ProgrammingError:
+                print("getNameById error. THIS IS BUGGG", playerId)
+#TODO solve this bug
+            print("getNameById error. THIS IS BUGGG", playerId)
+
 
     def getMobileOwnerId(mobile):
         Player.cur.execute("""SELECT player_id FROM player_data
@@ -56,7 +67,12 @@ class Player:
     def getMobileById(playerId):
         Player.cur.execute("""SELECT player_mobile FROM player_data
             WHERE player_id = %s""", [playerId])
-        return Player.cur.fetchone()
+        try:
+            mobile = Player.cur.fetchone()
+            return mobile
+        except psycopg2.ProgrammingError:
+#TODO solve this bug
+            print("getMobile error. THIS IS BUGGG", playerId)
 
 # flee
     def _generateFleeingCode(playerId):
@@ -65,8 +81,10 @@ class Player:
             SET player_fleeing_code = %s
             WHERE player_id = %s""", (random.randint(codeMax / 10, codeMax - 1), playerId))
 
-    def checkFleeingCode(playerId, code):
-        return Player.getFleeingCode(playerId) == code
+    def checkFleeingCode(code):
+        Player.cur.execute("""SELECT player_id FROM player_data
+            WHERE player_fleeing_code = %s""", [code])
+        return Player.cur.fetchone()
 
     def getFleeingCode(playerId):
         Player.cur.execute("""SELECT player_fleeing_code FROM player_data

@@ -16,3 +16,7 @@ def connectDB():
 def testConfigParams():
     assert game_config.player_fleeingCodeDigits != game_config.code_spotCodeDigits
     assert game_config.code_touchCodeDigits != game_config.code_spotCodeDigits
+
+def iterateZero(list):
+    if list:
+        return list[0]

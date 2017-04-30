@@ -21,15 +21,19 @@ class Code:
 # gets
     def getVictimIdByCode(code):
         result = 0
+        print("code,", code)
         if Code._isValidSpotCodeFormat(code):
             result = Code._getSpotCodeOwnerId(code)
         if Code._isValidTouchCodeFormat(code):
             result = Code._getTouchCodeOwnerId(code)
+        print("coderes,", result)
         if result:
             playerId, codeId = result
             playerId = (playerId,)
             codeId = (codeId,)
+            print("getwictimidebycode",result, playerId, codeId)
             return playerId, Code._isActiveCode(playerId, codeId)
+        return None, None
 
     def getTouchCodeByPlayerId(playerId):
         codeId = Code._getCodeIdByPlayerId(playerId)
@@ -46,7 +50,9 @@ class Code:
 # internals
     def _isValidSpotCodeFormat(code):
         codeMax = math.pow(10, game_config.code_spotCodeDigits)
-        return isinstance(code, int) and (code > (codeMax / 10) and code < (codeMax - 1))
+        print("valid", code,isinstance(code, int),  codeMax / 10, codeMax - 1)
+        assert isinstance(code, int)
+        return (code > (codeMax / 10) and code < (codeMax - 1))
 
     def _isValidTouchCodeFormat(code):
         codeMax = math.pow(10, game_config.code_touchCodeDigits)
@@ -67,6 +73,7 @@ class Code:
     def _isActiveCode(playerId, codeId):
         otherCodeId = Code._getCodeIdByPlayerId(playerId)
         assert type(codeId) == type(otherCodeId)
+        print("similar", codeId, otherCodeId)
         return otherCodeId == codeId
 
     def _getCodeIdByPlayerId(playerId):
