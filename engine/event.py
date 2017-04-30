@@ -21,6 +21,7 @@ class Event():
             extra_data VARCHAR(160) DEFAULT '',
             timestamp TIMESTAMP DEFAULT statement_timestamp() )""")
 
+# add player events
     def addPlayer(playerId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
             VALUES (%s, %s, %s)""", (Round.getActiveId(), playerId, EventType.wasAdded))
@@ -57,6 +58,15 @@ class Event():
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
             VALUES (%s, %s, %s)""", (Round.getActiveId(), victimId, EventType.wasExposingSelf))
 
+    def addObscureMessage(playerId, message):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
+            VALUES (%s, %s, %s, %s)""", (Round.getActiveId(), playerId, EventType.obscureMessage, message))
+
+    def addUnregisteredMessage(mobile, message):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
+            VALUES (%s, %s, %s, %s)""", (Round.getActiveId(), mobile, EventType.unregisteredMessage, message))
+
+# get player state
     def isPlayerJailed(playerId):
         Event.cur.execute("""SELECT event_type
             FROM event_list
@@ -68,14 +78,26 @@ class Event():
             return ev == EventType.wasSpotted or ev == EventType.wasTouched or ev == EventType.wasExposingSelf or ev == EventType.wasAdded
         return True
 
-    def addObscureMessage(playerId, message):
-        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
-            VALUES (%s, %s, %s, %s)""", (Round.getActiveId(), playerId, EventType.obscureMessage, message))
+    def getPlayerLastActivity(playerId):
+        Event.cur.execute("""SELECT timestamp
+            FROM event_list
+            WHERE player_id = %s
+            ORDER BY timestamp DESC""", [playerId])
+        timestamp = Event.cur.fetchall()
+        if timestamp:
+            return timestamp[0][0]
 
-    def addUnregisteredMessage(mobile, message):
-        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
-            VALUES (%s, %s, %s, %s)""", (Round.getActiveId(), mobile, EventType.unregisteredMessage, message))
+    def _getPlayerLastFleeingTime(playerId):
+        Event.cur.execute("""SELECT timestamp
+            FROM event_list
+            WHERE (player_id = %s AND event_type = %s)
+            ORDER BY timestamp DESC""", (playerId, EventType.didFlee))
+        timestamp = Event.cur.fetchall()
+        if timestamp:
+            return timestamp[0]
 
+
+# get player stats
     def getPlayerSpotTotalCount(playerId, roundId):
         Event.cur.execute("""SELECT COUNT(*) AS event_type
             FROM event_list
@@ -116,11 +138,3 @@ class Event():
             return success / all
         return 0
 
-    def getPlayerLastActivity(playerId):
-        Event.cur.execute("""SELECT timestamp
-            FROM event_list
-            WHERE player_id = %s
-            ORDER BY timestamp DESC""", [playerId])
-        timestamp = Event.cur.fetchall()
-        if timestamp:
-            return timestamp[0][0]

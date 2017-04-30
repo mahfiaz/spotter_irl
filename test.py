@@ -34,22 +34,22 @@ def addTestRounds():
 
 
 def addTestTeams():
-    teamCount = len(Team.getTeamsIdNameList())
+    teamCount = len(Team.getTeamsIdNameList(Round.getActiveId()))
     Team.add(teamName1, roundId = 0)
-    assert len(Team.getTeamsIdNameList()) == teamCount
+    assert len(Team.getTeamsIdNameList(Round.getActiveId())) == teamCount
 
     Team.add(teamName2, roundId = 0)
-    assert len(Team.getTeamsIdNameList()) == teamCount
+    assert len(Team.getTeamsIdNameList(Round.getActiveId())) == teamCount
 
     Team.add(teamName1, roundId = Round.getActiveId())
-    assert len(Team.getTeamsIdNameList()) == teamCount + 1
+    assert len(Team.getTeamsIdNameList(Round.getActiveId())) == teamCount + 1
 
     Team.add(teamName2, roundId = Round.getActiveId())
-    assert len(Team.getTeamsIdNameList()) == teamCount + 2
+    assert len(Team.getTeamsIdNameList(Round.getActiveId())) == teamCount + 2
 
     # should not add, because name is not unique
     Team.add(teamName1, roundId = Round.getActiveId())
-    assert len(Team.getTeamsIdNameList()) == teamCount + 2
+    assert len(Team.getTeamsIdNameList(Round.getActiveId())) == teamCount + 2
 
 
 def addTestPlayers():
@@ -162,6 +162,7 @@ def main():
     addTestPlayers()
     addPlayersToTeams()
     addTestAction()
+    print(Action.getAllStats(Round.getActiveId()))
 
 if __name__ == "__main__":
     main()

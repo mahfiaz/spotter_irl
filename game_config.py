@@ -6,3 +6,5 @@ connection_host='localhost'
 connection_password='securityFirst'
 
 database_dateformat = '%Y-%m-%d %H:%M:%S'
+
+player_fleeingProtectionTime = 1 #120

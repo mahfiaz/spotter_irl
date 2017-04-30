@@ -69,9 +69,10 @@ class Team:
 
 #team_id, team_name
 #WHERE round_id = %s
-    def getTeamsIdNameList():
+    def getTeamsIdNameList(roundId):
         Team.cur.execute("""SELECT team_id, team_name
-            FROM team_list""")
+            FROM team_list
+            WHERE round_id = %s""", [roundId])
         return Team.cur.fetchall()
 
     def getPlayerTeamId(playerId, roundId):

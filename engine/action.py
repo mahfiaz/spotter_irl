@@ -3,8 +3,10 @@ from .event import Event
 from .player import Player
 from .round import Round
 from .team import Team
+import game_config
 
 import time
+from threading import Timer
 
 class Action:
 
@@ -71,6 +73,7 @@ class Action:
             Action.updateStats()
 
     def updateStats():
+        roundSecondsLeft = Round.getActiveSecondsLeft()
         pass
 
     def addPlayer(name, mobile, email):
@@ -79,11 +82,15 @@ class Action:
             Event.addPlayer(newPlayerId)
         return newPlayerId
 
+    def _fleeTimerCall(playerId):
+        print(playerId, ", your fleeing protection is over, make the codes visible!")
+
     def _flee(playerId):
         if Event.isPlayerJailed(playerId):
             Player._generateFleeingCode(playerId)
             Event.addFlee(playerId)
             Code.generateNewCodes(playerId)
+            Timer(game_config.player_fleeingProtectionTime, Action._fleeTimerCall, (playerId,)).start()
             print(playerId, "fled!")
             return playerId
         else:
@@ -117,13 +124,17 @@ class Action:
         return teamStats
 
     def getAllStats(roundId):
+#        print(teams)
         teams = Team.getTeamsIdNameList(roundId)
-        print(teams)
-        roundStats = []
+        allTeams = []
         for team in teams:
             id, name = team
-            roundStats += [{
-            'teamName'          : name,
-            'players'           : Action.getTeamStats(id, roundId)}]
+            allTeams.append([{
+                'teamName'      : name,
+                'players'       : Action.getTeamStats(id, roundId)}])
+        roundStats = [{
+            'roundId'           : roundId,
+            'roundName'         : Round.getName(roundId),
+            'teams'             : allTeams}]
         return roundStats
 
