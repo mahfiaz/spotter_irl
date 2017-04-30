@@ -5,6 +5,7 @@ import math
 import psycopg2
 
 from .event import Event
+from .helper import iterateZero
 
 class Player:
 
@@ -29,8 +30,7 @@ class Player:
             FROM player_data 
             WHERE player_name = %s OR player_mobile = %s OR player_email = %s""",
             (name, mobile, email))
-        rows = Player.cur.fetchall()
-        if not rows:
+        if not Player.cur.fetchone():
             Player.cur.execute("""INSERT INTO player_data (player_name, player_mobile, player_email) VALUES (%s, %s, %s)""", (name, mobile, email))
             newId = Player._getIdByName(name)
             Player._generateFleeingCode(newId)
@@ -40,21 +40,15 @@ class Player:
     def _getIdByName(playerName):
         Player.cur.execute("""SELECT player_id FROM player_data
             WHERE player_name = %s""", [playerName])
-        return Player.cur.fetchone()
+        return iterateZero(Player.cur.fetchone())
 
     def getNameById(playerId):
         Player.cur.execute("""SELECT player_name FROM player_data
             WHERE player_id = %s""", (playerId,))
         try:
-            name = Player.cur.fetchone()
+            name = iterateZero(Player.cur.fetchone())
             return name
         except psycopg2.ProgrammingError:
-            Player.cur.execute("""SELECT player_name FROM player_data WHERE player_id = %s""", (playerId,))
-            try:
-                name = Player.cur.fetchone()
-                return name
-            except psycopg2.ProgrammingError:
-                print("getNameById error. THIS IS BUGGG", playerId)
 #TODO solve this bug
             print("getNameById error. THIS IS BUGGG", playerId)
 
@@ -62,13 +56,13 @@ class Player:
     def getMobileOwnerId(mobile):
         Player.cur.execute("""SELECT player_id FROM player_data
             WHERE player_mobile = %s""", [mobile])
-        return Player.cur.fetchone()
+        return iterateZero(Player.cur.fetchone())
 
     def getMobileById(playerId):
         Player.cur.execute("""SELECT player_mobile FROM player_data
             WHERE player_id = %s""", [playerId])
         try:
-            mobile = Player.cur.fetchone()
+            mobile = iterateZero(Player.cur.fetchone())
             return mobile
         except psycopg2.ProgrammingError:
 #TODO solve this bug
@@ -84,12 +78,12 @@ class Player:
     def checkFleeingCode(code):
         Player.cur.execute("""SELECT player_id FROM player_data
             WHERE player_fleeing_code = %s""", [code])
-        return Player.cur.fetchone()
+        return iterateZero(Player.cur.fetchone())
 
     def getFleeingCode(playerId):
         Player.cur.execute("""SELECT player_fleeing_code FROM player_data
             WHERE player_id = %s""", [playerId])
-        return Player.cur.fetchone()
+        return iterateZero(Player.cur.fetchone())
 
 # list
     def getAllPlayerIds():

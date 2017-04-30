@@ -36,12 +36,13 @@ msgCellular['roundEnded'] = '{} round ended. Come to the base and receive credit
 class Sms:
     _count = 0
     def send(mobile, data):
-        print("sendsms", mobile, data)
         if isinstance(mobile, str):
             if mobile.isdigit():
                 mobile = int(mobile)
                 print("     SMS:", mobile, data)
                 Sms._count += 1
+        else:
+            print(" Errror! send sms", mobile, data)
 
     def notSignedUp(mobile):
         Sms.send(mobile, msgCellular['notSignedUp'].format(mobile))
@@ -166,12 +167,16 @@ class Action:
             BaseMsg.playerNotUnique(name, mobile, email)
         return newPlayerId
 
+    def addTeams(roundId):
+        for teamName in game_config.team_names:
+            Team.add(teamName, roundId)
+
 # handle code
     def handleCodeValidate(mobile, code):
         mobile = re.sub('[^0-9+]', '', mobile)
         code = re.sub('[^0-9?]', '', code)
         if (not mobile) or (not code):
-            print("mobile or code total chibberish")
+            print("Warning. mobile or code is total chibberish")
             return
         Action._handleCode(mobile, code)
 

@@ -1,6 +1,7 @@
 #import player
 from .player import Player
 from .round import Round
+from .helper import iterateZero
 
 class Team:
 
@@ -46,31 +47,31 @@ class Team:
             Team.cur.execute("""DELETE FROM team_players
                 WHERE round_id = %s AND player_id = %s""", (roundId, playerId))
 
-# get singles
+# gets
     def _getIdByName(teamName, roundId):
         Team.cur.execute("""SELECT team_id
             FROM team_list
             WHERE round_id = %s AND team_name = %s""", (roundId, teamName))
-        return Team.cur.fetchone()
+        return iterateZero(Team.cur.fetchone())
 
     def getNameById(teamId):
         Team.cur.execute("""SELECT team_name
             FROM team_list
             WHERE team_id = %s""", [teamId])
-        return Team.cur.fetchone()
+        return iterateZero(Team.cur.fetchone())
 
     def _getRoundIdByTeamId(teamId):
         Team.cur.execute("""SELECT round_id
             FROM team_list
             WHERE team_id = %s""", [teamId])
-        return Team.cur.fetchone()
+        return iterateZero(Team.cur.fetchone())
 
     def getPlayerTeamId(playerId, roundId):
         Team.cur.execute("""SELECT team_id 
             FROM team_players 
             WHERE player_id = %s AND team_id IN 
             (SELECT team_id FROM team_list WHERE round_id = %s)""", (playerId, roundId))
-        return Team.cur.fetchone()
+        return iterateZero(Team.cur.fetchone())
 
 # get lists
     def getTeamPlayerIdList(teamId):

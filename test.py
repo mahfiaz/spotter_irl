@@ -185,7 +185,7 @@ def testWithInput():
     Action.initAllOnce(cursor)
 #    addTestRoundsShort()
     addTestRoundsNormal()
-    addTestTeams()
+    Action.addTeams(Round.getActiveId())
     addTestPlayers()
     addPlayersToTeams()
     fleeAllPlayers()

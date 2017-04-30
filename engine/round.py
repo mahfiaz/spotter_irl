@@ -3,6 +3,7 @@ import time
 from threading import Timer
 
 import game_config
+from .helper import iterateZero
 
 dateformat = game_config.database_dateformat
 
@@ -31,7 +32,7 @@ class Round():
             WHERE (round_start = %s OR (round_start < %s AND round_end > %s)) OR
             (round_end = %s AND (round_start < %s AND round_end > %s))""",
             (time_start, time_start, time_start, time_end, time_end, time_end))
-        if not Round.cur.fetchall():
+        if not Round.cur.fetchone():
             Round.cur.execute("""INSERT INTO round_data (round_name, round_start, round_end)
                 VALUES (%s, %s, %s)""", (name, time_start, time_end))
             return True
@@ -59,7 +60,7 @@ class Round():
         Round.cur.execute("""SELECT round_name
             FROM round_data 
             WHERE round_id = %s""", [roundId])
-        return Round.cur.fetchone()
+        return iterateZero(Round.cur.fetchone())
 
 
 # round time
@@ -73,21 +74,20 @@ class Round():
             FROM round_data 
             WHERE (round_start > statement_timestamp())
             ORDER BY round_start ASC""")
-        return Round.cur.fetchone()
+        return iterateZero(Round.cur.fetchone())
 
     def _getEndTimeOfActive():
         Round.cur.execute("""SELECT round_end
             FROM round_data 
             WHERE round_id = %s""", [Round.getActiveId()])
-        ends = Round.cur.fetchone()
-        if ends:
-            return ends[0]
+        return iterateZero(Round.cur.fetchone())
+
 # round automatic restarting and finishing
     def updateActiveId():
         Round.cur.execute("""SELECT round_id
             FROM round_data 
             WHERE (round_start <= statement_timestamp() AND round_end > statement_timestamp())""")
-        activeId = Round.cur.fetchone()
+        activeId = iterateZero(Round.cur.fetchone())
         Round._checkRoundChange(activeId)
         return Round._activeId
 

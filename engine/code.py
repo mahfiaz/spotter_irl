@@ -2,6 +2,7 @@ import math
 import random
 
 import game_config
+from .helper import iterateZero
 
 class Code:
 
@@ -21,17 +22,14 @@ class Code:
 # gets
     def getVictimIdByCode(code):
         result = 0
-        print("code,", code)
         if Code._isValidSpotCodeFormat(code):
             result = Code._getSpotCodeOwnerId(code)
         if Code._isValidTouchCodeFormat(code):
             result = Code._getTouchCodeOwnerId(code)
-        print("coderes,", result)
         if result:
             playerId, codeId = result
             playerId = (playerId,)
             codeId = (codeId,)
-            print("getwictimidebycode",result, playerId, codeId)
             return playerId, Code._isActiveCode(playerId, codeId)
         return None, None
 
@@ -50,7 +48,6 @@ class Code:
 # internals
     def _isValidSpotCodeFormat(code):
         codeMax = math.pow(10, game_config.code_spotCodeDigits)
-        print("valid", code,isinstance(code, int),  codeMax / 10, codeMax - 1)
         assert isinstance(code, int)
         return (code > (codeMax / 10) and code < (codeMax - 1))
 
@@ -62,43 +59,42 @@ class Code:
         Code.cur.execute("""SELECT player_id, code_id
             FROM code_list
             WHERE spot_code = %s""", [code])
-        return Code.cur.fetchone()
+        return iterateZero(Code.cur.fetchone())
 
     def _getTouchCodeOwnerId(code):
         Code.cur.execute("""SELECT player_id, code_id
             FROM code_list
             WHERE touch_code = %s""", [code])
-        return Code.cur.fetchone()
+        return iterateZero(Code.cur.fetchone())
 
     def _isActiveCode(playerId, codeId):
         otherCodeId = Code._getCodeIdByPlayerId(playerId)
         assert type(codeId) == type(otherCodeId)
-        print("similar", codeId, otherCodeId)
         return otherCodeId == codeId
 
     def _getCodeIdByPlayerId(playerId):
         Code.cur.execute("""SELECT player_code_id
             FROM player_data
             WHERE player_id = %s""", [playerId])
-        return Code.cur.fetchone()
+        return iterateZero(Code.cur.fetchone())
 
     def _getSpotCodeId(code):
         Code.cur.execute("""SELECT code_id
             FROM code_list
             WHERE spot_code = %s""", [code])
-        return Code.cur.fetchone()
+        return iterateZero(Code.cur.fetchone())
 
     def _getSpotCodeById(spotId):
         Code.cur.execute("""SELECT spot_code
             FROM code_list
             WHERE code_id = %s""", [spotId])
-        return Code.cur.fetchone()
+        return iterateZero(Code.cur.fetchone())
 
     def _getTouchCodeById(touchId):
         Code.cur.execute("""SELECT touch_code
             FROM code_list
             WHERE code_id = %s""", [touchId])
-        return Code.cur.fetchone()
+        return iterateZero(Code.cur.fetchone())
 
 # generate
     def generateNewCodes(playerId):

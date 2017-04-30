@@ -13,3 +13,9 @@ player_fleeingCodeDigits = 3
 code_spotCodeDigits = 4
 code_touchCodeDigits = 7
 
+team_names = ('Sinised', 'Punased')
+
+def testConfigParams():
+    assert player_fleeingCodeDigits != code_spotCodeDigits
+    assert code_touchCodeDigits != code_spotCodeDigits
+

@@ -1,4 +1,5 @@
 from .round import Round
+from .helper import iterateZero
 
 def enum(*args):
     enums = dict(zip(args, range(len(args))))
@@ -104,28 +105,28 @@ class Event():
             FROM event_list
             WHERE (player_id = %s AND event_type IN (%s, %s) AND round_id = %s)""",
             (playerId, EventType.didSpot, EventType.didTouch, roundId))
-        return Event.cur.fetchone()[0]
+        return iterateZero(Event.cur.fetchone())
 
     def getPlayerTouchCount(playerId, roundId):
         Event.cur.execute("""SELECT COUNT(*) AS event_type
             FROM event_list
             WHERE (player_id = %s AND event_type = %s AND round_id = %s)""",
             (playerId, EventType.didTouch, roundId))
-        return Event.cur.fetchone()[0]
+        return iterateZero(Event.cur.fetchone())
 
     def getPlayerJailedCount(playerId, roundId):
         Event.cur.execute("""SELECT COUNT(*) AS event_type
             FROM event_list
             WHERE (player_id = %s AND event_type IN (%s, %s, %s) AND round_id = %s)""",
             (playerId, EventType.wasSpotted, EventType.wasTouched, EventType.wasExposingSelf, roundId))
-        return Event.cur.fetchone()[0]
+        return iterateZero(Event.cur.fetchone())
 
     def getPlayerDisloyalityCount(playerId, roundId):
         Event.cur.execute("""SELECT COUNT(*) AS event_type
             FROM event_list
             WHERE (player_id = %s AND event_type IN (%s, %s) AND round_id = %s)""",
             (playerId, EventType.didSpotMate, EventType.wasExposingSelf, roundId))
-        return Event.cur.fetchone()[0]
+        return iterateZero(Event.cur.fetchone())
 
     def getSpottingAccuracy(playerId, roundId):
         success = Event.getPlayerSpotTotalCount(playerId, roundId)
@@ -134,7 +135,7 @@ class Event():
             WHERE (player_id = %s AND event_type IN (%s, %s, %s, %s, %s, %s) AND round_id = %s)""",
             (playerId, EventType.didSpot, EventType.didSpotJailed, EventType.didTouch,
             EventType.failedSpot, EventType.didSpotMate, EventType.wasExposingSelf, roundId))
-        all = Event.cur.fetchone()[0]
+        all = iterateZero(Event.cur.fetchone())
         if all:
             return success / all
         return 0
