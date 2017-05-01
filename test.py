@@ -82,7 +82,7 @@ def addTestPlayers():
     Action.addPlayer('Uuno', '2346', dataDict[3]['email'])
     assert len(Player.getAllPlayerIds()) == 6
 
-    Player.printDetailed()
+    Action.printPlayersDetailed()
 
 
 def addPlayersToTeams():
@@ -94,7 +94,7 @@ def addPlayersToTeams():
 def fleeAllPlayers():
     for playerId in Player.getAllPlayerIds():
         Action.fleePlayerWithCode(Player.getFleeingCode(playerId))
-    Player.printDetailed()
+    Action.printPlayersDetailed()
 
 def addTestAction():
     print("Not registered test")
@@ -105,14 +105,14 @@ def addTestAction():
     Action.handleCodeValidate(Player.getMobileById(1), Code.getSpotCodeByPlayerId(1))
     assert Event.getPlayerDisloyalityCount(1, Round.getActiveId()) == disloyality1 + 1
     Action.fleePlayerWithCode(Player.getFleeingCode(4))
-    Player.printDetailed()
+    Action.printPlayersDetailed()
     time.sleep(0.1)
 
     print("4-1")
     spotsTotal4 = Event.getPlayerSpotTotalCount(4, Round.getActiveId())
     Action.handleCodeValidate(Player.getMobileById(4), Code.getSpotCodeByPlayerId(1))
     assert Event.getPlayerSpotTotalCount(4, Round.getActiveId()) == spotsTotal4
-    Player.printDetailed()
+    Action.printPlayersDetailed()
     Action.fleePlayerWithCode(Player.getFleeingCode(1))
     time.sleep(0.1)
 
@@ -122,7 +122,7 @@ def addTestAction():
     Action.handleCodeValidate(Player.getMobileById(4), Code.getSpotCodeByPlayerId(1))
     assert Event.getPlayerSpotTotalCount(4, Round.getActiveId()) == spotsTotal4 + 1
     assert Event.getPlayerJailedCount(1, Round.getActiveId()) == jailed1 + 1
-    Player.printDetailed()
+    Action.printPlayersDetailed()
     Action.fleePlayerWithCode(Player.getFleeingCode(4))
     time.sleep(0.1)
 
@@ -143,7 +143,7 @@ def addTestAction():
 
     Action.fleePlayerWithCode(Player.getFleeingCode(2))
     Action.fleePlayerWithCode(Player.getFleeingCode(1))
-    Player.printDetailed()
+    Action.printPlayersDetailed()
     Action.fleePlayerWithCode(Player.getFleeingCode(1))
     Action.fleePlayerWithCode(Player.getFleeingCode(3))
     time.sleep(0.1)
@@ -153,7 +153,7 @@ def addTestAction():
     Action.handleCodeValidate(Player.getMobileById(1), Code.getTouchCodeByPlayerId(4))
     assert Event.getPlayerTouchCount(1, Round.getActiveId()) == touchTotal1 + 1
     Action.fleePlayerWithCode(Player.getFleeingCode(1))
-    Player.printDetailed()
+    Action.printPlayersDetailed()
     time.sleep(0.1)
 
 def processInput():
@@ -161,18 +161,18 @@ def processInput():
     if 'f' in userText:
         jailCode = input("enter jail code: ")
         Action.fleePlayerWithCode(jailCode)
-        Player.printDetailed()
+        Action.printPlayersDetailed()
     if 's' in userText:
         mobile = input("enter mobile: ")
         code = input("enter code: ")
         Action.handleCodeValidate(mobile, code)
-        Player.printDetailed()
+        Action.printPlayersDetailed()
     if 'a' in userText:
         name = input("enter name: ")
         mobile = input("enter mobile: ")
         email = input("enter email: ")
         Action.addPlayer(name, mobile, email)
-        Player.printDetailed()
+        Action.printPlayersDetailed()
     if 'q' in userText:
         return True
 

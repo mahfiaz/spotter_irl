@@ -24,9 +24,9 @@ def main():
     Action.initAllOnce(cursor)
 
     Round.addTestRounds()
-    Player.printDetailed()
+    Action.printPlayersDetailed()
     Action.addTestPlayers()
-    Player.printDetailed()
+    Action.printPlayersDetailed()
 
     Round.print()
     print("round active", Round.isActive())

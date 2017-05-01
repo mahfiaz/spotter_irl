@@ -1,5 +1,5 @@
 from .code import Code
-from .event import Event
+from .event import Event, EventType
 from .player import Player
 from .round import Round
 from .team import Team
@@ -8,6 +8,7 @@ import game_config
 import json
 import time
 import re
+import pprint
 from threading import Timer
 
 msgCellular = {}
@@ -130,18 +131,18 @@ class BaseMsg:
     def mobileNotDigits(mobile):
         BaseMsg.send(msgBase['mobileNotDigits'].format(mobile))
 
-    def roundStarted(roundName):
-        BaseMsg.send(msgBase['roundStarted'].format(roundName))
+    def roundStarted():
+        BaseMsg.send(msgBase['roundStarted'].format(Round.getName(Round.getActiveId())))
 
-    def roundEnding(roundName, timeLeft):
-        BaseMsg.send(msgBase['roundEnding'].format(roundName, timeLeft))
+    def roundEnding(timeLeft):
+        BaseMsg.send(msgBase['roundEnding'].format(Round.getName(Round.getActiveId()), timeLeft))
 
-    def roundEnded(roundName):
-        BaseMsg.send(msgBase['roundEnded'].format(roundName))
+    def roundEnded():
+        BaseMsg.send(msgBase['roundEnded'].format(Round.getName(Round.getActiveId())))
 
 
 class Action:
-
+    compactPrint = pprint.PrettyPrinter(width=41, compact=True)
 # init
     def initAllOnce(cursor):
         Round.initOnce(cursor)
@@ -202,6 +203,7 @@ class Action:
             return
         victimId, codeValid = Code.getVictimIdByCode(code)
         if not victimId:
+            # first add event, then update stats and then send sms with updated stats
             Event.addFailedSpot(senderId, code)
             Action.updateStats()
             Sms.missed(mobile, Player.getNameById(senderId))
@@ -266,8 +268,9 @@ class Action:
 #        roundSecondsLeft = Round.getActiveSecondsLeft()
         stats = Action._calcAllStats(Round.getActiveId())
         Action._storeStats(stats)
-        Action.printRoundStats(stats)
-#        print(stats)
+        Action.printIndentedStats(stats)
+        events = Action.getEventList(Round.getActiveId(), 10)
+        Action.printIndentedStats(events)
 
     def getPlayerStats(playerId, roundId):
         stats = {
@@ -316,15 +319,31 @@ class Action:
     def _storeStats(stats):
         if stats:
             with open('stats.json', 'w') as jsonFile:
-                json.dump(stats, jsonFile)
+                json.dump(stats, jsonFile, indent=4)
 
     def getRoundStats():
         with open('stats.json') as jsonFile:
             stats = json.load(jsonFile)[0]
             return stats
 
-    def printRoundStats(stats):
-        print( json.dumps(stats, sort_keys=False, indent=4) )
+    def printIndentedStats(stats):
+        Action.compactPrint._sorted = lambda x:x
+        Action.compactPrint.pprint(stats)
+
+#events
+    def getEventList(roundId, rows):
+        events = Event.getEventListRaw(roundId, rows)
+        eventList = []
+        for event in events:
+            event, playerId, timestamp = event
+            thisEvent = {}
+            thisEvent['time'] = timestamp.strftime(game_config.database_dateformat)
+            thisEvent['player1'] = { 'name' : Player.getNameById(playerId), 'team' : Team.getNameById(Team.getPlayerTeamId(playerId, roundId))}
+            thisEvent['event'] = EventType(event).name
+            player2Id = Event.getDidEventPair(event, timestamp)
+            thisEvent['player2'] = { 'name' : Player.getNameById(player2Id), 'team' : Team.getNameById(Team.getPlayerTeamId(player2Id, roundId))}
+            eventList.append(thisEvent)
+        return eventList
 
 # round calls
     def _roundStartedCall():
@@ -334,7 +353,7 @@ class Action:
             Sms.roundStarted(mobile, Round.getName(Round.getActiveId()))
 
     def _roundEndingCall(left):
-        BaseMsg.roundEnding()
+        BaseMsg.roundEnding(left)
         for id in Player.getAllPlayerIds():
             mobile = Player.getMobileById(id)
             Sms.roundEnding(mobile, Round.getName(Round.getActiveId()), left)
@@ -345,3 +364,14 @@ class Action:
             mobile = Player.getMobileById(id)
             Sms.roundEnded(mobile, Round.getName(Round.getActiveId()))
 
+# print
+    def printPlayersDetailed():
+        Player.cur.execute("""SELECT player_data.player_id, player_data.player_name, player_data.player_mobile, team_players.team_id, player_data.player_fleeing_code, code_list.spot_code, code_list.touch_code
+            FROM player_data 
+                JOIN code_list ON (player_data.player_code_id = code_list.code_id)
+                JOIN team_players ON (player_data.player_id = team_players.player_id)
+            """)
+        rows = Player.cur.fetchall()
+        for row in rows:
+            (id, name, mobile, teamId, fleeingCode, spotCode, touchCode) = row
+            print(" - ", id, mobile, teamId, fleeingCode, spotCode, touchCode, Event.isPlayerJailed(row[0]), name)

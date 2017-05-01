@@ -4,7 +4,6 @@ import math
 
 import psycopg2
 
-from .event import Event
 from .helper import iterateZero
 
 class Player:
@@ -97,15 +96,3 @@ class Player:
         print("Players:")
         for player in rows:
             print(" - ", player[1], player[2], player[3])
-
-# print
-    def printDetailed():
-        Player.cur.execute("""SELECT player_data.player_id, player_data.player_name, player_data.player_mobile, team_players.team_id, player_data.player_fleeing_code, code_list.spot_code, code_list.touch_code
-            FROM player_data 
-                JOIN code_list ON (player_data.player_code_id = code_list.code_id)
-                JOIN team_players ON (player_data.player_id = team_players.player_id)
-            """)
-        rows = Player.cur.fetchall()
-        for row in rows:
-            (id, name, mobile, teamId, fleeingCode, spotCode, touchCode) = row
-            print(" - ", id, mobile, teamId, fleeingCode, spotCode, touchCode, Event.isPlayerJailed(row[0]), name)
