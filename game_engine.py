@@ -52,9 +52,5 @@ if __name__ == "__main__":
 #TODO
 # input validation
 # multilingual support
-# stats to sms
-# private members _underscore
 # if new round starts - start it at event too Event.setRoundId
-# return variables some are duples (var,)
-# event analysis on rounds
-#equality ! check types
+    # equality ! check types

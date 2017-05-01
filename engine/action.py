@@ -220,6 +220,7 @@ class Action:
         if victimJailed:
             Sms.victimJailed(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
             return
+        assert type(senderId) == type(victimId)
         if senderId == victimId:
             Event.addExposeSelf(victimId)
             Action.updateStats()

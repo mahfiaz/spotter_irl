@@ -163,11 +163,12 @@ class Event():
             ORDER BY timestamp DESC""", (roundId, EventType.didFlee.value, EventType.didSpot.value, EventType.didTouch.value, EventType.didSpotMate.value))
         return Event.cur.fetchmany(rows)
 
-    def getDidEventPair(type, timestamp):
-        if not (type == EventType.didSpot.value or type == EventType.didTouch.value or type == EventType.didSpotMate.value):
+    def getDidEventPair(evType, timestamp):
+        assert type(evType) == type(EventType.didSpot.value)
+        if not (evType == EventType.didSpot.value or evType == EventType.didTouch.value or evType == EventType.didSpotMate.value):
             return
         expectedEvent = EventType.wasSpotted.value
-        if type == EventType.didTouch.value:
+        if evType == EventType.didTouch.value:
             expectedEvent = EventType.wasTouched.value
         Event.cur.execute("""SELECT player_id
             FROM event_list
