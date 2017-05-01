@@ -4,34 +4,13 @@ from .player import Player
 from .round import Round
 from .team import Team
 import game_config
+from game_config import msgCellular, msgBase
 
 import json
 import time
 import re
 import pprint
 from threading import Timer
-
-msgCellular = {}
-msgCellular['notSignedUp'] = 'You ({}) have not been signed up for the game. Come to the base @ linnavalituses parkla.'
-msgCellular['playerAdded'] = '{} welcome to jail. To escape, enter code {}.'
-msgCellular['senderJailed'] = '{}, you are jailed and can not spot anybody. Escape jail with code {}.'
-msgCellular['victimJailedVictim'] = '{}, if you were not jailed you would have been spotted by {}. Teleport quickly to the base with {}.'
-msgCellular['victimJailedSender'] = '{}, if not jailed you would had spotted {}. If safe, tell {} to teleport to the base.'
-msgCellular['missed'] = 'Hey {}, did you make up that code yourself? It was not found.'
-msgCellular['oldCode'] = '{}, this code is old. Either have you good memory or {} is wearing old codes while having new ones.'
-msgCellular['exposedSelf'] = '{}, you have exposed yourself to authorities. Did you mean selfie? Escape the jail with code {}.'
-msgCellular['spotMateSender'] = '{}, are you colorblind? Hitting teammate {} is not OK.'
-msgCellular['spotMateVictim'] = '{}, you have been spotted by a teammate. You can escape jail with code {}.'
-msgCellular['spottedSender'] = '{}, you spotted {}. Good job!'
-msgCellular['spottedVictim'] = '{}, you were spotted. Escape the jail with code {}.'
-msgCellular['touchedSender'] = '{}, you touched {}. Excellent!'
-msgCellular['touchedVictim'] = '{}, you were touched! Gotta be more watchful! Escape the jail with code {}.'
-msgCellular['fleeingProtectionOver'] = '{}, your fleeing protection is over now, make the codes visible!'
-msgCellular['noActiveRound'] = 'No running round. Next round starts at {}.'
-msgCellular['roundStarted'] = '{} round just started!'
-msgCellular['roundEnding'] = '{} round ends in {} minutes.'
-msgCellular['roundEnded'] = '{} round ended. Come to the base and receive credits.'
-
 
 
 class Sms:
@@ -96,19 +75,6 @@ class Sms:
     def playerAdded(mobile, name, jailCode):
         Sms.send(mobile, msgCellular['playerAdded'].format(name, jailCode))
 
-
-
-msgBase = {}
-msgBase['fleeingCodeMismatch'] = 'This code did not match. Try again or contact your lawyer!'
-msgBase['fledSuccessful'] = '{}, you managed to flee the jail! You have {} minutes of protection, when you are allowed to hide the code sheets!'
-msgBase['cantFleeFromLiberty'] = '{}, you are in freedom. Dont hang out at jail gates.'
-msgBase['playerAdded'] = '{}, welcome to the game!'
-msgBase['playerNotUnique'] = '{} or {} or {} has been entered already! Try something else.'
-msgBase['playerAdded'] = '{}, welcome to the clan!'
-msgBase['roundStarted'] = '{} round just started!'
-msgBase['roundEnding'] = '{} round ends in {} minutes.'
-msgBase['roundEnded'] = '{} round ended.'
-msgBase['mobileNotDigits'] = 'Error. {} is not valid phone number. Start all over.'
 
 class BaseMsg:
 
