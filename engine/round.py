@@ -64,10 +64,10 @@ class Round():
 
 
 # round time
-    def getActiveSecondsLeft():
-        ends = Round._getEndTimeOfActive()
-        if ends:
-            return (ends - datetime.datetime.now()).total_seconds()
+#    def getActiveSecondsLeft():
+#        ends = Round._getEndTimeOfActive()
+#        if ends:
+#            return (ends - datetime.datetime.now()).total_seconds()
 
     def _getStartTimeOfNext():
         Round.cur.execute("""SELECT round_start

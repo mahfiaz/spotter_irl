@@ -36,11 +36,13 @@ msgCellular['roundEnded'] = '{} round ended. Come to the base and receive credit
 
 class Sms:
     _count = 0
-    def send(mobile, data):
+    def send(mobile, data, sendStats = False):
         if isinstance(mobile, str):
             if mobile.isdigit():
-                mobile = int(mobile)
-                print("     SMS:", mobile, data)
+                if sendStats:
+                    print("     SMS:", mobile, data, Action.getTeamPlayerStatsString(Player.getMobileOwnerId(mobile)))
+                else:
+                    print("     SMS:", mobile, data)
                 Sms._count += 1
         else:
             print(" Errror! send sms", mobile, data)
@@ -49,32 +51,32 @@ class Sms:
         Sms.send(mobile, msgCellular['notSignedUp'].format(mobile))
 
     def senderJailed(mobile, name, jailCode):
-        Sms.send(mobile, msgCellular['senderJailed'].format(name, jailCode))
+        Sms.send(mobile, msgCellular['senderJailed'].format(name, jailCode), sendStats = True)
 
     def victimJailed(senderMobile, senderName, victimMobile, victimName, jailCode):
-        Sms.send(victimMobile, msgCellular['victimJailedVictim'].format(victimName, senderName, jailCode))
-        Sms.send(senderMobile, msgCellular['victimJailedSender'].format(senderName, victimName, victimName))
+        Sms.send(victimMobile, msgCellular['victimJailedVictim'].format(victimName, senderName, jailCode), sendStats = True)
+        Sms.send(senderMobile, msgCellular['victimJailedSender'].format(senderName, victimName, victimName), sendStats = True)
 
     def missed(mobile, name):
-        Sms.send(mobile, msgCellular['missed'].format(name))
+        Sms.send(mobile, msgCellular['missed'].format(name), sendStats = True)
 
     def oldCode(mobile, nameSender, nameVictim):
-        Sms.send(mobile, msgCellular['oldCode'].format(nameSender, nameVictim))
+        Sms.send(mobile, msgCellular['oldCode'].format(nameSender, nameVictim), sendStats = True)
 
     def exposedSelf(mobile, name, jailCode):
-        Sms.send(mobile, msgCellular['exposedSelf'].format(name, jailCode))
+        Sms.send(mobile, msgCellular['exposedSelf'].format(name, jailCode), sendStats = True)
 
     def spotMate(senderMobile, senderName, victimMobile, victimName, jailCode):
-        Sms.send(senderMobile, msgCellular['spotMateSender'].format(senderName, victimName))
-        Sms.send(victimMobile, msgCellular['spotMateVictim'].format(victimName, jailCode))
+        Sms.send(senderMobile, msgCellular['spotMateSender'].format(senderName, victimName), sendStats = True)
+        Sms.send(victimMobile, msgCellular['spotMateVictim'].format(victimName, jailCode), sendStats = True)
 
     def spotted(senderMobile, senderName, victimMobile, victimName, jailCode):
-        Sms.send(senderMobile, msgCellular['spottedSender'].format(senderName, victimName))
-        Sms.send(victimMobile, msgCellular['spottedVictim'].format(victimName, jailCode))
+        Sms.send(senderMobile, msgCellular['spottedSender'].format(senderName, victimName), sendStats = True)
+        Sms.send(victimMobile, msgCellular['spottedVictim'].format(victimName, jailCode), sendStats = True)
 
     def touched(senderMobile, senderName, victimMobile, victimName, jailCode):
-        Sms.send(senderMobile, msgCellular['touchedSender'].format(senderName, victimName))
-        Sms.send(victimMobile, msgCellular['touchedVictim'].format(victimName, jailCode))
+        Sms.send(senderMobile, msgCellular['touchedSender'].format(senderName, victimName), sendStats = True)
+        Sms.send(victimMobile, msgCellular['touchedVictim'].format(victimName, jailCode), sendStats = True)
 
     def fleeingProtectionOver(mobile, name):
         Sms.send(mobile, msgCellular['fleeingProtectionOver'].format(name))
@@ -86,10 +88,10 @@ class Sms:
         Sms.send(mobile, msgCellular['roundStarted'].format(roundName))
 
     def roundEnding(mobile, roundName, timeLeft):
-        Sms.send(mobile, msgCellular['roundEnding'].format(roundName, timeLeft))
+        Sms.send(mobile, msgCellular['roundEnding'].format(roundName, timeLeft), sendStats = True)
 
     def roundEnded(mobile, roundName):
-        Sms.send(mobile, msgCellular['roundEnded'].format(roundName))
+        Sms.send(mobile, msgCellular['roundEnded'].format(roundName), sendStats = True)
 
     def playerAdded(mobile, name, jailCode):
         Sms.send(mobile, msgCellular['playerAdded'].format(name, jailCode))
@@ -265,49 +267,52 @@ class Action:
 
 # stats
     def updateStats():
-#        roundSecondsLeft = Round.getActiveSecondsLeft()
         stats = Action._calcAllStats(Round.getActiveId())
         Action._storeStats(stats)
-        Action.printIndentedStats(stats)
-        events = Action.getEventList(Round.getActiveId(), 10)
-        Action.printIndentedStats(events)
+        events = Action.getEventList(Round.getActiveId(), 15)
+        Action._storeEvents(events)
+        Action.printIndented(stats)
+        Action.printIndented(events)
+        Action.printIndented(Action._getTeamScores(stats))
 
-    def getPlayerStats(playerId, roundId):
+    def _getPlayerStats(playerId, roundId):
         stats = {
             'name'              : Player.getNameById(playerId),
             'totalSpots'        : Event.getPlayerSpotTotalCount(playerId, roundId),
             'touchCount'        : Event.getPlayerTouchCount(playerId, roundId),
             'jailed'            : Event.getPlayerJailedCount(playerId, roundId),
-            'disloyality'   : Event.getPlayerDisloyalityCount(playerId, roundId),
+            'disloyality'       : Event.getPlayerDisloyalityCount(playerId, roundId),
             'lastActivity'      : Event.getPlayerLastActivity(playerId).strftime(game_config.database_dateformat)
         }
+        stats['score'] = stats['totalSpots'] + stats['touchCount'] - stats['jailed'] - stats['disloyality']
         return stats
 
-    def getTeamStats(teamId, roundId):
+    def _getTeamStats(teamId, roundId):
         players = Team.getTeamPlayerIdList(teamId)
         teamStats = {
             'name'              : Team.getNameById(teamId),
             'totalSpots'        : 0,
             'touchCount'        : 0,
             'jailed'            : 0,
-            'disloyality'   : 0}
-        playerStats = []
-        for player in players:
-            person = Action.getPlayerStats(player, roundId)
-            playerStats.append(person)
+            'disloyality'       : 0,
+            'score'             : 0}
+        playersStats = []
+        for playerId in players:
+            person = Action._getPlayerStats(playerId, roundId)
+            playersStats.append(person)
             teamStats['totalSpots'] += person['totalSpots']
             teamStats['touchCount'] += person['touchCount']
             teamStats['jailed'] += person['jailed']
             teamStats['disloyality'] += person['disloyality']
-        teamStats['score'] = teamStats['totalSpots'] + teamStats['touchCount'] - teamStats['jailed'] - teamStats['disloyality']
-        teamStats['players'] = playerStats
+            teamStats['score'] += person['score']
+        teamStats['players'] = playersStats
         return teamStats
 
     def _calcAllStats(roundId):
         teamIds = Team.getTeamsIdList(roundId)
         allTeams = []
         for id in teamIds:
-            allTeams.append(Action.getTeamStats(id, roundId))
+            allTeams.append(Action._getTeamStats(id, roundId))
         roundStats = {
             'roundId'           : roundId,
             'roundName'         : Round.getName(roundId),
@@ -323,12 +328,38 @@ class Action:
 
     def getRoundStats():
         with open('stats.json') as jsonFile:
-            stats = json.load(jsonFile)[0]
-            return stats
+            return json.load(jsonFile)
 
-    def printIndentedStats(stats):
-        Action.compactPrint._sorted = lambda x:x
+    def printIndented(stats):
         Action.compactPrint.pprint(stats)
+
+    def _getTeamScores(stats):
+        if stats:
+            teams = stats['teams']
+            teamScores = []
+            for team in teams:
+                teamScores.append({ 'name' : team['name'], 'score' : team['score'] })
+            return teamScores
+
+    def _getTeamScoreString():
+        stats = Action.getRoundStats()
+        if not stats:
+            print("Warning. Stats could not be fetched")
+            return ''
+        teamScores = Action._getTeamScores(stats)
+        result = ''
+        for each in teamScores:
+            result += ' {}:{}'.format(each['name'], each['score'])
+        return result
+
+    def _getPlayerScoreString(playerId):
+        stats = Action._getPlayerStats(playerId, Round.getActiveId())
+        if stats:
+            return '{}:{}'.format(Player.getNameById(playerId), stats['score'])
+        return ''
+
+    def getTeamPlayerStatsString(playerId):
+        return Action._getPlayerScoreString(playerId) + Action._getTeamScoreString()
 
 #events
     def getEventList(roundId, rows):
@@ -344,6 +375,15 @@ class Action:
             thisEvent['player2'] = { 'name' : Player.getNameById(player2Id), 'team' : Team.getNameById(Team.getPlayerTeamId(player2Id, roundId))}
             eventList.append(thisEvent)
         return eventList
+
+    def _storeEvents(events):
+        if events:
+            with open('events.json', 'w') as jsonFile:
+                json.dump(events, jsonFile, indent = 4)
+
+    def getRoundEvents():
+        with open('events.json') as jsonFile:
+            return json.load(jsonFile)[0]
 
 # round calls
     def _roundStartedCall():

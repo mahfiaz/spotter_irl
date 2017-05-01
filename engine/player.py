@@ -16,9 +16,9 @@ class Player:
     def _createDataTable():
         Player.cur.execute("""CREATE TABLE player_data (
             player_id serial PRIMARY KEY,
-            player_name varchar(128) UNIQUE,
-            player_mobile varchar(64) UNIQUE,
-            player_email varchar(128) UNIQUE,
+            player_name varchar(32) UNIQUE,
+            player_mobile varchar(16) UNIQUE,
+            player_email varchar(64) UNIQUE,
             player_code_id int DEFAULT 0,
             player_fleeing_code int DEFAULT 0,
             player_created timestamp DEFAULT statement_timestamp() )""")
