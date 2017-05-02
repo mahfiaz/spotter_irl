@@ -63,7 +63,6 @@ class Code:
 
     def _isActiveCode(playerId, codeId):
         otherCodeId = Code._getCodeIdByPlayerId(playerId)
-#        print(codeId, otherCodeId)
         assert type(codeId) == type(otherCodeId)
         return otherCodeId == codeId
 

@@ -119,11 +119,11 @@ class Event():
 
 
 # get player stats
-    def getPlayerSpotTotalCount(playerId, roundId):
+    def getPlayerSpotCount(playerId, roundId):
         Event.cur.execute("""SELECT COUNT(*) AS event_type
             FROM event_list
-            WHERE (player_id = %s AND event_type IN (%s, %s) AND round_id = %s)""",
-            (playerId, EventType.didSpot.value, EventType.didTouch.value, roundId))
+            WHERE (player_id = %s AND event_type = %s AND round_id = %s)""",
+            (playerId, EventType.didSpot.value, roundId))
         return iterateZero(Event.cur.fetchone())
 
     def getPlayerTouchCount(playerId, roundId):

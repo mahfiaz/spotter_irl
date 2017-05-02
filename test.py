@@ -97,55 +97,46 @@ def fleeAllPlayers():
     Action.printPlayersDetailed()
 
 def addTestAction():
-    print("Not registered test")
+    # not registered user test
     Action.handleCodeValidate("4678", Code.getSpotCodeByPlayerId(1))
+
 
     print("1-1")
     disloyality1 = Event.getPlayerDisloyalityCount(1, Round.getActiveId())
     Action.handleCodeValidate(Player.getMobileById(1), Code.getSpotCodeByPlayerId(1))
     assert Event.getPlayerDisloyalityCount(1, Round.getActiveId()) == disloyality1 + 1
-    Action.fleePlayerWithCode(Player.getFleeingCode(4))
+#    Action.fleePlayerWithCode(Player.getFleeingCode(4))
     Action.printPlayersDetailed()
     time.sleep(0.1)
 
     print("4-1")
-    spotsTotal4 = Event.getPlayerSpotTotalCount(4, Round.getActiveId())
+    spotsTotal4 = Event.getPlayerSpotCount(4, Round.getActiveId())
     Action.handleCodeValidate(Player.getMobileById(4), Code.getSpotCodeByPlayerId(1))
-    assert Event.getPlayerSpotTotalCount(4, Round.getActiveId()) == spotsTotal4
+    assert Event.getPlayerSpotCount(4, Round.getActiveId()) == spotsTotal4
     Action.printPlayersDetailed()
     Action.fleePlayerWithCode(Player.getFleeingCode(1))
     time.sleep(0.1)
 
     print("4-1")
-    spotsTotal4 = Event.getPlayerSpotTotalCount(4, Round.getActiveId())
+    spotsTotal4 = Event.getPlayerSpotCount(4, Round.getActiveId())
     jailed1 = Event.getPlayerJailedCount(1, Round.getActiveId())
     Action.handleCodeValidate(Player.getMobileById(4), Code.getSpotCodeByPlayerId(1))
-    assert Event.getPlayerSpotTotalCount(4, Round.getActiveId()) == spotsTotal4 + 1
+    assert Event.getPlayerSpotCount(4, Round.getActiveId()) == spotsTotal4 + 1
     assert Event.getPlayerJailedCount(1, Round.getActiveId()) == jailed1 + 1
     Action.printPlayersDetailed()
     Action.fleePlayerWithCode(Player.getFleeingCode(4))
     time.sleep(0.1)
 
-    print("1-3")
-    spotsTotal1 = Event.getPlayerSpotTotalCount(1, Round.getActiveId())
-    Action.handleCodeValidate(Player.getMobileById(1), Code.getSpotCodeByPlayerId(3))
-    assert Event.getPlayerSpotTotalCount(1, Round.getActiveId()) == spotsTotal1
-    Action.fleePlayerWithCode(Player.getFleeingCode(1))
-
     print("1-3 teammate")
-    spotsTotal1 = Event.getPlayerSpotTotalCount(1, Round.getActiveId())
+    Action.fleePlayerWithCode(Player.getFleeingCode(1))
+    spots1 = Event.getPlayerSpotCount(1, Round.getActiveId())
     disloyality1 = Event.getPlayerDisloyalityCount(1, Round.getActiveId())
     Action.handleCodeValidate(Player.getMobileById(1), Code.getSpotCodeByPlayerId(3))
-    assert Event.getPlayerSpotTotalCount(1, Round.getActiveId()) == spotsTotal1
-    print(Event.getPlayerDisloyalityCount(1, Round.getActiveId()), disloyality1)
+    assert Event.getPlayerSpotCount(1, Round.getActiveId()) == spots1
     assert Event.getPlayerDisloyalityCount(1, Round.getActiveId()) == disloyality1 + 1
-
-
-    Action.fleePlayerWithCode(Player.getFleeingCode(2))
     Action.fleePlayerWithCode(Player.getFleeingCode(1))
-    Action.printPlayersDetailed()
-    Action.fleePlayerWithCode(Player.getFleeingCode(1))
-    Action.fleePlayerWithCode(Player.getFleeingCode(3))
+
+    fleeAllPlayers()
     time.sleep(0.1)
 
     print("1-H4", Code.getTouchCodeByPlayerId(4))
@@ -206,10 +197,9 @@ def quickTest():
     addTestTeams()
     addTestPlayers()
     addPlayersToTeams()
+    fleeAllPlayers()
     addTestAction()
-    print(Action.getRoundStats())
-    print("toretre", Player.getMobileById(1))
 
 if __name__ == "__main__":
-    testWithInput()
-
+#    testWithInput()
+    quickTest()

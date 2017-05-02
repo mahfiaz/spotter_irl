@@ -142,8 +142,15 @@ class Action:
 
 # handle code
     def handleCodeValidate(mobile, code):
+        if (not mobile) or (not code):
+            print("Warning. handleCode input missing", mobile, code)
+            return
+        if isinstance(code, str):
+            if '?' in code:
+                print("Mode: stats requested")
+                return
+            code = int(re.sub('[^0-9?]', '', code))
         mobile = re.sub('[^0-9+]', '', mobile)
-        code = re.sub('[^0-9?]', '', code)
         if (not mobile) or (not code):
             print("Warning. mobile or code is total chibberish")
             return
@@ -160,9 +167,6 @@ class Action:
         if not Round.updateActiveId():
             Sms.noActiveRound(mobile, Round._getStartTimeOfNext())
             addObscureMessage(senderId, code)
-            return
-        if '?' in code:
-            print("stats requested")
             return
         code = int(code)
         if senderJailed:
@@ -245,31 +249,34 @@ class Action:
     def _getPlayerStats(playerId, roundId):
         stats = {
             'name'              : Player.getNameById(playerId),
-            'totalSpots'        : Event.getPlayerSpotTotalCount(playerId, roundId),
+            'nowInLiberty'      : not Event.isPlayerJailed(playerId),
+            'spotCount'         : Event.getPlayerSpotCount(playerId, roundId),
             'touchCount'        : Event.getPlayerTouchCount(playerId, roundId),
-            'jailed'            : Event.getPlayerJailedCount(playerId, roundId),
+            'jailedCount'       : Event.getPlayerJailedCount(playerId, roundId),
             'disloyality'       : Event.getPlayerDisloyalityCount(playerId, roundId),
             'lastActivity'      : Event.getPlayerLastActivity(playerId).strftime(game_config.database_dateformat)
         }
-        stats['score'] = stats['totalSpots'] + stats['touchCount'] - stats['jailed'] - stats['disloyality']
+        stats['score'] = stats['spotCount'] + 2 * stats['touchCount'] - stats['jailedCount'] - stats['disloyality']
         return stats
 
     def _getTeamStats(teamId, roundId):
         players = Team.getTeamPlayerIdList(teamId)
         teamStats = {
             'name'              : Team.getNameById(teamId),
-            'totalSpots'        : 0,
+            'nowInLiberty'      : 0,
+            'spotCount'         : 0,
             'touchCount'        : 0,
-            'jailed'            : 0,
+            'jailedCount'       : 0,
             'disloyality'       : 0,
             'score'             : 0}
         playersStats = []
         for playerId in players:
             person = Action._getPlayerStats(playerId, roundId)
             playersStats.append(person)
-            teamStats['totalSpots'] += person['totalSpots']
+            teamStats['nowInLiberty'] += person['nowInLiberty']
+            teamStats['spotCount'] += person['spotCount']
             teamStats['touchCount'] += person['touchCount']
-            teamStats['jailed'] += person['jailed']
+            teamStats['jailedCount'] += person['jailedCount']
             teamStats['disloyality'] += person['disloyality']
             teamStats['score'] += person['score']
         teamStats['players'] = playersStats
@@ -285,6 +292,7 @@ class Action:
             'roundName'         : Round.getName(roundId),
             'roundStart'        : Round.getStartTime(roundId).strftime(game_config.database_dateformat),
             'roundEnd'          : Round.getEndTime(roundId).strftime(game_config.database_dateformat),
+            'smsCount'          : Sms._count,
             'teams'             : allTeams}
         return roundStats
 

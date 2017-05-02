@@ -29,7 +29,6 @@ def main():
     Action.printPlayersDetailed()
 
     Round.print()
-    print("round active", Round.isActive())
 
     Action.addTestTeams()
     Action.addPlayersToTeams()

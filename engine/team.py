@@ -26,7 +26,7 @@ class Team:
 # modify teams
     def add(teamName, roundId):
         if not Round.existingId(roundId):
-            print("Error. Team", teamName, "not added, because roundId", roundId, "doesn't exist.")
+            print("Warning. Team", teamName, "not added, because roundId", roundId, "doesn't exist.")
             return
         if not Team._getIdByName(teamName, roundId):
             Team.cur.execute("""INSERT INTO team_list (team_name, round_id)
@@ -40,7 +40,7 @@ class Team:
         Team.removePlayer(playerId, Team._getRoundIdByTeamId(teamId))
         Team.cur.execute("""INSERT INTO team_players (player_id, team_id)
             VALUES (%s, %s)""", (playerId, teamId))
-        print("Player ", Player.getNameById(playerId), " added to ", Team.getNameById(teamId))
+        print(Player.getNameById(playerId), "added to team", Team.getNameById(teamId))
 
     def removePlayer(playerId, roundId):
         if Team.getPlayerTeamId(playerId, roundId):

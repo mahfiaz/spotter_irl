@@ -49,7 +49,7 @@ class Player:
             return name
         except psycopg2.ProgrammingError:
 #TODO solve this bug
-            print("getNameById error. THIS IS BUGGG", playerId)
+            print("ERROR! getNameById error. THIS IS BUGGG", playerId)
 
 
     def getMobileOwnerId(mobile):
@@ -65,7 +65,7 @@ class Player:
             return mobile
         except psycopg2.ProgrammingError:
 #TODO solve this bug
-            print("getMobile error. THIS IS BUGGG", playerId)
+            print("ERROR! getMobile error. THIS IS BUGGG", playerId)
 
 # flee
     def _generateFleeingCode(playerId):
