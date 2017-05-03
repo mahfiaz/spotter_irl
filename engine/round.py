@@ -40,6 +40,12 @@ class Round():
         else:
             print("Error: New round has overlapping time. not added", name, time_start, time_end)
 
+    def addRealRounds():
+        for round in game_config.round_data:
+            starts = datetime.datetime.strptime(game_config.round_day + ' ' + round['starts'] + ':00', game_config.database_dateformat)
+            ends = datetime.datetime.strptime(game_config.round_day + ' ' + round['ends'] + ':00', game_config.database_dateformat)
+            Round.add(round['name'], starts, ends)
+
 # state
     def getActiveId():
         return Round._activeId

@@ -13,6 +13,19 @@ player_fleeingCodeDigits = 3
 code_spotCodeDigits = 4
 code_touchCodeDigits = 7
 
+round_day = '2017-05-27'
+round_data = [
+    {'name':'Soendus',      'starts':'11:05', 'ends':'11:55'},
+    {'name':'Ohtlik',       'starts':'12:05', 'ends':'12:55'},
+    {'name':'Valus',        'starts':'13:05', 'ends':'13:55'},
+    {'name':'Peamine',      'starts':'14:05', 'ends':'14:55'},
+    {'name':'Kibe',         'starts':'15:05', 'ends':'15:55'},
+    {'name':'Kriitiline',   'starts':'16:05', 'ends':'16:55'},
+    {'name':'Karm',         'starts':'17:05', 'ends':'17:55'},
+    {'name':'Viimane',      'starts':'18:05', 'ends':'18:55'}]
+
+
+
 team_names = ('Sinised', 'Punased')
 
 def testConfigParams():

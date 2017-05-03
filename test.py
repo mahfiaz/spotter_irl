@@ -9,10 +9,6 @@ from engine.player import *
 from engine.round import *
 from engine.team import *
 
-teamName1 = "Sinised"
-teamName2 = "Punased"
-
-
 def addTestRoundsShort():
     time.strftime(dateformat)
     time1 = format(datetime.datetime.now() + datetime.timedelta(seconds = -20), dateformat)
@@ -44,21 +40,21 @@ def addTestRoundsNormal():
 def addTestTeams():
     teamCount = len(Team.getTeamsIdList(Round.getActiveId()))
     # shouldnt add, because roundId invalid
-    Team.add(teamName1, roundId = 0)
+    Team.add(game_config.team_names[0], roundId = 0)
     assert len(Team.getTeamsIdList(Round.getActiveId())) == teamCount
 
     # shouldnt add, because roundId invalid
-    Team.add(teamName2, roundId = 0)
+    Team.add(game_config.team_names[1], roundId = 0)
     assert len(Team.getTeamsIdList(Round.getActiveId())) == teamCount
 
-    Team.add(teamName1, roundId = Round.getActiveId())
+    Team.add(game_config.team_names[0], roundId = Round.getActiveId())
     assert len(Team.getTeamsIdList(Round.getActiveId())) == teamCount + 1
 
-    Team.add(teamName2, roundId = Round.getActiveId())
+    Team.add(game_config.team_names[1], roundId = Round.getActiveId())
     assert len(Team.getTeamsIdList(Round.getActiveId())) == teamCount + 2
 
     # should not add, because name is not unique
-    Team.add(teamName1, roundId = Round.getActiveId())
+    Team.add(game_config.team_names[0], roundId = Round.getActiveId())
     assert len(Team.getTeamsIdList(Round.getActiveId())) == teamCount + 2
 
 
@@ -91,8 +87,8 @@ def addTestPlayers():
 def addPlayersToTeams():
     players = Player.getAllPlayerIds()
     for pl1, pl2 in zip(players[0::2], players[1::2]):
-        Team.addPlayer(pl1, Team._getIdByName(teamName1, Round.getActiveId()))
-        Team.addPlayer(pl2, Team._getIdByName(teamName2, Round.getActiveId()))
+        Team.addPlayer(pl1, Team._getIdByName(game_config.team_names[0], Round.getActiveId()))
+        Team.addPlayer(pl2, Team._getIdByName(game_config.team_names[1], Round.getActiveId()))
 
 def fleeAllPlayers():
     for playerId in Player.getAllPlayerIds():
@@ -198,8 +194,10 @@ def testWithInput():
     cursor = connection.cursor()
 
     Action.initAllOnce(cursor)
-#    addTestRoundsShort()
-    addTestRoundsNormal()
+    addTestRoundsShort()
+#    addTestRoundsNormal()
+#    Round.addRealRounds()
+
     Action.addTeams(Round.getActiveId())
     addTestPlayers()
     addPlayersToTeams()

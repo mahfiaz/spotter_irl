@@ -23,6 +23,7 @@ def main():
 
     Action.initAllOnce(cursor)
 
+#    Round.addRealRounds()
     Round.addTestRounds()
     Action.printPlayersDetailed()
     Action.addTestPlayers()
