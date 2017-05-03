@@ -1,7 +1,7 @@
 import random
 import game_config
 import math
-
+import hashlib
 import psycopg2
 
 from .helper import iterateZero
@@ -21,6 +21,7 @@ class Player:
             player_email varchar(64) UNIQUE,
             player_code_id int DEFAULT 0,
             player_fleeing_code int DEFAULT 0,
+            player_web_hash char(6) UNIQUE,
             player_created timestamp DEFAULT statement_timestamp() )""")
 
 # modify
@@ -30,10 +31,21 @@ class Player:
             WHERE player_name = %s OR player_mobile = %s OR player_email = %s""",
             (name, mobile, email))
         if not Player.cur.fetchone():
-            Player.cur.execute("""INSERT INTO player_data (player_name, player_mobile, player_email) VALUES (%s, %s, %s)""", (name, mobile, email))
+            hash = Player._generateHash(name)
+            Player.cur.execute("""INSERT INTO player_data (player_name, player_mobile, player_email, player_web_hash) 
+                VALUES (%s, %s, %s, %s)""", (name, mobile, email, hash))
             newId = Player._getIdByName(name)
             Player._generateFleeingCode(newId)
             return newId
+
+    def _generateHash(name):
+        unique = True
+        while unique:
+            hash = hashlib.sha224(name.encode('utf-8')).hexdigest()[-6:]
+            Player.cur.execute("""SELECT * FROM player_data
+                WHERE player_name = %s""",(hash,))
+            if not Player.cur.fetchone():
+                return hash
 
 # gets
     def _getIdByName(playerName):
@@ -41,16 +53,20 @@ class Player:
             WHERE player_name = %s""", [playerName])
         return iterateZero(Player.cur.fetchone())
 
+    def getIdByHash(hash):
+        Player.cur.execute("""SELECT player_id FROM player_data
+            WHERE player_web_hash = %s""", [hash])
+        return iterateZero(Player.cur.fetchone())
+
+    def getHashById(playerId):
+        Player.cur.execute("""SELECT player_web_hash FROM player_data
+            WHERE player_id = %s""", (playerId,))
+        return iterateZero(Player.cur.fetchone())
+
     def getNameById(playerId):
         Player.cur.execute("""SELECT player_name FROM player_data
             WHERE player_id = %s""", (playerId,))
-        try:
-            name = iterateZero(Player.cur.fetchone())
-            return name
-        except psycopg2.ProgrammingError:
-#TODO solve this bug
-            print("ERROR! getNameById error. THIS IS BUGGG", playerId)
-
+        return iterateZero(Player.cur.fetchone())
 
     def getMobileOwnerId(mobile):
         Player.cur.execute("""SELECT player_id FROM player_data
@@ -60,12 +76,7 @@ class Player:
     def getMobileById(playerId):
         Player.cur.execute("""SELECT player_mobile FROM player_data
             WHERE player_id = %s""", [playerId])
-        try:
-            mobile = iterateZero(Player.cur.fetchone())
-            return mobile
-        except psycopg2.ProgrammingError:
-#TODO solve this bug
-            print("ERROR! getMobile error. THIS IS BUGGG", playerId)
+        return iterateZero(Player.cur.fetchone())
 
 # flee
     def _generateFleeingCode(playerId):
@@ -88,6 +99,13 @@ class Player:
     def getAllPlayerIds():
         Player.cur.execute("""SELECT player_id FROM player_data """)
         return Player.cur.fetchall()
+
+    def getPlayerMobilesNamesList():
+        playerList = []
+        for id in Player.getAllPlayerIds():
+            data = Player.getMobileById(id), Player.getNameById(id)
+            playerList.append(data)
+        return playerList
 
 
     def print():

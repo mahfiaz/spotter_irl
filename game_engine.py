@@ -48,8 +48,8 @@ def main():
 if __name__ == "__main__":
     main()
 
-#TODO
-# input validation
-# multilingual support
+# TODO
+    # interfacing with web
+    # input validation
 # if new round starts - start it at event too Event.setRoundId
     # equality ! check types

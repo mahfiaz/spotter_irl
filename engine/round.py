@@ -3,6 +3,7 @@ import time
 from threading import Timer
 
 import game_config
+from .player import Player
 from .helper import iterateZero
 
 dateformat = game_config.database_dateformat
@@ -137,16 +138,16 @@ class Round():
     def _roundStartCall():
         Round.updateActiveId()
         if Round._callRoundStarted:
-            Round._callRoundStarted()
+            Round._callRoundStarted(Player.getPlayerMobilesNamesList(), Round.getName(Round.getActiveId()))
 
     def _minutesLeftCall(left):
         if Round._callRoundEnding:
-            Round._callRoundEnding(left)
+            Round._callRoundEnding(Player.getPlayerMobilesNamesList(), Round.getName(Round.getActiveId()), left)
 
     def _roundOverCall():
         Round.updateActiveId()
         if Round._callRoundEnded:
-            Round._callRoundEnded()
+            Round._callRoundEnded(Player.getPlayerMobilesNamesList(), Round.getName(Round.getActiveId()))
 
 # print
     def print():

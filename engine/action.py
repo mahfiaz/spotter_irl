@@ -19,9 +19,9 @@ class Sms:
         if isinstance(mobile, str):
             if mobile.isdigit():
                 if sendStats:
-                    print("     SMS:", mobile, data, Action.getTeamPlayerStatsString(Player.getMobileOwnerId(mobile)))
-                else:
-                    print("     SMS:", mobile, data)
+                    data += Action.getTeamPlayerStatsString(Player.getMobileOwnerId(mobile))
+# placeholder to true SMS send function
+                print("     SMS:", mobile, data)
                 Sms._count += 1
         else:
             print(" Errror! send sms", mobile, data)
@@ -141,32 +141,56 @@ class Action:
             Team.add(teamName, roundId)
 
 # handle code
-    def handleCodeValidate(mobile, code):
-        if (not mobile) or (not code):
-            print("Warning. handleCode input missing", mobile, code)
+
+    def _codeValidate(code):
+        if not code:
+            print("Warning. code input missing", code)
             return
         if isinstance(code, str):
-            if '?' in code:
-                print("Mode: stats requested")
-                return
-            code = int(re.sub('[^0-9?]', '', code))
-        mobile = re.sub('[^0-9+]', '', mobile)
-        if (not mobile) or (not code):
-            print("Warning. mobile or code is total chibberish")
-            return
-        Action._handleCode(mobile, code)
+            code = int(re.sub('[^0-9]', '', code))
+        assert isinstance(code, int)
+        return code
 
-    def _handleCode(mobile, code):
+    def _mobileValidate(mobile):
+        if not mobile:
+            print("Warning. mobile input missing", mobile)
+            return
+        assert isinstance(mobile, str)
+        return re.sub('[^0-9+]', '', mobile)
+
+    def _hashValidate(hash):
+        if not hash:
+            print("Warning. hash input missing", hash)
+            return
+        assert isinstance(hash, str)
+        return re.sub('[^a-z0-9]', '', hash)
+
+
+    def handleSms(mobile, message):
+        mobile = Action._mobileValidate(mobile)
+        code = Action._codeValidate(message)
         senderId = Player.getMobileOwnerId(mobile)
+        Action._handleCode(senderId, code, byMobile = True)
+
+    def handleWeb(hash, code):
+        hash = Action._hashValidate(hash)
+        code = Action._codeValidate(code)
+        senderId = Player.getIdByHash(hash)
+        Action._handleCode(senderId, code, byMobile = False)
+
+    def _handleCode(senderId, code, byMobile):
+        mobile = Player.getMobileById(senderId)
         senderJailed = Event.isPlayerJailed(senderId)
         senderName = Player.getNameById(senderId)
         if not senderId:
             Event.addObscureMessage(mobile, code)
-            Sms.notSignedUp(mobile)
+            if byMobile:
+                Sms.notSignedUp(mobile)
             return
         if not Round.updateActiveId():
-            Sms.noActiveRound(mobile, Round._getStartTimeOfNext())
             addObscureMessage(senderId, code)
+            if byMobile:
+                Sms.noActiveRound(mobile, Round._getStartTimeOfNext())
             return
         code = int(code)
         if senderJailed:
@@ -220,8 +244,8 @@ class Action:
         else:
             BaseMsg.fleeingCodeMismatch()
 
-    def _fleeTimerCall(playerId):
-        Sms.fleeingProtectionOver(Player.getMobileById(playerId), Player.getNameById(playerId))
+    def _fleeTimerCall(mobile, name):
+        Sms.fleeingProtectionOver(mobile, name)
 
     def _flee(playerId):
         if Player.getNameById(playerId):
@@ -229,7 +253,7 @@ class Action:
                 Player._generateFleeingCode(playerId)
                 Event.addFlee(playerId)
                 Code.generateNewCodes(playerId)
-                Timer(game_config.player_fleeingProtectionTime, Action._fleeTimerCall, (playerId,)).start()
+                Timer(game_config.player_fleeingProtectionTime, Action._fleeTimerCall, (Player.getMobileById(playerId), Player.getNameById(playerId),)).start()
                 BaseMsg.fledSuccessful(Player.getNameById(playerId), round(game_config.player_fleeingProtectionTime / 60, 1))
                 return playerId
             else:
@@ -242,6 +266,10 @@ class Action:
         Action._storeStats(stats)
         events = Action.getEventList(Round.getActiveId(), 15)
         Action._storeEvents(events)
+
+    def printStats():
+        stats = Action.getRoundStats()
+        events = Action.getRoundEvents()
         Action.printIndented(stats)
         Action.printIndented(events)
         Action.printIndented(Action._getTeamScores(stats))
@@ -361,23 +389,25 @@ class Action:
             return json.load(jsonFile)[0]
 
 # round calls
-    def _roundStartedCall():
+
+    def _roundStartedCall(playerMobileName, roundName):
         BaseMsg.roundStarted()
-        for id in Player.getAllPlayerIds():
-            mobile = Player.getMobileById(id)
-            Sms.roundStarted(mobile, Round.getName(Round.getActiveId()))
+        for (mobile, name) in playerMobileName:
+            Sms.roundStarted(mobile, roundName)
+            time.sleep(0.05)
 
-    def _roundEndingCall(left):
+    def _roundEndingCall(playerMobileName, roundName, left):
         BaseMsg.roundEnding(left)
-        for id in Player.getAllPlayerIds():
-            mobile = Player.getMobileById(id)
-            Sms.roundEnding(mobile, Round.getName(Round.getActiveId()), left)
+        for (mobile, name) in playerMobileName:
+            Sms.roundEnding(mobile, roundName, left)
+            time.sleep(0.05)
 
-    def _roundEndedCall():
+
+    def _roundEndedCall(playerMobileName, roundName):
         BaseMsg.roundEnded()
-        for id in Player.getAllPlayerIds():
-            mobile = Player.getMobileById(id)
-            Sms.roundEnded(mobile, Round.getName(Round.getActiveId()))
+        for (mobile, name) in playerMobileName:
+            Sms.roundEnded(mobile, roundName)
+            time.sleep(0.05)
 
 # print
     def printPlayersDetailed():
