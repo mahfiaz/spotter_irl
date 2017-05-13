@@ -12,19 +12,19 @@ from enum import Enum, auto
 #EventType = enum('didFlee', 'didSpot', 'didTouch', 'failedSpot', 'didSpotJailed', 'didSpotMate', 'wasSpotted', 'wasTouched', 'wasAdded', 'wasExposingSelf', 'wasAimedOldCode', 'obscureMessage', 'unregisteredMessage')
 
 class EventType(Enum):
-    didFlee = auto()
-    didSpot = auto()
-    didTouch = auto()
-    failedSpot = auto()
-    didSpotJailed = auto()
-    didSpotMate = auto()
-    wasSpotted = auto()
-    wasTouched = auto()
-    wasAdded = auto()
-    wasExposingSelf = auto()
-    wasAimedOldCode = auto()
-    obscureMessage = auto()
-    unregisteredMessage = auto()
+    didFlee = 1
+    didSpot = 2
+    didTouch = 3
+    failedSpot = 4
+    didSpotJailed = 5
+    didSpotMate = 6
+    wasSpotted = 7
+    wasTouched = 8
+    wasAdded = 9
+    wasExposingSelf = 10
+    wasAimedOldCode = 11
+    obscureMessage = 12
+    unregisteredMessage = 13
 
 
 class Event:
