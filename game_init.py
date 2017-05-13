@@ -35,7 +35,7 @@ def initGame():
 
 # remove these
 #    Action.addTestPlayers()
-#    Action.printPlayersDetailed()
+#    Stats.printPlayersDetailed()
 
     try:
         os.remove(file_events)

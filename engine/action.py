@@ -19,7 +19,7 @@ class Sms:
         if isinstance(mobile, str):
             if mobile.isdigit():
                 if sendStats:
-                    data += " " + Action.getTeamPlayerStatsString(Player.getMobileOwnerId(mobile))
+                    data += " " + Stats.getTeamPlayerStatsString(Player.getMobileOwnerId(mobile))
 # TODO placeholder to true SMS send function
                 print("     SMS:", mobile, data)
                 Sms._count += 1
@@ -119,7 +119,7 @@ class Action:
         Code.initDB(cursor)
         Team.initDB(cursor)
         Event.initDB(cursor)
-        Action.updateStats()
+        Stats.updateStats()
 
     def initAllConnect(cursor):
         Round.initConnect(cursor)
@@ -128,7 +128,7 @@ class Action:
         Team.initConnect(cursor)
         Event.initConnect(cursor)
         Round.setCallbacks(roundStarted = Action._roundStartedCall, roundEnding = Action._roundEndingCall, roundEnded = Action._roundEndedCall)
-        Action.updateStats()
+        Stats.updateStats()
 
 
 # modify
@@ -143,7 +143,7 @@ class Action:
             Event.addPlayer(newPlayerId)
             BaseMsg.playerAdded(name)
             Sms.playerAdded(mobile, name, Player.getFleeingCode(newPlayerId))
-            Action.updateStats()
+            Stats.updateStats()
         else:
             BaseMsg.playerNotUnique(name, mobile, email)
         return newPlayerId
@@ -161,7 +161,7 @@ class Action:
             return
         if Team.addPlayer(playerId, Team._getIdByName(teamName, Round.getActiveId())):
             Code.generateNewCodes(playerId)
-        Action.updateStats()
+        Stats.updateStats()
 
     def addTeamsToAllRounds():
         for roundId in Round.getRoundIdList():
@@ -218,7 +218,7 @@ class Action:
             if byMobile and mobile:
                 Sms.notSignedUp(mobile)
             return
-        if not Round.updateActiveId():
+        if not Round.updateActiveId() or not code:
             Event.addObscureMessage(senderId, code)
             if byMobile:
                 Sms.noActiveRound(mobile, Round._getStartTimeOfNext())
@@ -232,7 +232,7 @@ class Action:
         if not victimId:
             # first add event, then update stats and then send sms with updated stats
             Event.addFailedSpot(senderId, code)
-            Action.updateStats()
+            Stats.updateStats()
             Sms.missed(mobile, Player.getNameById(senderId))
             return
         victimJailed = Event.isPlayerJailed(victimId)
@@ -248,22 +248,22 @@ class Action:
         assert type(senderId) == type(victimId)
         if senderId == victimId:
             Event.addExposeSelf(victimId)
-            Action.updateStats()
+            Stats.updateStats()
             Sms.exposedSelf(mobile, senderName, Player.getFleeingCode(senderId))
             return
         if Team.getPlayerTeamId(senderId, Round.getActiveId()) == Team.getPlayerTeamId(victimId, Round.getActiveId()):
             Event.addSpotMate(senderId, victimId)
-            Action.updateStats()
+            Stats.updateStats()
             Sms.spotMate(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
             return
         else:
             if Code._isValidSpotCodeFormat(code):
                 Event.addSpot(senderId, victimId)
-                Action.updateStats()
+                Stats.updateStats()
                 Sms.spotted(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
             elif Code._isValidTouchCodeFormat(code):
                 Event.addTouch(senderId, victimId)
-                Action.updateStats()
+                Stats.updateStats()
                 Sms.touched(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
 
 
@@ -289,30 +289,53 @@ class Action:
                 Player._generateFleeingCode(playerId)
                 Event.addFlee(playerId)
                 Code.generateNewCodes(playerId)
-                Timer(game_config.player_fleeingProtectionTime, Action._fleeTimerCall, (Player.getMobileById(playerId), Player.getNameById(playerId),)).start()
+                timer = Timer(game_config.player_fleeingProtectionTime, Action._fleeTimerCall, (Player.getMobileById(playerId), Player.getNameById(playerId),))
+                timer.daemon=True
+                timer.start()
                 BaseMsg.fledSuccessful(Player.getNameById(playerId), round(game_config.player_fleeingProtectionTime / 60, 1))
                 return playerId
             else:
                 BaseMsg.cantFleeFromLiberty(Player.getNameById(playerId))
                 return False
 
-# stats
+# round calls
+    def _roundStartedCall(playerMobileName, roundName):
+        BaseMsg.roundStarted()
+        for (mobile, name) in playerMobileName:
+            Sms.roundStarted(mobile, roundName)
+            time.sleep(0.05)
+
+    def _roundEndingCall(playerMobileName, roundName, left):
+        BaseMsg.roundEnding(left)
+        for (mobile, name) in playerMobileName:
+            Sms.roundEnding(mobile, roundName, left)
+            time.sleep(0.05)
+
+
+    def _roundEndedCall(playerMobileName, roundName):
+        BaseMsg.roundEnded()
+        for (mobile, name) in playerMobileName:
+            Sms.roundEnded(mobile, roundName)
+            time.sleep(0.05)
+
+
+class Stats:
     def updateStats():
-        stats = Action._calcAllStats(Round.getActiveId())
-        Action._storeStats(stats)
-        events = Action.getEventList(Round.getActiveId(), 15)
-        Action._storeEvents(events)
+        stats = Stats._calcAllStats(Round.getActiveId())
+        Stats._storeStats(stats)
+        events = Stats.getEventList(Round.getActiveId(), 15)
+        Stats._storeEvents(events)
 
     def printStats():
         if not Round.getActiveId():
             print("Warning. printStats() no active round")
             return
-        stats = Action.getRoundStats()
-        events = Action.getRoundEvents()
-        Action.printIndented(stats)
-        Action.printIndented(events)
-        Action.printIndented(Action._getTeamScores(stats))
-        Action.printPlayersDetailed()
+        stats = Stats.getRoundStats()
+        events = Stats.getRoundEvents()
+        Stats.printIndented(stats)
+        Stats.printIndented(events)
+        Stats.printIndented(Stats._getTeamScores(stats))
+        Stats.printPlayersDetailed()
 
     def _getPlayerStats(playerId, roundId):
         stats = {
@@ -339,7 +362,7 @@ class Action:
             'score'             : 0}
         playersStats = []
         for playerId in players:
-            person = Action._getPlayerStats(playerId, roundId)
+            person = Stats._getPlayerStats(playerId, roundId)
             playersStats.append(person)
             teamStats['nowInLiberty'] += person['nowInLiberty']
             teamStats['spotCount'] += person['spotCount']
@@ -353,7 +376,7 @@ class Action:
     def _getTeamplessPlayerStats(roundId):
         teamless = []
         for player in Team.getTeamlessPlayerIdList(roundId):
-            teamless.append(Action._getPlayerStats(player, roundId))
+            teamless.append(Stats._getPlayerStats(player, roundId))
         return teamless
 
     def _calcAllStats(roundId):
@@ -362,14 +385,14 @@ class Action:
         teamIds = Team.getTeamsIdList(roundId)
         allTeams = []
         for id in teamIds:
-            allTeams.append(Action._getTeamStats(id, roundId))
+            allTeams.append(Stats._getTeamStats(id, roundId))
         roundStats = {
             'roundName'         : Round.getName(roundId),
             'roundStart'        : Round.getStartTime(roundId).strftime(game_config.database_dateformat),
             'roundEnd'          : Round.getEndTime(roundId).strftime(game_config.database_dateformat),
             'smsCount'          : Sms._count,
             'teams'             : allTeams,
-            'teamlessPlayers'   : Action._getTeamplessPlayerStats(roundId) }
+            'teamlessPlayers'   : Stats._getTeamplessPlayerStats(roundId) }
         return roundStats
 
     def _storeStats(stats):
@@ -393,24 +416,24 @@ class Action:
             return teamScores
 
     def _getTeamScoreString():
-        stats = Action.getRoundStats()
+        stats = Stats.getRoundStats()
         if not stats:
             print("Warning. Stats could not be fetched")
             return ''
-        teamScores = Action._getTeamScores(stats)
+        teamScores = Stats._getTeamScores(stats)
         result = ''
         for each in teamScores:
             result += ' {}:{}'.format(each['name'], each['score'])
         return result
 
     def _getPlayerScoreString(playerId):
-        stats = Action._getPlayerStats(playerId, Round.getActiveId())
+        stats = Stats._getPlayerStats(playerId, Round.getActiveId())
         if stats:
             return '{}:{}'.format(Player.getNameById(playerId), stats['score'])
         return ''
 
     def getTeamPlayerStatsString(playerId):
-        return Action._getPlayerScoreString(playerId) + Action._getTeamScoreString()
+        return Stats._getPlayerScoreString(playerId) + Stats._getTeamScoreString()
 
 #events
     def getEventList(roundId, rows):
@@ -437,27 +460,6 @@ class Action:
     def getRoundEvents():
         with open('events.json') as jsonFile:
             return json.load(jsonFile)[0]
-
-# round calls
-
-    def _roundStartedCall(playerMobileName, roundName):
-        BaseMsg.roundStarted()
-        for (mobile, name) in playerMobileName:
-            Sms.roundStarted(mobile, roundName)
-            time.sleep(0.05)
-
-    def _roundEndingCall(playerMobileName, roundName, left):
-        BaseMsg.roundEnding(left)
-        for (mobile, name) in playerMobileName:
-            Sms.roundEnding(mobile, roundName, left)
-            time.sleep(0.05)
-
-
-    def _roundEndedCall(playerMobileName, roundName):
-        BaseMsg.roundEnded()
-        for (mobile, name) in playerMobileName:
-            Sms.roundEnded(mobile, roundName)
-            time.sleep(0.05)
 
 # print
     def printPlayersDetailed():

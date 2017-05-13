@@ -126,7 +126,10 @@ class Round:
         next = Round._getStartTimeOfNext()
         if next:
             delay = next - datetime.datetime.now()
-            Timer(delay.total_seconds() + 1, Round._roundStartCall, ()).start()
+            timer = Timer(delay.total_seconds() + 1, Round._roundStartCall, ())
+            timer.daemon=True
+            timer.start()
+
 
     def _roundStart(newActiveId):
         Round._activeId = newActiveId
@@ -134,11 +137,17 @@ class Round:
         early5 = ends - datetime.timedelta(seconds = 2)
         early1 = ends - datetime.timedelta(seconds = 1)
         if datetime.datetime.now() < early5:
-            Timer((early5 - datetime.datetime.now()).total_seconds(), Round._minutesLeftCall, (2,)).start()
+            timer = Timer((early5 - datetime.datetime.now()).total_seconds(), Round._minutesLeftCall, (2,))
+            timer.daemon=True
+            timer.start()
         if datetime.datetime.now() < early1:
-            Timer((early1 - datetime.datetime.now()).total_seconds(), Round._minutesLeftCall, (1,)).start()
+            timer = Timer((early1 - datetime.datetime.now()).total_seconds(), Round._minutesLeftCall, (1,))
+            timer.daemon=True
+            timer.start()
         if datetime.datetime.now() < ends:
-            Timer((ends - datetime.datetime.now()).total_seconds(), Round._roundOverCall, ()).start()
+            timer = Timer((ends - datetime.datetime.now()).total_seconds(), Round._roundOverCall, ())
+            timer.daemon=True
+            timer.start()
 
 # list
     def getRoundIdList():

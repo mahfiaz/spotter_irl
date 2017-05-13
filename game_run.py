@@ -17,30 +17,30 @@ def processInput():
     if 'f' in userText:
         jailCode = input("enter jail code: ")
         Action.fleePlayerWithCode(jailCode)
-        Action.printPlayersDetailed()
+        Stats.printPlayersDetailed()
     if 's' in userText:
         mobile = input("enter mobile: ")
         code = input("enter code: ")
         Action.handleSms(mobile, code)
-        Action.printPlayersDetailed()
+        Stats.printPlayersDetailed()
     if 'a' in userText:
         name = input("enter name: ")
         mobile = input("enter mobile: ")
         email = input("enter email: ")
         Action.addPlayer(name, mobile, email)
-        Action.printPlayersDetailed()
+        Stats.printPlayersDetailed()
     if 'w' in userText:
         hash = input("enter player hash: ")
         code = input("enter code: ")
         Action.handleWeb(hash, code)
-        Action.printPlayersDetailed()
+        Stats.printPlayersDetailed()
     if 't' in userText:
         name = input("enter player name: ")
         team = input("enter team name: ")
         Action.addPlayerToTeam(name, team)
-        Action.printPlayersDetailed()
+        Stats.printPlayersDetailed()
     if 'p' in userText:
-        Action.printStats()
+        Stats.printStats()
 
 
 def main():
@@ -52,8 +52,8 @@ def main():
     Action.initAllConnect(cursor)
 
     Round.updateActiveId()
-    Action.updateStats()
-    Action.printPlayersDetailed()
+    Stats.updateStats()
+    Stats.printPlayersDetailed()
 
 #    Action.addPlayersToTeams()
 

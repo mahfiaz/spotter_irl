@@ -81,7 +81,7 @@ def addTestPlayers():
     id = 3
     assert Player.getIdByHash(Player.getHashById(id)) == id
 
-    Action.printPlayersDetailed()
+    Stats.printPlayersDetailed()
 
 
 def addPlayersToTeams():
@@ -94,7 +94,7 @@ def fleeAllPlayers():
     for playerId in Player.getAllPlayerIds():
         Action.fleePlayerWithCode(Player.getFleeingCode(playerId))
         time.sleep(0.1)
-    Action.printPlayersDetailed()
+    Stats.printPlayersDetailed()
 
 def addTestActionSms():
     # not registered user test
@@ -105,14 +105,14 @@ def addTestActionSms():
     Action.handleSms(Player.getMobileById(1), Code.getSpotCodeByPlayerId(1))
     assert Event.getPlayerDisloyalityCount(1, Round.getActiveId()) == disloyality1 + 1
 #    Action.fleePlayerWithCode(Player.getFleeingCode(4))
-    Action.printPlayersDetailed()
+    Stats.printPlayersDetailed()
     time.sleep(0.1)
 
     print("4-1")
     spotsTotal4 = Event.getPlayerSpotCount(4, Round.getActiveId())
     Action.handleSms(Player.getMobileById(4), Code.getSpotCodeByPlayerId(1))
     assert Event.getPlayerSpotCount(4, Round.getActiveId()) == spotsTotal4
-    Action.printPlayersDetailed()
+    Stats.printPlayersDetailed()
     Action.fleePlayerWithCode(Player.getFleeingCode(1))
     time.sleep(0.1)
 
@@ -122,7 +122,7 @@ def addTestActionSms():
     Action.handleSms(Player.getMobileById(4), Code.getSpotCodeByPlayerId(1))
     assert Event.getPlayerSpotCount(4, Round.getActiveId()) == spotsTotal4 + 1
     assert Event.getPlayerJailedCount(1, Round.getActiveId()) == jailed1 + 1
-    Action.printPlayersDetailed()
+    Stats.printPlayersDetailed()
     Action.fleePlayerWithCode(Player.getFleeingCode(4))
     time.sleep(0.1)
 
@@ -143,7 +143,7 @@ def addTestActionSms():
     Action.handleSms(Player.getMobileById(1), Code.getTouchCodeByPlayerId(4))
     assert Event.getPlayerTouchCount(1, Round.getActiveId()) == touchTotal1 + 1
     Action.fleePlayerWithCode(Player.getFleeingCode(1))
-    Action.printPlayersDetailed()
+    Stats.printPlayersDetailed()
     time.sleep(0.1)
 
 def addTestActionWeb():
@@ -154,7 +154,7 @@ def addTestActionWeb():
     disloyality1 = Event.getPlayerDisloyalityCount(1, Round.getActiveId())
     Action.handleWeb(Player.getHashById(1), Code.getSpotCodeByPlayerId(1))
     assert Event.getPlayerDisloyalityCount(1, Round.getActiveId()) == disloyality1 + 1
-    Action.printPlayersDetailed()
+    Stats.printPlayersDetailed()
     time.sleep(0.1)
 
     print("Web 4-1")
@@ -163,7 +163,7 @@ def addTestActionWeb():
     Action.fleePlayerWithCode(Player.getFleeingCode(4))
     Action.handleWeb(Player.getHashById(4), Code.getSpotCodeByPlayerId(1))
     assert Event.getPlayerSpotCount(4, Round.getActiveId()) == spotsTotal4 + 1
-    Action.printPlayersDetailed()
+    Stats.printPlayersDetailed()
     Action.fleePlayerWithCode(Player.getFleeingCode(1))
     time.sleep(0.1)
 
@@ -183,7 +183,7 @@ def testWithInput():
     addTestPlayers()
     addPlayersToTeams()
     fleeAllPlayers()
-    Action.updateStats()
+    Stats.updateStats()
     stop = False
     while not stop:
         stop = processInput()
