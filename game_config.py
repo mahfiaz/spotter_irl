@@ -13,9 +13,14 @@ player_fleeingCodeDigits = 3
 code_spotCodeDigits = 4
 code_touchCodeDigits = 7
 
-round_day = '2017-05-27'
+file_stats = 'stats.json'
+file_events = 'events.json'
+
+import datetime
+round_day = datetime.datetime.now().date().strftime(database_dateformat[:8])
+#round_day = '2017-05-27'
 round_data = [
-    {'name':'Soendus',      'starts':'11:05', 'ends':'11:55'},
+    {'name':'Soojendus',      'starts':'11:05', 'ends':'11:55'},
     {'name':'Ohtlik',       'starts':'12:05', 'ends':'12:55'},
     {'name':'Valus',        'starts':'13:05', 'ends':'13:55'},
     {'name':'Peamine',      'starts':'14:05', 'ends':'14:55'},

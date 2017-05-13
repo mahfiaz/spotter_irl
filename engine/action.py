@@ -112,13 +112,25 @@ class BaseMsg:
 class Action:
     compactPrint = pprint.PrettyPrinter(width=41, compact=True)
 # init
-    def initAllOnce(cursor):
-        Round.initOnce(cursor)
-        Player.initOnce(cursor)
-        Code.initOnce(cursor)
-        Team.initOnce(cursor)
-        Event.initOnce(cursor)
+    def initAllDB(cursor):
+        Round.initDB(cursor)
+        Player.initDB(cursor)
+        Code.initDB(cursor)
+        Team.initDB(cursor)
+        Event.initDB(cursor)
+        Action.updateStats()
+#        Action._storeStats(stats)
+#        Action._storeEvents(events)
+
+    def initAllConnect(cursor):
+        Round.initConnect(cursor)
+        Player.initConnect(cursor)
+        Code.initConnect(cursor)
+        Team.initConnect(cursor)
+        Event.initConnect(cursor)
         Round.setCallbacks(roundStarted = Action._roundStartedCall, roundEnding = Action._roundEndingCall, roundEnded = Action._roundEndedCall)
+        Action.updateStats()
+
 
 # modify
     def addPlayer(name, mobile, email):
@@ -136,7 +148,24 @@ class Action:
             BaseMsg.playerNotUnique(name, mobile, email)
         return newPlayerId
 
-    def addTeams(roundId):
+    def addPlayerToTeam(name, teamName):
+        if not Round.getActiveId():
+            print("Warning! addPlayerToTeam(). no active round")
+            return
+        if not Player._getIdByName(name):
+            print("Warning! addPlayerToTeam(). no player found")
+            return
+        if not Team._getIdByName(teamName, Round.getActiveId()):
+            print("Warning! addPlayerToTeam(). no team found")
+            return
+        Team.addPlayer(Player._getIdByName(name), Team._getIdByName(teamName, Round.getActiveId()))
+        Action.updateStats()
+
+    def addTeamsToAllRounds():
+        for roundId in Round.getRoundIdList():
+            Action._addConfiguredTeams(roundId)
+
+    def _addConfiguredTeams(roundId):
         for teamName in game_config.team_names:
             Team.add(teamName, roundId)
 
@@ -147,9 +176,9 @@ class Action:
             print("Warning. code input missing", code)
             return
         if isinstance(code, str):
-            code = int(re.sub('[^0-9]', '', code))
-        assert isinstance(code, int)
-        return code
+            code = re.sub('[^0-9]', '', code)
+            if code:
+                return int(code)
 
     def _mobileValidate(mobile):
         if not mobile:
@@ -183,12 +212,12 @@ class Action:
         senderJailed = Event.isPlayerJailed(senderId)
         senderName = Player.getNameById(senderId)
         if not senderId:
-            Event.addObscureMessage(mobile, code)
-            if byMobile:
+            Event.addObscureMessage(senderId, code)
+            if byMobile and mobile:
                 Sms.notSignedUp(mobile)
             return
         if not Round.updateActiveId():
-            addObscureMessage(senderId, code)
+            Event.addObscureMessage(senderId, code)
             if byMobile:
                 Sms.noActiveRound(mobile, Round._getStartTimeOfNext())
             return
@@ -238,7 +267,12 @@ class Action:
 
 # flee
     def fleePlayerWithCode(fleeingCode):
-        playerId = Player.checkFleeingCode(fleeingCode)
+        code = Action._codeValidate(fleeingCode)
+        if not code:
+            return
+        if not Round.getActiveId():
+            return
+        playerId = Player.checkFleeingCode(code)
         if playerId:
             Action._flee(playerId)
         else:
@@ -268,6 +302,9 @@ class Action:
         Action._storeEvents(events)
 
     def printStats():
+        if not Round.getActiveId():
+            print("Warning. printStats() no active round")
+            return
         stats = Action.getRoundStats()
         events = Action.getRoundEvents()
         Action.printIndented(stats)
@@ -311,12 +348,13 @@ class Action:
         return teamStats
 
     def _calcAllStats(roundId):
+        if not roundId:
+            return { 'roundId' : None }
         teamIds = Team.getTeamsIdList(roundId)
         allTeams = []
         for id in teamIds:
             allTeams.append(Action._getTeamStats(id, roundId))
         roundStats = {
-            'roundId'           : roundId,
             'roundName'         : Round.getName(roundId),
             'roundStart'        : Round.getStartTime(roundId).strftime(game_config.database_dateformat),
             'roundEnd'          : Round.getEndTime(roundId).strftime(game_config.database_dateformat),
@@ -367,6 +405,8 @@ class Action:
 #events
     def getEventList(roundId, rows):
         events = Event.getEventListRaw(roundId, rows)
+        if not events:
+            return [{ 'event' : None }]
         eventList = []
         for event in events:
             event, playerId, timestamp = event

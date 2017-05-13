@@ -4,6 +4,7 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import getpass
 import game_config
+import subprocess
 
 localPassword = getpass.getpass()
 localUser = getpass.getuser()
@@ -14,7 +15,9 @@ localHost = "localhost"
 try:
     con = psycopg2.connect("dbname='" + localDBname + "' user='" + localUser + "' host='" + localHost + "' password='" + localPassword + "'")
 except:
-    print("""Error. Database is probably not running. start it by e.g. running 'pg_ctl -D /usr/local/var/postgres start'""")
+    subprocess.check_call("pg_ctl -D /usr/local/var/postgres start", shell=True)
+    con = psycopg2.connect("dbname='" + localDBname + "' user='" + localUser + "' host='" + localHost + "' password='" + localPassword + "'")
+#    print("""Error. Database is probably not running. start it by e.g. running 'pg_ctl -D /usr/local/var/postgres start'""")
 
 con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 cur = con.cursor()

@@ -9,11 +9,15 @@ from .helper import iterateZero
 class Player:
 
 # init
-    def initOnce(cursor):
+    def initDB(cursor):
         Player.cur = cursor
         Player._createDataTable()
 
+    def initConnect(cursor):
+        Player.cur = cursor
+
     def _createDataTable():
+        Player.cur.execute("""DROP TABLE IF EXISTS player_data""")
         Player.cur.execute("""CREATE TABLE player_data (
             player_id serial PRIMARY KEY,
             player_name varchar(32) UNIQUE,

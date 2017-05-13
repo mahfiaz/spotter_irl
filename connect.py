@@ -8,6 +8,7 @@ def connectDB():
     connParams = "dbname='" + database + "' user='" + user + "' host='" + host + "' password='" + password + "'"
     try:
         connection = psycopg2.connect(connParams)
+        connection.set_session(autocommit=True)
         return connection
     except:
         print ("Error. Unable to connect to the database. If losing data is acceptable, try running 'python reset_db.py'")

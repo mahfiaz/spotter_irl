@@ -27,9 +27,6 @@
       </FileRef>
    </Group>
    <FileRef
-      location = "group:../game_engine.py">
-   </FileRef>
-   <FileRef
       location = "group:../game_config.py">
    </FileRef>
    <FileRef
@@ -40,5 +37,11 @@
    </FileRef>
    <FileRef
       location = "group:../connect.py">
+   </FileRef>
+   <FileRef
+      location = "group:../game_init.py">
+   </FileRef>
+   <FileRef
+      location = "group:../game_run.py">
    </FileRef>
 </Workspace>

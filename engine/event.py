@@ -27,14 +27,18 @@ class EventType(Enum):
     unregisteredMessage = auto()
 
 
-class Event():
+class Event:
 
 # init
-    def initOnce(cursor):
+    def initDB(cursor):
         Event.cur = cursor
         Event._createDataTable()
 
+    def initConnect(cursor):
+        Event.cur = cursor
+
     def _createDataTable():
+        Event.cur.execute("""DROP TABLE IF EXISTS event_list""")
         Event.cur.execute("""CREATE TABLE event_list (
             round_id int,
             player_id int,

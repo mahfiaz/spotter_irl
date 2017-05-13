@@ -7,11 +7,15 @@ from .helper import iterateZero
 class Code:
 
 # init
-    def initOnce(cursor):
+    def initDB(cursor):
         Code.cur = cursor
         Code._createDataTable()
 
+    def initConnect(cursor):
+        Code.cur = cursor
+
     def _createDataTable():
+        Code.cur.execute("""DROP TABLE IF EXISTS code_list""")
         Code.cur.execute("""CREATE TABLE code_list (
             code_id serial PRIMARY KEY,
             spot_code int unique,

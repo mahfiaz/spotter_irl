@@ -167,25 +167,6 @@ def addTestActionWeb():
     Action.fleePlayerWithCode(Player.getFleeingCode(1))
     time.sleep(0.1)
 
-def processInput():
-    userText = input("Enter command [Add player] [Spot] [Flee jail] [Print]: ")
-    if 'f' in userText:
-        jailCode = input("enter jail code: ")
-        Action.fleePlayerWithCode(jailCode)
-        Action.printPlayersDetailed()
-    if 's' in userText:
-        mobile = input("enter mobile: ")
-        code = input("enter code: ")
-        Action.handleSms(mobile, code)
-        Action.printPlayersDetailed()
-    if 'a' in userText:
-        name = input("enter name: ")
-        mobile = input("enter mobile: ")
-        email = input("enter email: ")
-        Action.addPlayer(name, mobile, email)
-        Action.printPlayersDetailed()
-    if 'p' in userText:
-        Action.printStats()
 
 def testWithInput():
     connection = connect.connectDB()
@@ -198,7 +179,7 @@ def testWithInput():
 #    addTestRoundsNormal()
 #    Round.addRealRounds()
 
-    Action.addTeams(Round.getActiveId())
+    Action.addConfiguredTeams(Round.getActiveId())
     addTestPlayers()
     addPlayersToTeams()
     fleeAllPlayers()

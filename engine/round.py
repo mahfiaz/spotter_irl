@@ -8,18 +8,22 @@ from .helper import iterateZero
 
 dateformat = game_config.database_dateformat
 
-class Round():
+class Round:
     _activeId = 0
     _callRoundStarted = None
     _callRoundEnding = None
     _callRoundEnded = None
     
 # init
-    def initOnce(cursor):
+    def initDB(cursor):
         Round.cur = cursor
         Round._createDataTable()
 
+    def initConnect(cursor):
+        Round.cur = cursor
+
     def _createDataTable():
+        Round.cur.execute("""DROP TABLE IF EXISTS round_data""")
         Round.cur.execute("""CREATE TABLE round_data (
             round_id serial PRIMARY KEY,
             round_name VARCHAR(30) NOT NULL,
@@ -45,6 +49,7 @@ class Round():
             starts = datetime.datetime.strptime(game_config.round_day + ' ' + round['starts'] + ':00', game_config.database_dateformat)
             ends = datetime.datetime.strptime(game_config.round_day + ' ' + round['ends'] + ':00', game_config.database_dateformat)
             Round.add(round['name'], starts, ends)
+            print("Added Round",round['name'],"which starts", starts,"and ends", ends)
 
 # state
     def getActiveId():
@@ -134,6 +139,13 @@ class Round():
             Timer((early1 - datetime.datetime.now()).total_seconds(), Round._minutesLeftCall, (1,)).start()
         if datetime.datetime.now() < ends:
             Timer((ends - datetime.datetime.now()).total_seconds(), Round._roundOverCall, ()).start()
+
+# list
+    def getRoundIdList():
+        Round.cur.execute("""SELECT round_id
+            FROM round_data""")
+        return Round.cur.fetchall()
+
 
 # callbacks
     def setCallbacks(roundStarted, roundEnding, roundEnded):

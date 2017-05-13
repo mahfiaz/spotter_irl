@@ -6,18 +6,23 @@ from .helper import iterateZero
 class Team:
 
 # init
-    def initOnce(cursor):
+    def initDB(cursor):
         Team.cur = cursor
         Team._createTeamTable()
         Team._createTeamPlayersTable()
 
+    def initConnect(cursor):
+        Team.cur = cursor
+
     def _createTeamTable():
+        Team.cur.execute("""DROP TABLE IF EXISTS team_list""")
         Team.cur.execute("""CREATE TABLE team_list (
             team_id serial PRIMARY KEY,
             team_name VARCHAR(30) NOT NULL,
             round_id int)""")
 
     def _createTeamPlayersTable():
+        Team.cur.execute("""DROP TABLE IF EXISTS team_players""")
         Team.cur.execute("""CREATE TABLE team_players (
             player_id int,
             team_id int,
@@ -31,7 +36,7 @@ class Team:
         if not Team._getIdByName(teamName, roundId):
             Team.cur.execute("""INSERT INTO team_list (team_name, round_id)
                 VALUES (%s, %s)""", (teamName, roundId))
-            print("Team", teamName, "added.")
+            print("Team", teamName, "added to round", Round.getName(roundId))
             return Team._getIdByName(teamName, roundId)
         else:
             print("Warning! Team", teamName, "not added, it already exists.")
