@@ -2,7 +2,7 @@ from .round import Round
 from .helper import iterateZero
 import game_config
 
-from enum import Enum, auto
+from enum import Enum   
 
 #def enum(*args):
 #    enums = dict(zip(args, range(len(args))))
