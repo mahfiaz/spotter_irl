@@ -19,8 +19,8 @@ class Sms:
         if isinstance(mobile, str):
             if mobile.isdigit():
                 if sendStats:
-                    data += Action.getTeamPlayerStatsString(Player.getMobileOwnerId(mobile))
-# placeholder to true SMS send function
+                    data += " " + Action.getTeamPlayerStatsString(Player.getMobileOwnerId(mobile))
+# TODO placeholder to true SMS send function
                 print("     SMS:", mobile, data)
                 Sms._count += 1
         else:
@@ -79,6 +79,7 @@ class Sms:
 class BaseMsg:
 
     def send(msg):
+# TODO placeholder to true base message send function
         print("        Base Msg:", msg)
 
     def fleeingCodeMismatch():
@@ -119,8 +120,6 @@ class Action:
         Team.initDB(cursor)
         Event.initDB(cursor)
         Action.updateStats()
-#        Action._storeStats(stats)
-#        Action._storeEvents(events)
 
     def initAllConnect(cursor):
         Round.initConnect(cursor)
@@ -144,6 +143,7 @@ class Action:
             Event.addPlayer(newPlayerId)
             BaseMsg.playerAdded(name)
             Sms.playerAdded(mobile, name, Player.getFleeingCode(newPlayerId))
+            Action.updateStats()
         else:
             BaseMsg.playerNotUnique(name, mobile, email)
         return newPlayerId
@@ -152,13 +152,15 @@ class Action:
         if not Round.getActiveId():
             print("Warning! addPlayerToTeam(). no active round")
             return
-        if not Player._getIdByName(name):
+        playerId = Player._getIdByName(name)
+        if not playerId:
             print("Warning! addPlayerToTeam(). no player found")
             return
         if not Team._getIdByName(teamName, Round.getActiveId()):
             print("Warning! addPlayerToTeam(). no team found")
             return
-        Team.addPlayer(Player._getIdByName(name), Team._getIdByName(teamName, Round.getActiveId()))
+        if Team.addPlayer(playerId, Team._getIdByName(teamName, Round.getActiveId())):
+            Code.generateNewCodes(playerId)
         Action.updateStats()
 
     def addTeamsToAllRounds():
@@ -310,6 +312,7 @@ class Action:
         Action.printIndented(stats)
         Action.printIndented(events)
         Action.printIndented(Action._getTeamScores(stats))
+        Action.printPlayersDetailed()
 
     def _getPlayerStats(playerId, roundId):
         stats = {
@@ -347,6 +350,12 @@ class Action:
         teamStats['players'] = playersStats
         return teamStats
 
+    def _getTeamplessPlayerStats(roundId):
+        teamless = []
+        for player in Team.getTeamlessPlayerIdList(roundId):
+            teamless.append(Action._getPlayerStats(player, roundId))
+        return teamless
+
     def _calcAllStats(roundId):
         if not roundId:
             return { 'roundId' : None }
@@ -359,7 +368,8 @@ class Action:
             'roundStart'        : Round.getStartTime(roundId).strftime(game_config.database_dateformat),
             'roundEnd'          : Round.getEndTime(roundId).strftime(game_config.database_dateformat),
             'smsCount'          : Sms._count,
-            'teams'             : allTeams}
+            'teams'             : allTeams,
+            'teamlessPlayers'   : Action._getTeamplessPlayerStats(roundId) }
         return roundStats
 
     def _storeStats(stats):
@@ -451,12 +461,16 @@ class Action:
 
 # print
     def printPlayersDetailed():
-        Player.cur.execute("""SELECT player_data.player_id, player_data.player_name, player_data.player_mobile, team_players.team_id, player_data.player_fleeing_code, code_list.spot_code, code_list.touch_code
+        Player.cur.execute("""SELECT player_data.player_id, player_data.player_name, player_data.player_mobile, player_data.player_web_hash, player_data.player_fleeing_code, code_list.spot_code, code_list.touch_code
             FROM player_data 
                 JOIN code_list ON (player_data.player_code_id = code_list.code_id)
-                JOIN team_players ON (player_data.player_id = team_players.player_id)
             """)
         rows = Player.cur.fetchall()
+        print(" - ID MOB HASH  JAIL SPOT TOUCH   STATE  TEAM    NAME")
         for row in rows:
-            (id, name, mobile, teamId, fleeingCode, spotCode, touchCode) = row
-            print(" - ", id, mobile, teamId, fleeingCode, spotCode, touchCode, Event.isPlayerJailed(row[0]), name)
+            (id, name, mobile, webHash, fleeingCode, spotCode, touchCode) = row
+            team = Team.getNameById(Team.getPlayerTeamId(id, Round.getActiveId()))
+            jailed = "jailed"
+            if not Event.isPlayerJailed(id):
+                jailed = "free  "
+            print(" - ", id, mobile, webHash, fleeingCode, spotCode, touchCode, jailed, team, name)

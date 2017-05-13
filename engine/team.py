@@ -42,15 +42,23 @@ class Team:
             print("Warning! Team", teamName, "not added, it already exists.")
 
     def addPlayer(playerId, teamId):
-        Team.removePlayer(playerId, Team._getRoundIdByTeamId(teamId))
+        if not Team.removePlayer(playerId, teamId):
+            return
         Team.cur.execute("""INSERT INTO team_players (player_id, team_id)
             VALUES (%s, %s)""", (playerId, teamId))
         print(Player.getNameById(playerId), "added to team", Team.getNameById(teamId))
+        return True
 
-    def removePlayer(playerId, roundId):
-        if Team.getPlayerTeamId(playerId, roundId):
+    def removePlayer(playerId, teamId):
+        roundId = Team._getRoundIdByTeamId(teamId)
+        if not roundId:
+            print("Warning. addPlayer() round or team did not exist")
+            return False
+        oldTeamId = Team.getPlayerTeamId(playerId, roundId)
+        if oldTeamId:
             Team.cur.execute("""DELETE FROM team_players
-                WHERE round_id = %s AND player_id = %s""", (roundId, playerId))
+                WHERE team_id = %s AND player_id = %s""", (oldTeamId, playerId))
+        return True
 
 # gets
     def _getIdByName(teamName, roundId):
@@ -77,6 +85,13 @@ class Team:
             WHERE player_id = %s AND team_id IN 
             (SELECT team_id FROM team_list WHERE round_id = %s)""", (playerId, roundId))
         return iterateZero(Team.cur.fetchone())
+
+    def getTeamlessPlayerIdList(roundId):
+        teamlessPlayers = []
+        for id in Player.getAllPlayerIds():
+            if not Team.getPlayerTeamId(id, roundId):
+                teamlessPlayers.append(id)
+        return teamlessPlayers
 
 # get lists
     def getTeamPlayerIdList(teamId):

@@ -13,7 +13,7 @@ from engine.team import *
 
 
 def processInput():
-    userText = input("Enter command [Add player] [Team player] [Spot] [Web spot] [Flee jail] [Print]: ")
+    userText = input("Enter command [Add player] [Team player] [Spot] [Web spot] [Flee jail] [Print]: \n")
     if 'f' in userText:
         jailCode = input("enter jail code: ")
         Action.fleePlayerWithCode(jailCode)
