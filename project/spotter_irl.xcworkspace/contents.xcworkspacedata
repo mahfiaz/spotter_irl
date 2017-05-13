@@ -5,6 +5,9 @@
       location = "container:"
       name = "Objects">
       <FileRef
+         location = "group:../engine/message.py">
+      </FileRef>
+      <FileRef
          location = "group:../engine/helper.py">
       </FileRef>
       <FileRef
