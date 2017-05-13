@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <title>Spotter IRL</title>
+        <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+
+        <script type="text/javascript">
+            
+            var xhr = new XMLHttpRequest();
+            /*
+            xhr.onreadystatechange = dataReceived;
+            function dataReceived() {
+                document.getElementById("song").innerHTML = xhr.responseText;
+            }
+            */
+            function register() {
+
+                var user = document.getElementById("user");
+                var phone = document.getElementById("phone");
+                var email = document.getElementById("email");
+
+                xhr.open("GET", "/register?user="+user.innerHTML+"&phone="+phone.innerHTML+"&email="+email.innerHTML, true);
+                xhr.send();
+
+            }
+
+        </script>
+
+    </head>
+    <body>
+        <div class="col-xs-12"  style="text-align:center;">
+
+            <p>
+                <b><p style="font-size:400%;">Welcome</p>
+                <p style="font-size:300%;">to spotter IRL</p></b>
+                <p style="font-size:200%;">If you would like to join
+                <br>the game, we need a 
+                <br>bit of data about you.</p>
+            
+            <form action="register" method="GET">
+                <input id="user" name="user" type="text" placeholder="Player name" size="20">
+                <br>
+                <input id="phone" name="phone" type="text" placeholder="Phone nr" size="20">
+                <br>
+                <input id="email" name="email" type="eamil" placeholder="Email" size="20">
+                <br>
+                <input id="NOTplayerSubmit" type="submit" value="Ready" onclick="register()">
+            </form>
+            </p>
+        </div>
+    </body>
+</html>

@@ -22,11 +22,18 @@ class Player:
             player_id serial PRIMARY KEY,
             player_name varchar(32) UNIQUE,
             player_mobile varchar(16) UNIQUE,
-            player_email varchar(64) UNIQUE,
+            player_email varchar(64),
             player_code_id int DEFAULT 0,
             player_fleeing_code int DEFAULT 0,
             player_web_hash char(6) UNIQUE,
             player_created timestamp DEFAULT statement_timestamp() )""")
+
+
+# Delete player, who added wrong data to avoid phonenumber and username conflicts
+    def delPlayer(playerName):
+        Player.cur.execute("""DELETE FROM player_data WHERE player_name = %s""",(playerName,))
+        
+
 
 # modify
     def add(name, mobile, email):
