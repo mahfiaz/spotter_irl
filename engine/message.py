@@ -1,5 +1,18 @@
 from game_config import msgCellular, msgBase
 
+
+def parseIncomingSms(senderMobile, contents, sent = None, received = None):
+    """
+    This is called directly from the SMS receiving thread.
+    Whatever you do here, please make it quick and when done
+    return the event so it can be added to events queue.
+    """
+    print("SMS received from %s" % senderMobile)
+    # TODO do the actual parsing thing
+    event = ''
+    return event
+
+
 class Sms:
     _count = 0
     _statsCallback = None

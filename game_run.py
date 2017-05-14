@@ -2,6 +2,9 @@
 
 #import game_config
 
+from queue import Queue
+from threading import Thread
+
 import connect
 
 from engine.event import *
@@ -11,6 +14,7 @@ from engine.player import *
 from engine.round import *
 from engine.team import *
 
+from spotter_sms.smsserver import sms_sender, sms_receiver
 
 def processInput():
     userText = input("Enter command [Add player] [Team player] [Spot] [Web spot] [Flee jail] [Print]: \n")
@@ -46,6 +50,7 @@ def processInput():
 def main():
     connection = connect.connectDB()
     if not connection:
+        print("Could not connect to database")
         return
     cursor = connection.cursor()
 
@@ -56,6 +61,22 @@ def main():
     Stats.printPlayersDetailed()
 
 #    Action.addPlayersToTeams()
+
+    # Queue for incoming events from web server and incoming SMSes
+    incoming_events = Queue()
+
+    # Start SMS receiving thread
+    # incoming SMSes will be parsed to events
+    sms_in_thread = Thread(target=sms_receiver, args=(incoming_events,))
+    sms_in_thread.setDaemon(True)
+    sms_in_thread.start()
+
+    # Start SMS sending thread with listening queue
+    # queue expects tuples with (number, data)
+    sms_out = Queue()
+    sms_out_thread = Thread(target=sms_sender, args=(sms_out,))
+    sms_out_thread.setDaemon(True)
+    sms_out_thread.start()
 
     while True:
         processInput()
