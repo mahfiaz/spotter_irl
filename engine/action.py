@@ -181,6 +181,7 @@ class Action:
         playerId = Player.checkFleeingCode(code)
         if playerId:
             Action._flee(playerId)
+            Stats.updateStats()
         else:
             BaseMsg.fleeingCodeMismatch()
 
@@ -251,7 +252,7 @@ class Stats:
             'disloyality'       : Event.getPlayerDisloyalityCount(playerId, roundId),
             'lastActivity'      : Event.getPlayerLastActivity(playerId).strftime(game_config.database_dateformat)
         }
-        stats['score'] = stats['spotCount'] + 2 * stats['touchCount'] - stats['jailedCount'] - stats['disloyality']
+        stats['score'] = stats['spotCount'] + 2 * stats['touchCount'] - stats['disloyality']
         return stats
 
     def _getTeamStats(teamId, roundId):
