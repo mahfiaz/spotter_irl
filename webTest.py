@@ -18,17 +18,13 @@ SESSION_TYPE = 'Redis'
 app.config.from_object(__name__)
 app.secret_key = os.urandom(24)
 
-teamName1 = "Sinised"
-teamName2 = "Punased"
-
-
 
 # START BLOCK
 # Player registration
 
 
 def registrationTemplate():
-	return render_template("playerRegistration.html")
+	return render_template("regi")
 
 @app.route("/")
 def isLoggedin():
@@ -36,7 +32,7 @@ def isLoggedin():
 		if session["user"] == None:
 			return registrationTemplate()
 		else:
-			return render_template("playerPending.html", user=session["user"], phone=session["phone"], email=session["email"])
+			return render_template("pending", user=session["user"], phone=session["phone"], email=session["email"])
 	except KeyError:
 		return registrationTemplate()
 
@@ -82,7 +78,7 @@ def jailStatus():
 
 @app.route("/masterlogin")
 def masterLoginTemplate():
-	return render_template("masterLogin.html")
+	return render_template("m_auth")
 
 
 def masterView():
@@ -90,7 +86,7 @@ def masterView():
 	for person in teamless:
 		print(person)
 	rounds = Round.getRounds()
-	return render_template("base.html", rounds=rounds, teamless=teamless)
+	return render_template("master", rounds=rounds, teamless=teamless)
 
 
 def isMaster():
@@ -139,7 +135,7 @@ def hue():
 		events = json.load(data_file)
 	with open('stats.json') as data_file:
 		stats = json.load(data_file)
-	return render_template("baas.html", events = events, stats = stats)
+	return render_template("stats", events = events, stats = stats)
 # Spawnmaster screen
 # END BLOCK
 
