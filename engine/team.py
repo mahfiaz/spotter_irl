@@ -19,6 +19,7 @@ class Team:
         Team.cur.execute("""CREATE TABLE team_list (
             team_id serial PRIMARY KEY,
             team_name VARCHAR(30) NOT NULL,
+            team_color CHAR(6),
             round_id int)""")
 
     def _createTeamPlayersTable():
@@ -29,13 +30,13 @@ class Team:
             added timestamp DEFAULT statement_timestamp() )""")
 
 # modify teams
-    def add(teamName, roundId):
+    def add(teamName, color, roundId):
         if not Round.existingId(roundId):
             print("Warning. Team", teamName, "not added, because roundId", roundId, "doesn't exist.")
             return
         if not Team._getIdByName(teamName, roundId):
-            Team.cur.execute("""INSERT INTO team_list (team_name, round_id)
-                VALUES (%s, %s)""", (teamName, roundId))
+            Team.cur.execute("""INSERT INTO team_list (team_name, round_id, team_color)
+                VALUES (%s, %s, %s)""", (teamName, roundId, color))
             print("Team", teamName, "added to round", Round.getName(roundId))
             return Team._getIdByName(teamName, roundId)
         else:
@@ -69,6 +70,12 @@ class Team:
 
     def getNameById(teamId):
         Team.cur.execute("""SELECT team_name
+            FROM team_list
+            WHERE team_id = %s""", [teamId])
+        return iterateZero(Team.cur.fetchone())
+
+    def getColorById(teamId):
+        Team.cur.execute("""SELECT team_color
             FROM team_list
             WHERE team_id = %s""", [teamId])
         return iterateZero(Team.cur.fetchone())

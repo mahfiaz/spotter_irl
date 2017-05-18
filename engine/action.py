@@ -72,8 +72,8 @@ class Action:
             Action._addConfiguredTeams(roundId)
 
     def _addConfiguredTeams(roundId):
-        for teamName in game_config.team_names:
-            Team.add(teamName, roundId)
+        for team in game_config.teams:
+            Team.add(team['name'], team['color'], roundId)
 
 # handle code
 
@@ -259,6 +259,7 @@ class Stats:
         players = Team.getTeamPlayerIdList(teamId)
         teamStats = {
             'name'              : Team.getNameById(teamId),
+            'color'             : Team.getColorById(teamId),
             'nowInLiberty'      : 0,
             'spotCount'         : 0,
             'touchCount'        : 0,
@@ -351,10 +352,10 @@ class Stats:
             event, playerId, timestamp = event
             thisEvent = {}
             thisEvent['time'] = timestamp.strftime(game_config.database_dateformat)
-            thisEvent['player1'] = { 'name' : Player.getNameById(playerId), 'team' : Team.getNameById(Team.getPlayerTeamId(playerId, roundId))}
+            thisEvent['player1'] = { 'name' : Player.getNameById(playerId), 'color' : Team.getColorById(Team.getPlayerTeamId(playerId, roundId))}
             thisEvent['event'] = EventType(event).name
             player2Id = Event.getDidEventPair(event, timestamp)
-            thisEvent['player2'] = { 'name' : Player.getNameById(player2Id), 'team' : Team.getNameById(Team.getPlayerTeamId(player2Id, roundId))}
+            thisEvent['player2'] = { 'name' : Player.getNameById(player2Id), 'color' : Team.getColorById(Team.getPlayerTeamId(player2Id, roundId))}
             eventList.append(thisEvent)
         return eventList
 

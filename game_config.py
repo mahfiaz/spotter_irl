@@ -30,8 +30,7 @@ round_data = [
     {'name':'Viimane',      'starts':'18:05', 'ends':'18:55'}]
 
 
-
-team_names = ('Sinised', 'Punased')
+teams = ({'name':'Sinised', 'color':'3399FF'}, {'name':'Punased', 'color':'FF6699'})
 
 def testConfigParams():
     assert player_fleeingCodeDigits != code_spotCodeDigits
