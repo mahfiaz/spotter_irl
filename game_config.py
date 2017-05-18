@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 # database connection parameters
 connection_dbname='game_database'
