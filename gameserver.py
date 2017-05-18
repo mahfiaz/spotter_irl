@@ -71,6 +71,29 @@ def jailStatus():
 # END BLOCK
 
 
+# START BLOCK
+# Player actions
+
+@app.route("/flee", methods = ["GET"])
+def flee():
+	code = request.args.get("tagCode")
+	try:
+		Action.fleePlayerWithCode(code)
+		return "Pääsesid"
+	except:
+		return "Oled kindle, et sisestasid koodi?"
+
+
+@app.route("/tag", methods = ["GET"])
+def tag():
+	#TODO login control (for webhash)
+	tag_code = request.args.get("tagCode")
+	web_hash = session["web_hash"]
+	Action.handleWeb(web_hash, tag_code)
+
+
+# Player actions
+# END BLOCK
 
 # START BLOCK
 # Spawnmaster screen
@@ -196,8 +219,8 @@ def addToTeam():
 # Routes to player screen templates
 
 
-@app.route("/tag")
-def tag():
+@app.route("/tagging")
+def tagging():
 	user = "rjurik"
 	team = 2
 	if team == 1:

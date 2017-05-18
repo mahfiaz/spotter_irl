@@ -33,6 +33,20 @@
 			}
 		</style>
 
+		<script type="text/javascript">
+			
+			var xhr = new XMLHttpRequest();
+
+			function fleeJail() {
+				var code = document.getElementById("fleeingCode").value;
+				xhr.open("GET", "/flee?tagCode="+code, true);
+				xhr.send();
+				window.location.assign("/s");
+
+			}
+
+		</script>
+
 
 
 	</head>
