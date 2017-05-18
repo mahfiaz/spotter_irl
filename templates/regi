@@ -9,12 +9,7 @@
         <script type="text/javascript">
             
             var xhr = new XMLHttpRequest();
-            /*
-            xhr.onreadystatechange = dataReceived;
-            function dataReceived() {
-                document.getElementById("song").innerHTML = xhr.responseText;
-            }
-            */
+            
             function register() {
 
                 var user = document.getElementById("user");

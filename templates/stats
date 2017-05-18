@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+<html lang="en">
+	<head>
+		
+		<title>Spotter IRL Base</title>
+
+		<link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+
+		<style type="text/css">
+			/*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */img,legend{border:0}legend,td,th{padding:0}html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,optgroup,strong{font-weight:700}dfn{font-style:italic}h1{font-size:2em;margin:.67em 0}mark{background:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{box-sizing:content-box;height:0}pre,textarea{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{color:inherit;font:inherit;margin:0}button{overflow:visible}button,select{text-transform:none}button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}input{line-height:normal}input[type=checkbox],input[type=radio]{box-sizing:border-box;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{height:auto}input[type=search]{-webkit-appearance:textfield;box-sizing:content-box}input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none}fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}table{border-collapse:collapse;border-spacing:0}
+
+			body {
+				background-image: url("css_dust2.jpg");
+				background-size: cover;
+
+			}
+
+			.textarea {
+				color: white;
+				font-weight: bold;
+				width: 100%;
+				background-color: #000000;
+				opacity: 0.65;
+				border-radius: 5px;
+				padding: 5px;
+			}
+
+			.bottom {
+				position: absolute;
+				bottom: 0;
+			}
+		</style>
+
+
+
+	</head>
+	<body>
+		<div class="sm-col-12">
+			<div class="col-sm-10 col-sm-offset-1">
+				<div class="textarea">
+					<p style="text-align:center; font-size:200%"> Lahing "{{ stats["roundName"] }}" seis: Baas</p>
+				</div>
+			</div>
+			<div class="col-sm-10 col-sm-offset-1" style="top:20px; padding:0;">
+				<div class="col-sm-7 col-sm-offset">
+					<div class="textarea" style="min-height:70vh;">
+						<table id="team1" style="color:blue;width:100%;">
+							<tr>
+								<th></th>
+								<th>Tabatud</th>
+								<th>Puude</th>
+								<th>Miinus</th>
+								<th>Skoor</th>
+							</tr>
+							<tr>
+								<th>{{ stats["teams"][0]["name"] }}</th>
+								<th>{{ stats["teams"][0]["spotCount"] }}</th>
+								<th>{{ stats["teams"][0]["touchCount"] }}</th>
+								<th>{{ stats["teams"][0]["disloyality"] }}</th>
+								<th>{{ stats["teams"][0]["score"] }}</th>
+							</tr>
+							{% for player in stats["teams"][0]["players"] %}
+	                        <tr>
+	                            <td>{{ player["name"] }}</td>
+	                            <td>{{ player["spotCount"] }}</td>
+	                            <td>{{ player["touchCount"] }}</td>
+	                            <td>{{ player["disloyality"] }}</td>
+	                            <td>{{ player["score"] }}</td>
+	                        </tr>
+	                        {% endfor %}
+						</table>
+
+						<div class="col-sm-12" style="min-height: 20vh"></div>
+
+						<table id="team2" style="color:red;width:100%;">
+							<tr>
+								<th></th>
+								<th>Tabatud</th>
+								<th>Puude</th>
+								<th>Miinus</th>
+								<th>Skoor</th>
+							</tr>
+							<tr>
+								<th>{{ stats["teams"][1]["name"] }}</th>
+								<th>{{ stats["teams"][1]["spotCount"] }}</th>
+								<th>{{ stats["teams"][1]["touchCount"] }}</th>
+								<th>{{ stats["teams"][1]["disloyality"] }}</th>
+								<th>{{ stats["teams"][1]["score"] }}</th>
+							</tr>
+							{% for player in stats["teams"][1]["players"] %}
+	                        <tr>
+	                            <td>{{ player["name"] }}</td>
+	                            <td>{{ player["spotCount"] }}</td>
+	                            <td>{{ player["touchCount"] }}</td>
+	                            <td>{{ player["disloyality"] }}</td>
+	                            <td>{{ player["score"] }}</td>
+	                        </tr>
+	                        {% endfor %}
+						</table>
+
+						<div class="col-sm-12"></div>
+
+						<p class="bottom">Battle ending in {{ stats["roundEnd"][-8:-3] }}</p>
+					</div>
+				</div>
+				<div class="col-sm-4 col-sm-offset-1">
+					<div class="textarea" style="min-height:70vh;overflow: auto;">
+						{% for event in events %}
+						<table>
+						<tr>
+							<td style="padding:5px;">{{ event["time"][-8:-3] }} </td>
+							{% if event["player1"]["team"] == "Sinised" %}
+								<td style="color:blue;padding:5px;">{{ event["player1"]["name"]+" " }} </td>
+								<td style="padding:5px;">{{ event["event"] }} </td>
+								{% if event["player2"]["name"] != None %}
+									<td style="color:red;padding:5px;">{{ event["player2"]["name"] }}</td>
+								{% endif %}
+							{% else %}
+								<td style="color:red;padding:5px;">{{ event["player1"]["name"]+" " }} </td>
+								<td style="padding:5px;">{{ event["event"] }} </td>
+								{% if event["player2"]["name"] != None %}
+									<td style="color:blue;padding:5px;">{{ event["player2"]["name"] }}</td>
+								{% endif %}
+							{% endif %}
+						</tr>
+						</table>
+						{% endfor %}
+						<div id="fleeMessage" class="bottom"></div>
+
+					</div>
+				</div>
+				<div class="col-sm-3 col-sm-offset-8" style="top:20px;">
+					<p>
+						<input id="fleeingCode" type="text" placeholder="Pagemiskood">
+						<input type="submit" value="Page" onclick="fleeJail()">
+					</p>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
