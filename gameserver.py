@@ -16,7 +16,12 @@ import json
 app = Flask(__name__)
 SESSION_TYPE = 'Redis'
 app.config.from_object(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = "huehuehuehuehuehuehue"#os.urandom(24)
+
+
+
+
+
 
 
 # START BLOCK
@@ -29,23 +34,9 @@ def registration_template():
 def pending_template():
 	return render_template("pending", user=session["user"], phone=session["phone"])
 
-@app.route("/p")
 def playing_template():
-	with open('events.json') as data_file:
-		events = json.load(data_file)
-	with open('stats.json') as data_file:
-		stats = json.load(data_file)
-		
-	user = session["user"]
-	for player in stats["teamlessPlayers"]:
-		if player["name"] == user:
-			user = player
-	for team in stats["teams"]:
-		for player in team["players"]:
-			if player["name"] == user:
-				user = player
+	return render_template("p_stats")
 
-	return render_template("p_stats", player=user, roundName=stats["roundName"], events=events, teams=stats["teams"], stats=stats)
 
 def login_status():
 	try:
@@ -59,7 +50,7 @@ def login_status():
 @app.route("/")
 def is_logged_in():
 	if login_status() and is_free():
-		return pending_template()
+		return playing_template()
 	elif login_status():
 		return pending_template()
 	else:
@@ -88,7 +79,7 @@ def wrong_info():
 	session.clear()
 	return "User data removed"
 
-
+@app.route("/jf")
 def is_free():
 	if login_status:
 		user = session["user"]
@@ -97,11 +88,11 @@ def is_free():
 		if stats["roundName"] != None:
 			for player in stats["teamlessPlayers"]:
 				if player["name"] == user:
-					return player["nowInLiberty"]
+					return str(player["nowInLiberty"])
 			for team in stats["teams"]:
 				for player in team["players"]:
 					if player["name"] == user:
-						return player["nowInLiberty"]
+						return str(player["nowInLiberty"])
 		else:
 			return "False"
 
@@ -111,28 +102,36 @@ def is_free():
 
 
 # START BLOCK
-# Player actions
+# Getting data
 
-@app.route("/flee", methods = ["GET"])
-def flee():
-	code = request.args.get("tagCode")
+@app.route("/user")
+def userName():
+	if login_status():
+		return session["user"]
+
+@app.route("/events")
+def events():
 	try:
-		Action.fleePlayerWithCode(code)
-		return "Pääsesid"
+		with open('events.json') as data_file:
+			events = json.load(data_file)
+		response = jsonify(events)
+		return response
 	except:
-		return "Oled kindle, et sisestasid koodi?"
+		return "File not found"
 
+@app.route("/stats")
+def stats():
+	try:
+		with open('stats.json') as data_file:
+			stats = json.load(data_file)
+		response = jsonify(stats)
+		return response
+	except:
+		return "File not found"
 
-@app.route("/tag", methods = ["GET"])
-def tag():
-	#TODO login control (for webhash)
-	tag_code = request.args.get("tagCode")
-	web_hash = session["web_hash"]
-	Action.handleWeb(web_hash, tag_code)
-
-
-# Player actions
+# Getting data
 # END BLOCK
+
 
 # START BLOCK
 # Spawnmaster screen

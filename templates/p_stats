@@ -39,13 +39,60 @@
 
 		<script type="text/javascript">
 			
-		function tag() {
-			console.log("Tagged someone")
-		}
+			var xhr = new XMLHttpRequest();
 
-		function message() {
-			console.log("Messaged team")
-		}
+			function getStats() {
+				var stats = "";
+				var user = "";
+
+				xhr.open("GET", "/user", true);
+				xhr.send();
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState == 4 && xhr.state == 200) {
+						user = xhr.responseText;
+					}
+
+				xhr.open("GET", "/stats", true);
+				xhr.send();
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState == 4 && xhr.state == 200) {
+						stats = xhr.responseText;
+					}
+					stats = JSON.parse(stats);
+					var statsDiv = document.getElementById("stats")
+					statsDiv.innerHTML = "<table><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>"
+					for(i in stats["teams"]) {
+						team = stats["teams"][i];
+						statsDiv.innerHTML = statsDiv.innerHTML + "<tr style='color:#"+team["color"]+";'><th>"+team["name"]+"</th><th>"+team["spotCount"]+"</th><th>"+team["touchCount"]+"</th><th>"+team["disloyality"]+"</th><th>"+team["score"]+"</th></tr>";
+						for(i in team["players"]) {
+							player = team["players"][i];
+							if(player["name"] == user) {
+								statsDiv.innerHTML = statsDiv.innerHTML + "<tr style='color:#"+team["color"]+";'><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>p"+ayer["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
+							}
+						}
+					}
+					for(i in stats["teamlessPlayers"]) {
+						player = stats["teamlessPlayers"][i];
+						if(player["name"] == user) {
+							statsDiv.innerHTML = statsDiv.innerHTML + "<tr><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>p"+ayer["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
+						}
+					}
+				}
+			}
+
+			window.onload = function() {
+				window.setInsterval(function() {
+					getStats();
+				}, 4000);
+			}
+
+			function tag() {
+				console.log("Tagged someone")
+			}
+
+			function message() {
+				console.log("Messaged team")
+			}
 
 		</script>
 
@@ -54,50 +101,13 @@
 		<div class="sm-col-12">
 			<div class="col-sm-10 col-sm-offset-1">
 				<p>
-					<div class="textarea">
-						<p style="text-align:center; font-size:200%"> Lahing "{{ stats["roundName"] }}" seis: {{ player["name"] }}</p>
-					</div>
+					<div class="textarea" style="text-align:center; font-size:200%"></div>
 				</p>
 				<p>
-					<div class="textarea">
-						<table id="player">
-							<tr>
-								<th></th>
-								<th>Tabatud</th>
-								<th>Puude</th>
-								<th>Miinus</th>
-								<th>Skoor</th>
-							</tr>
-							{% for team in teams %}
-							<tr style="color:#{{ team['color'] }};">
-								<th>{{ team["name"] }}</th>
-								<th>{{ team["spotCount"] }}</th>
-								<th>{{ team["touchCount"] }}</th>
-								<th>{{ team["disloyality"] }}</th>
-								<th>{{ team["score"] }}</th>
-							</tr>
-							{% endfor %}
-							<tr>
-	                            <td>{{ player["name"] }}</td>
-	                            <td>{{ player["spotCount"] }}</td>
-	                            <td>{{ player["touchCount"] }}</td>
-	                            <td>{{ player["disloyality"] }}</td>
-	                            <td>{{ player["score"] }}</td>
-	                        </tr>
-						</table>
-					</div>
+					<div id="stats" class="textarea"></div>
 				</p>
 				<p>
-					<div class="textarea">
-						{% for event in events %}
-						<p>
-							{{ event["time"] }}
-							<span style="color:#{{ event['text1']['color'] }};">{{ event["text1"]["text"] }}</span>
-							<span style="color:#{{ event['text2']['color'] }};">{{ event["text2"]["text"] }}</span>
-							<span style="color:#{{ event['text3']['color'] }};">{{ event["text3"]["text"] }}</span>
-						</p>
-						{% endfor %}
-					</div>
+					<div id="events" class="textarea"></div>
 				</p>
 				<p style="text-align:center;">
 					<input class="form-control" id="fleeingCode" type="text" placeholder="Silmasin koodi">

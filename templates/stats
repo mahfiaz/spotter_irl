@@ -61,7 +61,7 @@
 				<div class="col-sm-7 col-sm-offset">
 					<div class="textarea" style="min-height:70vh;">
 						{% for team in stats['teams'] %}
-						<table id="team1" style="color:#{{ team['color'] }};width:100%;">
+						<table style="color:#{{ team['color'] }};width:100%;">
 							<tr>
 								<th></th>
 								<th>Tabatud</th>
