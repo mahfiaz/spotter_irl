@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import connect
 
 from engine.event import *
