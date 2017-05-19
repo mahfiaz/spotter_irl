@@ -90,7 +90,12 @@
 				<p>
 					<div class="textarea">
 						{% for event in events %}
-						<p>{{ event["time"] }} {{ event["text1"]["text"] }} {{ event["text2"]["text"] }} {{ event["text3"]["text"] }}</p>
+						<p>
+							{{ event["time"] }}
+							<span style="color:#{{ event['text1']['color'] }};">{{ event["text1"]["text"] }}</span>
+							<span style="color:#{{ event['text2']['color'] }};">{{ event["text2"]["text"] }}</span>
+							<span style="color:#{{ event['text3']['color'] }};">{{ event["text3"]["text"] }}</span>
+						</p>
 						{% endfor %}
 					</div>
 				</p>

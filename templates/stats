@@ -99,10 +99,10 @@
 					<div class="textarea" style="min-height:70vh;overflow: auto;">
 						{% for event in events %}
 						<p>
-							<span>{{ event['time'][-8:-3] }} </span>
-							<td style="color:#{{ event['text1']['color'] }};">{{ event['text1']['text'] }} </span>
-							<td style="color:#{{ event['text2']['color'] }};">{{ event['text2']['text'] }} </span>
-							<td style="color:#{{ event['text3']['color'] }};">{{ event['text3']['text'] }} </span>
+							{{ event['time'][-8:-3] }}
+							<span style="color:#{{ event['text1']['color'] }};">{{ event['text1']['text'] }} </span>
+							<span style="color:#{{ event['text2']['color'] }};">{{ event['text2']['text'] }} </span>
+							<span style="color:#{{ event['text3']['color'] }};">{{ event['text3']['text'] }} </span>
 						</p>
 						{% endfor %}
 						<div id="fleeMessage" class="bottom"></div>
