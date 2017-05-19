@@ -39,8 +39,8 @@ class Player:
     def add(name, mobile, email):
         Player.cur.execute("""SELECT player_name, player_mobile, player_email
             FROM player_data 
-            WHERE player_name = %s OR player_mobile = %s OR player_email = %s""",
-            (name, mobile, email))
+            WHERE player_name = %s OR player_mobile = %s""",
+            (name, mobile))
         if not Player.cur.fetchone():
             hash = Player._generateHash(name)
             Player.cur.execute("""INSERT INTO player_data (player_name, player_mobile, player_email, player_web_hash) 

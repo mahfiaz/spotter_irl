@@ -6,6 +6,7 @@ connection_host='localhost'
 connection_password='securityFirst'
 
 database_dateformat = '%Y-%m-%d %H:%M:%S'
+database_dateformat_hours_minutes = '%H:%M'
 
 player_fleeingProtectionTime = 2 #120
 
@@ -37,6 +38,18 @@ game_link_sms = 'http://fusiongame.dk'
 def testConfigParams():
     assert player_fleeingCodeDigits != code_spotCodeDigits
     assert code_touchCodeDigits != code_spotCodeDigits
+
+event_type_translated_Est = {'didFlee' : 'pages',
+                'didSpot' : 'tabas',
+                'didTouch' : 'puutus',
+                'didSpotMate' : 'tabas',
+                'wasAddedToTeam' : 'värvati',
+                'teamChat' : 'teatas:'}
+
+# for alert messages, like player X not added to any team.
+game_master_mobile_number = '554433221'
+
+event_type_translated = event_type_translated_Est
 
 msgCellularEng = {}
 msgCellularEng['notSignedUp'] = 'You ({}) have not been signed up for the game. Come to the base @ linnavalituses parkla.'

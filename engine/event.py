@@ -21,10 +21,12 @@ class EventType(Enum):
     wasSpotted = 7
     wasTouched = 8
     wasAdded = 9
-    wasExposingSelf = 10
-    wasAimedOldCode = 11
-    obscureMessage = 12
-    unregisteredMessage = 13
+    wasAddedToTeam = 10
+    wasExposingSelf = 11
+    wasAimedOldCode = 12
+    obscureMessage = 13
+    unregisteredMessage = 14
+    teamChat = 15
 
 
 class Event:
@@ -42,6 +44,7 @@ class Event:
         Event.cur.execute("""CREATE TABLE event_list (
             round_id int,
             player_id int,
+            team_id_visible int DEFAULT 0,
             event_type int,
             extra_data VARCHAR(160) DEFAULT '',
             timestamp TIMESTAMP DEFAULT statement_timestamp() )""")
@@ -50,6 +53,10 @@ class Event:
     def addPlayer(playerId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
             VALUES (%s, %s, %s)""", (Round.getActiveId(), playerId, EventType.wasAdded.value))
+
+    def addPlayerToTeam(playerId):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
+            VALUES (%s, %s, %s)""", (Round.getActiveId(), playerId, EventType.wasAddedToTeam.value))
 
     def addSpot(hitterId, victimId):
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
@@ -91,6 +98,12 @@ class Event:
         Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type, extra_data)
             VALUES (%s, %s, %s, %s)""", (Round.getActiveId(), mobile, EventType.unregisteredMessage.value, message))
 
+    def addChatMessage(playerId, teamId, message):
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, team_id_visible, event_type, extra_data)
+            VALUES (%s, %s, %s, %s, %s)""", (Round.getActiveId(), playerId, teamId, EventType.teamChat.value, message))
+
+
+
 # get player state
     def isPlayerJailed(playerId):
         Event.cur.execute("""SELECT event_type
@@ -100,7 +113,7 @@ class Event:
         event = Event.cur.fetchall()
         if event:
             ev = event[0][0]
-            return ev == EventType.wasSpotted.value or ev == EventType.wasTouched.value or ev == EventType.wasExposingSelf.value or ev == EventType.wasAdded.value
+            return ev == EventType.wasSpotted.value or ev == EventType.wasTouched.value or ev == EventType.wasExposingSelf.value or ev == EventType.wasAdded.value or ev == EventType.wasAddedToTeam.value
         return True
 
     def getPlayerLastActivity(playerId):
@@ -111,6 +124,12 @@ class Event:
         timestamp = Event.cur.fetchall()
         if timestamp:
             return timestamp[0][0]
+
+    def getPlayerLastActivityFormatted(playerId):
+        time = Event.getPlayerLastActivity(playerId)
+        if time:
+            return time.strftime(game_config.database_dateformat)
+
 
     def _getPlayerLastFleeingTime(playerId):
         Event.cur.execute("""SELECT timestamp
@@ -161,10 +180,10 @@ class Event:
     #??     wasExposingSelf
 
     def getEventListRaw(roundId, rows):
-        Event.cur.execute("""SELECT event_type, player_id, timestamp
+        Event.cur.execute("""SELECT event_type, player_id, timestamp, team_id_visible, extra_data
             FROM event_list
-            WHERE round_id = %s AND event_type IN (%s, %s, %s, %s)
-            ORDER BY timestamp DESC""", (roundId, EventType.didFlee.value, EventType.didSpot.value, EventType.didTouch.value, EventType.didSpotMate.value))
+            WHERE round_id = %s AND event_type IN (%s, %s, %s, %s, %s, %s)
+            ORDER BY timestamp DESC LIMIT 30""", (roundId, EventType.didFlee.value, EventType.didSpot.value, EventType.didTouch.value, EventType.didSpotMate.value, EventType.wasAddedToTeam.value, EventType.teamChat.value))
         return Event.cur.fetchmany(rows)
 
     def getDidEventPair(evType, timestamp):

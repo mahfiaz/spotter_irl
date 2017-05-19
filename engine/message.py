@@ -87,6 +87,9 @@ class Sms:
     def playerAdded(mobile, name, jailCode):
         Sms.send(mobile, msgCellular['playerAdded'].format(name, jailCode), sendLink = True)
 
+    def alertGameMaster(message):
+        Sms.send(game_config.game_master_mobile_number, message)
+
 
 class BaseMsg:
 

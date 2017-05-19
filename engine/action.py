@@ -36,12 +36,15 @@ class Action:
         Sms.setCallback(Stats.getTeamPlayerStatsStringByMobile)
 
 # modify
+    def addPlayer(name, mobile):
+        Action.addPlayer(name, mobile, '')
+
     def addPlayer(name, mobile, email):
         if not mobile.isdigit():
             BaseMsg.mobileNotDigits(mobile)
             return
         name = re.sub('[^a-zA-Z0-9-_]', '', name)
-        email = re.sub('[^a-zA-Z0-9-_@.]', '', email)
+        email = re.sub('[^a-zA-Z0-9-_@\.]', '', email)
         newPlayerId = Player.add(name, mobile, email)
         if newPlayerId:
             Event.addPlayer(newPlayerId)
@@ -63,8 +66,10 @@ class Action:
         if not Team._getIdByName(teamName, Round.getActiveId()):
             print("Warning! addPlayerToTeam(). no team found")
             return
-        if Team.addPlayer(playerId, Team._getIdByName(teamName, Round.getActiveId())):
+        teamId = Team._getIdByName(teamName, Round.getActiveId())
+        if Team.addPlayer(playerId, teamId):
             Code.generateNewCodes(playerId)
+            Event.addPlayerToTeam(playerId)
         Stats.updateStats()
 
     def addTeamsToAllRounds():
@@ -127,6 +132,9 @@ class Action:
             if byMobile:
                 Sms.noActiveRound(mobile, Round._getStartTimeOfNext())
             return
+        if not Team.getPlayerTeamId(senderId, Round.getActiveId()):
+            Sms.alertGameMaster(senderName + " not added to any team! Please add!")
+            return
         code = int(code)
         if senderJailed:
             Sms.senderJailed(mobile, senderName, Player.getFleeingCode(senderId))
@@ -138,6 +146,9 @@ class Action:
             Event.addFailedSpot(senderId, code)
             Stats.updateStats()
             Sms.missed(mobile, Player.getNameById(senderId))
+            return
+        if not Team.getPlayerTeamId(victimId, Round.getActiveId()):
+            Sms.alertGameMaster(Player.getNameById(victimId) + " not added to any team! Please add!")
             return
         victimJailed = Event.isPlayerJailed(victimId)
         victimName = Player.getNameById(victimId)
@@ -170,6 +181,15 @@ class Action:
                 Stats.updateStats()
                 Sms.touched(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
 
+    def sayToMyTeam(playerId, message):
+        if not playerId:
+            return
+        teamId = Team.getPlayerTeamId(playerId, Round.getActiveId())
+        message = re.sub('[^A-Za-z0-9 \.,:;\-\?!#/ÕõÄäÖöÜü]', '', message)
+        message = message[:60]
+        print(Player.getNameById(playerId), "said ", message)
+        Event.addChatMessage(playerId, teamId, message)
+        Stats.updateEvents()
 
 # flee
     def fleePlayerWithCode(fleeingCode):
@@ -228,6 +248,9 @@ class Stats:
     def updateStats():
         stats = Stats._calcAllStats(Round.getActiveId())
         Stats._storeStats(stats)
+        Stats.updateEvents()
+
+    def updateEvents():
         events = Stats.getEventList(Round.getActiveId(), 15)
         Stats._storeEvents(events)
 
@@ -250,7 +273,7 @@ class Stats:
             'touchCount'        : Event.getPlayerTouchCount(playerId, roundId),
             'jailedCount'       : Event.getPlayerJailedCount(playerId, roundId),
             'disloyality'       : Event.getPlayerDisloyalityCount(playerId, roundId),
-            'lastActivity'      : Event.getPlayerLastActivity(playerId).strftime(game_config.database_dateformat)
+            'lastActivity'      : Event.getPlayerLastActivityFormatted(playerId)
         }
         stats['score'] = stats['spotCount'] + 2 * stats['touchCount'] - stats['disloyality']
         return stats
@@ -287,7 +310,7 @@ class Stats:
 
     def _calcAllStats(roundId):
         if not roundId:
-            return { 'roundId' : None }
+            return { 'roundName' : None }
         teamIds = Team.getTeamsIdList(roundId)
         allTeams = []
         for id in teamIds:
@@ -343,19 +366,33 @@ class Stats:
         return Stats._getPlayerScoreString(playerId) + Stats._getTeamScoreString()
 
 #events
+
+    def _eventTranslate(eventName):
+        if eventName in game_config.event_type_translated:
+            return game_config.event_type_translated[eventName]
+
     def getEventList(roundId, rows):
         events = Event.getEventListRaw(roundId, rows)
         if not events:
             return [{ 'event' : None }]
         eventList = []
-        for event in events:
-            event, playerId, timestamp = event
+        for ev in events:
+            event, playerId, timestamp, teamVisible, message = ev
             thisEvent = {}
-            thisEvent['time'] = timestamp.strftime(game_config.database_dateformat)
-            thisEvent['player1'] = { 'name' : Player.getNameById(playerId), 'color' : Team.getColorById(Team.getPlayerTeamId(playerId, roundId))}
-            thisEvent['event'] = EventType(event).name
-            player2Id = Event.getDidEventPair(event, timestamp)
-            thisEvent['player2'] = { 'name' : Player.getNameById(player2Id), 'color' : Team.getColorById(Team.getPlayerTeamId(player2Id, roundId))}
+            thisEvent['time'] = timestamp.strftime(game_config.database_dateformat_hours_minutes)
+            thisEvent['text1'] = { 'text' : Player.getNameById(playerId),
+                                    'color' : Team.getColorById(Team.getPlayerTeamId(playerId, roundId))}
+            thisEvent['text2'] = { 'text' : Stats._eventTranslate(EventType(event).name),
+                                    'color' : 'FFFFFF'}
+            if event == EventType.teamChat.value:
+                thisEvent['visible'] = Team.getNameById(teamVisible)
+                thisEvent['text3'] = { 'text' : message,
+                                    'color' : Team.getColorById(teamVisible)}
+            else:
+                thisEvent['visible'] = 'All'
+                player2Id = Event.getDidEventPair(event, timestamp)
+                thisEvent['text3'] = { 'text' : Player.getNameById(player2Id),
+                                    'color' : Team.getColorById(Team.getPlayerTeamId(player2Id, roundId))}
             eventList.append(thisEvent)
         return eventList
 
@@ -366,7 +403,7 @@ class Stats:
 
     def getRoundEvents():
         with open('events.json') as jsonFile:
-            return json.load(jsonFile)[0]
+            return json.load(jsonFile)
 
 # print
     def printPlayersDetailed():

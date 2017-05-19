@@ -78,7 +78,10 @@ class Team:
         Team.cur.execute("""SELECT team_color
             FROM team_list
             WHERE team_id = %s""", [teamId])
-        return iterateZero(Team.cur.fetchone())
+        color = iterateZero(Team.cur.fetchone())
+        if not color:
+            return 'FFFFFF'
+        return color
 
     def _getRoundIdByTeamId(teamId):
         Team.cur.execute("""SELECT round_id
