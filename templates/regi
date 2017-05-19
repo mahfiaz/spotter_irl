@@ -6,23 +6,6 @@
         <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
 
-        <script type="text/javascript">
-            
-            var xhr = new XMLHttpRequest();
-            
-            function register() {
-
-                var user = document.getElementById("user");
-                var phone = document.getElementById("phone");
-                var email = document.getElementById("email");
-
-                xhr.open("GET", "/register?user="+user.innerHTML+"&phone="+phone.innerHTML+"&email="+email.innerHTML, true);
-                xhr.send();
-
-            }
-
-        </script>
-
     </head>
     <body>
         <div class="col-xs-12"  style="text-align:center;">
@@ -35,12 +18,13 @@
                 <br>bit of data about you.</p>
             
             <form action="register" method="GET">
-                <input id="user" name="user" type="text" placeholder="Player name" size="20">
+                <input name="user" type="text" placeholder="Player name" size="20">
                 <br>
-                <input id="phone" name="phone" type="text" placeholder="Phone nr" size="20">
+                <input name="phone" type="text" placeholder="Phone nr" size="20">
                 <br>
-                <input id="NOTplayerSubmit" type="submit" value="Ready" onclick="register()">
+                <input type="submit" value="Ready">
             </form>
+            
             </p>
         </div>
     </body>

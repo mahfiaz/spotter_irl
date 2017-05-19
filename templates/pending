@@ -1,5 +1,4 @@
-
-g<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
         
@@ -11,8 +10,8 @@ g<!DOCTYPE html>
             
             var xhr = new XMLHttpRequest();
 
-            if(window.location.href != "http://localhost:5000/") {
-                window.location.assign("/");
+            window.onLoad = function() {
+                    window.location.assign("/")
             }
 
             function logout() {
@@ -26,29 +25,14 @@ g<!DOCTYPE html>
                 }
             }
 
-            function checkStatus() {
-
-                xhr.open("GET", "/status", true);
-                xhr.send();
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        console.log(xhr.responseText)
-                        window.location.assign("/")
-                    }
-                }
-
-            }
-
-
         </script>
 
     </head>
     <body>
         <div class="col-xs-12 col-sm-2 col-sm-offset-5">
             <b><p style="font-size:400%; text-align:center;">Welcome</p>
-            <p>user <span style="font-size:300%;">{{ user }}</span></p></b>
+            <p>user <span style="font-size:250%;">{{ user }}</span></p></b>
             <p style="font-size:200%;">{{ phone }}</p>
-            <p style="font-size:200%;">{{ email }}</p>
             <p>Go show your screen to spawnmaster @Keila päevade noorteala.</p>
             <p><input id="invalidRegistration" type="submit" class="btn btn-danger btn-sm btn-block" value="I made a mistake, go back" onclick="logout()"></p>
         </div>

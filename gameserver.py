@@ -26,36 +26,34 @@ app.secret_key = os.urandom(24)
 def registrationTemplate():
 	return render_template("regi")
 
-@app.route("/hea")
-def login_status():
-	try:
-		if session["user"] != None and session["phone"] != None:
-			return True
-		else:
-			return False
-	except KeyError:
-		return False
+def pendingTemplate():
+	return render_template("pending", user=session["user"], phone=session["phone"])
 
 @app.route("/")
 def isLoggedin():
-	if login_status == True:
-		return render_template("pending", user=session["user"], phone=session["phone"], email=session["email"])
-	else:
+	try:
+		if session["user"] == None:
+			return registrationTemplate()
+		else:
+			return pendingTemplate()
+	except KeyError:
 		return registrationTemplate()
 
 
 @app.route("/register", methods=["GET"])
 def saveNew():
-	user = request.args.get("user")
-	phone = request.args.get("phone")
-	email = request.args.get("email")
-	session["user"] = user
-	session["phone"] = phone
-	session["email"] = email
+	_user = request.args.get("user")
+	_phone = request.args.get("phone")
+	session["user"] = _user
+	session["phone"] = _phone
 
-	if user and phone:
-		if Action.addPlayer(user, phone, email):
+	if _user and _phone:
+		try:
+			Action.addPlayerWOEmail(_user, _phone)
+			print("data received")
 			return isLoggedin()
+		except:
+			return "Probleem mängija lisamisega"
 		else:
 			return registrationTemplate()
 	else:
@@ -67,26 +65,6 @@ def wrongInfo():
 	Player.delPlayer(session["user"])
 	session.clear()
 	return "User data removed"
-
-
-@app.route("/status")
-def is_free():
-	if login_status:
-		user = session["user"]
-		with open('stats.json') as data_file:
-			stats = json.load(data_file)
-		if stats["roundName"] != None:
-			for player in stats["teamlessPlayers"]:
-				if player["name"] == user:
-					return "Teamless"#player["nowInLiberty"]
-			for team in stats["teams"]:
-				for player in team["players"]:
-					if player["name"] == user:
-						return "Team"#player["nowInLiberty"]
-		else:
-			return "False"
-
-
 
 
 # Player registration
