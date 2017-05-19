@@ -4,6 +4,7 @@ from .player import Player
 from .round import Round
 from .team import Team
 from .message import Sms, BaseMsg
+from .spawn import Spawn
 import game_config
 
 import json
@@ -24,6 +25,7 @@ class Action:
         Team.initDB(cursor)
         Event.initDB(cursor)
         Stats.updateStats()
+        Spawn.initDB(cursor)
 
     def initAllConnect(cursor):
         Round.initConnect(cursor)
@@ -34,6 +36,7 @@ class Action:
         Round.setCallbacks(roundStarted = Action._roundStartedCall, roundEnding = Action._roundEndingCall, roundEnded = Action._roundEndedCall)
         Stats.updateStats()
         Sms.setCallback(Stats.getTeamPlayerStatsStringByMobile)
+        Spawn.initConnect(cursor)
 
 # modify
     def addPlayer(name, mobile):
@@ -420,3 +423,37 @@ class Stats:
             if not Event.isPlayerJailed(id):
                 jailed = "free  "
             print(" - ", id, mobile, webHash, fleeingCode, spotCode, touchCode, jailed, team, name)
+
+
+# get
+    def playersDetailed():
+        Player.cur.execute("""SELECT player_data.player_id, player_data.player_name, player_data.player_mobile, player_data.player_web_hash, player_data.player_fleeing_code, code_list.spot_code, code_list.touch_code
+            FROM player_data 
+                JOIN code_list ON (player_data.player_code_id = code_list.code_id)
+            """)
+        rows = Player.cur.fetchall()
+        #print(" - ID MOB HASH  JAIL SPOT TOUCH   STATE  TEAM    NAME")
+        players = []
+        teamless = []
+        for row in rows:
+            player = []           
+            (id, name, mobile, webHash, fleeingCode, spotCode, touchCode) = row
+            team = Team.getNameById(Team.getPlayerTeamId(id, Round.getActiveId()))
+            jailed = "jailed"
+            if not Event.isPlayerJailed(id):
+                jailed = "free  "
+            print(" - ", id, mobile, webHash, fleeingCode, spotCode, touchCode, jailed, team, name)
+            player.append(id)
+            player.append(name)
+            player.append(mobile)
+            player.append(webHash)
+            player.append(fleeingCode)
+            player.append(spotCode)
+            player.append(touchCode)
+            player.append(jailed)
+            player.append(team)
+            if team == None:
+                teamless.append(player)
+            else:
+                players.append(player)
+        return players, teamless

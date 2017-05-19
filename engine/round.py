@@ -190,3 +190,26 @@ class Round:
                 indicator = " * "
             print(indicator, id, name, time1, time2)
 
+
+# rounds
+    def getRounds():
+        Round.cur.execute("""SELECT round_id, round_name, round_start, round_end
+            FROM round_data """)
+        rows = Round.cur.fetchall()
+        active = Round.getActiveId()
+        #print("Rounds:")
+        rounds = []
+        for row in rows:
+            id, name, time1, time2 = row
+            indicator = " - "
+            if id == active:
+                indicator = " * "
+            #print(indicator, id, name, time1, time2)
+            round = []
+            round.append(indicator)
+            round.append(id)
+            round.append(name)
+            round.append(time1)
+            round.append(time2)
+            rounds.append(round)
+        return rounds

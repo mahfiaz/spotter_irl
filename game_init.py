@@ -15,10 +15,10 @@ from game_config import file_events, file_stats
 def addTestRoundsNormal():
     time.strftime(dateformat)
     time3 = format(datetime.datetime.now() + datetime.timedelta(seconds = -2), dateformat)
-    time4 = format(datetime.datetime.now() + datetime.timedelta(seconds = 6 * 60 * 60), dateformat)
+    time4 = format(datetime.datetime.now() + datetime.timedelta(seconds = 10 * 60), dateformat)
 
     Round.add("third", time3, time4)
-#    Round.updateActiveId()
+    Round.updateActiveId()
 
 def initGame():
     connection = connect.connectDB()
