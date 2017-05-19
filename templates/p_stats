@@ -55,7 +55,7 @@
 			<div class="col-sm-10 col-sm-offset-1">
 				<p>
 					<div class="textarea">
-						<p style="text-align:center; font-size:200%"> Lahing {{ roundname }} seis: {{ player }}</p>
+						<p style="text-align:center; font-size:200%"> Lahing "{{ stats["roundName"] }}" seis: {{ player["name"] }}</p>
 					</div>
 				</p>
 				<p>
@@ -68,26 +68,21 @@
 								<th>Miinus</th>
 								<th>Skoor</th>
 							</tr>
-							<tr>
-								<th>{{ team1 }}</th>
-								<th>{{ team1[tabatud] }}</th>
-								<th>{{ team1[puude] }}</th>
-								<th>{{ team1[miinus] }}</th>
-								<th>{{ team1[skoor] }}</th>
+							{% for team in teams %}
+							<tr style='color:#{{ team["color"] }};'">
+								<th>{{ team["name"] }}</th>
+								<th>{{ team["spotCount"] }}</th>
+								<th>{{ team["touchCount"] }}</th>
+								<th>{{ team["disloyality"] }}</th>
+								<th>{{ team["score"] }}</th>
 							</tr>
+							{% endfor %}
 							<tr>
-								<th>{{ team2 }}</th>
-								<th>{{ team2[tabatud] }}</th>
-								<th>{{ team2[puude] }}</th>
-								<th>{{ team2[miinus] }}</th>
-								<th>{{ team2[skoor] }}</th>
-							</tr>
-							<tr>
-	                            <td>{{ player[name] }}</td>
-	                            <td>{{ player[tabatud] }}</td>
-	                            <td>{{ player[puude] }}</td>
-	                            <td>{{ player[miinus] }}</td>
-	                            <td>{{ player[skoor] }}</td>
+	                            <td>{{ player["name"] }}</td>
+	                            <td>{{ player["spotCount"] }}</td>
+	                            <td>{{ player["touchCount"] }}</td>
+	                            <td>{{ player["disloyality"] }}</td>
+	                            <td>{{ player["score"] }}</td>
 	                        </tr>
 						</table>
 					</div>
@@ -95,13 +90,13 @@
 				<p>
 					<div class="textarea">
 						{% for event in events %}
-						<p>{{ time }} {{ committer }} {{ action }} {{ receiver }}</p>
+						<p>{{ event["time"] }} {{ event["text1"]["text"] }} {{ event["text2"]["text"] }} {{ event["text3"]["text"] }}</p>
 						{% endfor %}
 					</div>
 				</p>
 				<p style="text-align:center;">
 					<input class="form-control" id="fleeingCode" type="text" placeholder="Silmasin koodi">
-					<button class="btn-sm btn-danger btn-block" type="button" value="Taba" onclick="tag()">Teade meeskonnale</button>
+					<button class="btn-sm btn-danger btn-block" type="button" value="Taba" onclick="tag()">Taba</button>
 				</p>
 				<p style="text-align:center;width: 100%">
 					<input class="form-control" id="fleeingCode" type="text" placeholder="Teade">

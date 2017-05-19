@@ -23,48 +23,87 @@ app.secret_key = os.urandom(24)
 # Player registration
 
 
-def registrationTemplate():
+def registration_template():
 	return render_template("regi")
 
-def pendingTemplate():
+def pending_template():
 	return render_template("pending", user=session["user"], phone=session["phone"])
 
-@app.route("/")
-def isLoggedin():
+@app.route("/p")
+def playing_template():
+	with open('events.json') as data_file:
+		events = json.load(data_file)
+	with open('stats.json') as data_file:
+		stats = json.load(data_file)
+		
+	user = session["user"]
+	for player in stats["teamlessPlayers"]:
+		if player["name"] == user:
+			user = player
+	for team in stats["teams"]:
+		for player in team["players"]:
+			if player["name"] == user:
+				user = player
+
+	return render_template("p_stats", player=user, roundName=stats["roundName"], events=events, teams=stats["teams"], stats=stats)
+
+def login_status():
 	try:
 		if session["user"] == None:
-			return registrationTemplate()
+			return False
 		else:
-			return pendingTemplate()
+			return True
 	except KeyError:
-		return registrationTemplate()
+		return False
+
+@app.route("/")
+def is_logged_in():
+	if login_status() and is_free():
+		return pending_template()
+	elif login_status():
+		return pending_template()
+	else:
+		return registration_template()
 
 
 @app.route("/register", methods=["GET"])
-def saveNew():
+def save_new():
 	_user = request.args.get("user")
 	_phone = request.args.get("phone")
 	session["user"] = _user
 	session["phone"] = _phone
 
 	if _user and _phone:
-		try:
-			Action.addPlayerWOEmail(_user, _phone)
-			print("data received")
-			return isLoggedin()
-		except:
-			return "Probleem mängija lisamisega"
+		if Action.addPlayerWOEmail(_user, _phone):
+			return is_logged_in()
 		else:
-			return registrationTemplate()
+			return registration_template()
 	else:
-		return registrationTemplate()
+		return registration_template()
 
 
 @app.route("/wrongInfo")
-def wrongInfo():
+def wrong_info():
 	Player.delPlayer(session["user"])
 	session.clear()
 	return "User data removed"
+
+
+def is_free():
+	if login_status:
+		user = session["user"]
+		with open('stats.json') as data_file:
+			stats = json.load(data_file)
+		if stats["roundName"] != None:
+			for player in stats["teamlessPlayers"]:
+				if player["name"] == user:
+					return player["nowInLiberty"]
+			for team in stats["teams"]:
+				for player in team["players"]:
+					if player["name"] == user:
+						return player["nowInLiberty"]
+		else:
+			return "False"
 
 
 # Player registration
