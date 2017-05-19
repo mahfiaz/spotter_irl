@@ -44,6 +44,7 @@
 			function getStats() {
 				var stats = "";
 				var user = "";
+				var divContents = "";
 
 				xhr.open("GET", "/user", true);
 				xhr.send();
@@ -51,47 +52,56 @@
 					if (xhr.readyState == 4 && xhr.state == 200) {
 						user = xhr.responseText;
 					}
+				}
 
 				xhr.open("GET", "/stats", true);
 				xhr.send();
 				xhr.onreadystatechange = function() {
-					if (xhr.readyState == 4 && xhr.state == 200) {
+					if (xhr.readyState == 4 && xhr.status == 200) {
 						stats = xhr.responseText;
-					}
-					stats = JSON.parse(stats);
-					var statsDiv = document.getElementById("stats")
-					statsDiv.innerHTML = "<table><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>"
-					for(i in stats["teams"]) {
-						team = stats["teams"][i];
-						statsDiv.innerHTML = statsDiv.innerHTML + "<tr style='color:#"+team["color"]+";'><th>"+team["name"]+"</th><th>"+team["spotCount"]+"</th><th>"+team["touchCount"]+"</th><th>"+team["disloyality"]+"</th><th>"+team["score"]+"</th></tr>";
-						for(i in team["players"]) {
-							player = team["players"][i];
-							if(player["name"] == user) {
-								statsDiv.innerHTML = statsDiv.innerHTML + "<tr style='color:#"+team["color"]+";'><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>p"+ayer["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
+						stats = JSON.parse(stats);
+						if(stats["roundName"] != null) {
+							var statsDiv = document.getElementById("stats")
+							divContents = "<table style='width:100%;'><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>";
+							for(i in stats["teams"]) {
+								team = stats["teams"][i];
+								divContents += "<tr style='color:#"+team["color"]+";'><th>"+team["name"]+"</th><th>"+team["spotCount"]+"</th><th>"+team["touchCount"]+"</th><th>"+team["disloyality"]+"</th><th>"+team["score"]+"</th></tr>";
+								console.log("done");
+								for (i in team["players"]) {
+									console.log(i);
+									player = team["players"][i];
+									if (player["name"] == user) {
+										divContents += "<tr style='color:#"+team["color"]+";'><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>p"+ayer["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
+									}
+								}
 							}
+							for(i in stats["teamlessPlayers"]) {
+								console.log("teamless");
+								player = stats["teamlessPlayers"][i];
+								if(player["name"] == user) {
+									divContents += "<tr><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>p"+ayer["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
+								}
+							}
+							statsDiv.innerHTML = divContents;
 						}
-					}
-					for(i in stats["teamlessPlayers"]) {
-						player = stats["teamlessPlayers"][i];
-						if(player["name"] == user) {
-							statsDiv.innerHTML = statsDiv.innerHTML + "<tr><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>p"+ayer["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
-						}
+
 					}
 				}
 			}
 
 			window.onload = function() {
-				window.setInsterval(function() {
+				getStats();
+				window.setInterval(function() {
 					getStats();
 				}, 4000);
 			}
 
 			function tag() {
-				console.log("Tagged someone")
+				console.log("Tagged someone");
 			}
 
 			function message() {
-				console.log("Messaged team")
+				console.log("Messaged team");
 			}
 
 		</script>
