@@ -39,8 +39,8 @@ class Action:
         Spawn.initConnect(cursor)
 
 # modify
-    def addPlayer(name, mobile):
-        Action.addPlayer(name, mobile, '')
+    def addPlayerWOEmail(name, mobile):
+        return Action.addPlayer(name, mobile, '')
 
     def addPlayer(name, mobile, email):
         if not mobile.isdigit():

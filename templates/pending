@@ -10,8 +10,10 @@
             
             var xhr = new XMLHttpRequest();
 
-            window.onLoad = function() {
-                    window.location.assign("/")
+            window.onload = function() {
+                if(window.location.href != "http://localhost:5000/") {
+                    window.location.assign("/");
+                }
             }
 
             function logout() {
