@@ -69,7 +69,7 @@
 								<th>Skoor</th>
 							</tr>
 							{% for team in teams %}
-							<tr style='color:#{{ team["color"] }};'">
+							<tr style="color:#{{ team['color'] }};">
 								<th>{{ team["name"] }}</th>
 								<th>{{ team["spotCount"] }}</th>
 								<th>{{ team["touchCount"] }}</th>
