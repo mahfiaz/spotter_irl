@@ -26,28 +26,35 @@ app.secret_key = os.urandom(24)
 def registrationTemplate():
 	return render_template("regi")
 
+@app.route("/hea")
+def login_status():
+	try:
+		if session["user"] != None and session["phone"] != None:
+			return True
+		else:
+			return False
+	except KeyError:
+		return False
+
 @app.route("/")
 def isLoggedin():
-	try:
-		if session["user"] == None:
-			return registrationTemplate()
-		else:
-			return render_template("pending", user=session["user"], phone=session["phone"], email=session["email"])
-	except KeyError:
+	if login_status == True:
+		return render_template("pending", user=session["user"], phone=session["phone"], email=session["email"])
+	else:
 		return registrationTemplate()
 
 
 @app.route("/register", methods=["GET"])
 def saveNew():
-	_user = request.args.get("user")
-	_phone = request.args.get("phone")
-	_email = request.args.get("email")
-	session["user"] = _user
-	session["phone"] = _phone
-	session["email"] = _email
+	user = request.args.get("user")
+	phone = request.args.get("phone")
+	email = request.args.get("email")
+	session["user"] = user
+	session["phone"] = phone
+	session["email"] = email
 
-	if _user and _phone:
-		if Action.addPlayer(_user, _phone, _email):
+	if user and phone:
+		if Action.addPlayer(user, phone, email):
 			return isLoggedin()
 		else:
 			return registrationTemplate()
@@ -63,8 +70,23 @@ def wrongInfo():
 
 
 @app.route("/status")
-def jailStatus():
-	_user = session["user"]
+def is_free():
+	if login_status:
+		user = session["user"]
+		with open('stats.json') as data_file:
+			stats = json.load(data_file)
+		if stats["roundName"] != None:
+			for player in stats["teamlessPlayers"]:
+				if player["name"] == user:
+					return "Teamless"#player["nowInLiberty"]
+			for team in stats["teams"]:
+				for player in team["players"]:
+					if player["name"] == user:
+						return "Team"#player["nowInLiberty"]
+		else:
+			return "False"
+
+
 
 
 # Player registration

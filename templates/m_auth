@@ -24,7 +24,7 @@
 
     </head>
     <body>
-        <div class="col-xs-3"  style="text-align:center;">
+        <div class="col-xs-12"  style="text-align:center;">
 
             <p>
                 <b><p style="font-size:400%;">Welcome</p>

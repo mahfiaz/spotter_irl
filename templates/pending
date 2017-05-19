@@ -26,7 +26,8 @@ g<!DOCTYPE html>
                 }
             }
 
-            function checkstatus() {
+            function checkStatus() {
+
                 xhr.open("GET", "/status", true);
                 xhr.send();
                 xhr.onreadystatechange = function() {
@@ -38,17 +39,17 @@ g<!DOCTYPE html>
 
             }
 
+
         </script>
 
     </head>
     <body>
         <div class="col-xs-12 col-sm-2 col-sm-offset-5">
             <b><p style="font-size:400%; text-align:center;">Welcome</p>
-            <p style="font-size:300%;">user {{ user }}</p></b>
+            <p>user <span style="font-size:300%;">{{ user }}</span></p></b>
             <p style="font-size:200%;">{{ phone }}</p>
             <p style="font-size:200%;">{{ email }}</p>
             <p>Go show your screen to spawnmaster @Keila päevade noorteala.</p>
-            <p><input id="playerPending" type="submit" class="btn btn-success btn-lg btn-block" value="Am I free?" onclick="checkstatus()"></p>
             <p><input id="invalidRegistration" type="submit" class="btn btn-danger btn-sm btn-block" value="I made a mistake, go back" onclick="logout()"></p>
         </div>
     </body>

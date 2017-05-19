@@ -39,8 +39,6 @@
                 <br>
                 <input id="phone" name="phone" type="text" placeholder="Phone nr" size="20">
                 <br>
-                <input id="email" name="email" type="eamil" placeholder="Email" size="20">
-                <br>
                 <input id="NOTplayerSubmit" type="submit" value="Ready" onclick="register()">
             </form>
             </p>
