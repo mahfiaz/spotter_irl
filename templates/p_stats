@@ -49,6 +49,7 @@
 				var stats = "";
 				var user = "";
 				var divContents = "";
+				var playerStatus = "";
 
 				xhrPlayer.open("GET", "/user", true);
 				xhrPlayer.send();
@@ -66,21 +67,26 @@
 						stats = JSON.parse(stats);
 						if(stats["roundName"] != null) {
 							var statsDiv = document.getElementById("stats");
-							divContents = "<table style='width:100%;'><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>";
+							divContents += "<table style='width:100%;'><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>";
 							for(i in stats["teams"]) {
 								team = stats["teams"][i];
 								divContents += "<tr style='color:#"+team["color"]+";'><th>"+team["name"]+"</th><th>"+team["spotCount"]+"</th><th>"+team["touchCount"]+"</th><th>"+team["disloyality"]+"</th><th>"+team["score"]+"</th></tr>";
+							}
+							for(i in stats["teams"]) {
+								team = stats["teams"][i];
 								for (i in team["players"]) {
 									player = team["players"][i];
 									if (player["name"] == user) {
-										divContents += "<tr style='color:#"+team["color"]+";'><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>p"+ayer["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
+										divContents += "<tr style='color:#"+team["color"]+";'><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>"+player["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
+										playerStatus = player["nowInLiberty"];
 									}
 								}
 							}
 							for(i in stats["teamlessPlayers"]) {
 								player = stats["teamlessPlayers"][i];
 								if(player["name"] == user) {
-									divContents += "<tr><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>p"+ayer["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
+									divContents += "<tr><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>"+player["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
+									playerStatus = player["nowInLiberty"];
 								}
 							}
 							divContents += "<div class='bottom' id='toEnd'></div>";
@@ -159,6 +165,8 @@
 
 			}
 
+			
+
 			window.onload = function() {
 				getRoundInfo();
 				getEvents();
@@ -172,6 +180,9 @@
 				}, 4000);
 				window.setInterval(function() {
 					timeToEnd();
+					if (!player["nowInLiberty"]) {
+						window.location.assign("/");
+					}
 				}, 1000);
 			}
 

@@ -122,15 +122,15 @@ def is_free1():
 			if stats["roundName"] != None:
 				for player in stats["teamlessPlayers"]:
 					if player["name"] == user:
-						return str(player["nowInLiberty"])+" - teamless"
+						return str(player["nowInLiberty"])
 				for team in stats["teams"]:
 					for player in team["players"]:
 						if player["name"] == user:
-							return str(player["nowInLiberty"])+" - in team"
+							return str(player["nowInLiberty"])
 			else:
-				return "False - roundname == none"
+				return "False"
 		except:
-			return "False - no file"
+			return "False"
 
 
 # Player registration

@@ -7,7 +7,7 @@
         <link href="jumbotron-narrow.css" rel="stylesheet">
         <link href="/style.css" rel="stylesheet">
         <script src="/script.js" charset="utf-8"></script>
-        
+
         <script type="text/javascript">
             
             var xhr = new XMLHttpRequest();
@@ -15,8 +15,18 @@
             window.onload = function() {
                 if(window.location.href != "http://localhost:5000/") {
                     window.location.assign("/");
+                    setInterval(function() {
+                        var xhrJailCheck = new XMLHttpRequest();
+                        xhrJailCheck.open("GET","/jf",true);
+                        xhrJailCheck.send();
+                        if (xhrJailCheck.responseText == "True") {
+                            window.location.assign("/");
+                        } else {
+                        }
+                    }, 2000);
                 }
             }
+
 
             function logout() {
                 xhr.open("GET", "/wrongInfo", true);
