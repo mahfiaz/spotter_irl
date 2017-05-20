@@ -14,15 +14,16 @@
 			
 			function getRoundInfo() {
 				var xhrRound = new XMLHttpRequest();
+				var xhrPlayer = new XMLHttpRequest();
 				var stats = "";
 				var user = "";
 				var divContents = "";
 
-				xhrRound.open("GET", "/user", true);
-				xhrRound.send();
-				xhrRound.onreadystatechange = function() {
-					if (xhrRound.readyState == 4 && xhrRound.state == 200) {
-						user = xhrRound.responseText;
+				xhrPlayer.open("GET", "/user", true);
+				xhrPlayer.send();
+				xhrPlayer.onreadystatechange = function() {
+					if (xhrPlayer.readyState == 4 && xhrPlayer.status == 200) {
+						user = xhrPlayer.responseText;
 					}
 				}
 
@@ -34,7 +35,7 @@
 						stats = JSON.parse(stats);
 						if(stats["roundName"] != null) {
 							var roundDiv = document.getElementById("roundInfo");
-							divContents = "<p>Lahing \"" + stats["roundName"] + "\", mängija: " + user + "</p>";
+							divContents += "<p>Lahing \"" + stats["roundName"] + "\", mängija: " + user + "</p>";
 							roundDiv.innerHTML = divContents;
 						}
 					}
@@ -44,15 +45,16 @@
 
 			function getStats() {
 				var xhrStats = new XMLHttpRequest();
+				var xhrPlayer = new XMLHttpRequest();
 				var stats = "";
 				var user = "";
 				var divContents = "";
 
-				xhrStats.open("GET", "/user", true);
-				xhrStats.send();
-				xhrStats.onreadystatechange = function() {
-					if (xhrStats.readyState == 4 && xhrStats.state == 200) {
-						user = xhrStats.responseText;
+				xhrPlayer.open("GET", "/user", true);
+				xhrPlayer.send();
+				xhrPlayer.onreadystatechange = function() {
+					if (xhrPlayer.readyState == 4 && xhrPlayer.status == 200) {
+						user = xhrPlayer.responseText;
 					}
 				}
 
@@ -94,15 +96,16 @@
 
 			function getEvents() {
 				var xhrEvents = new XMLHttpRequest();
+				var xhrPlayer = new XMLHttpRequest();
 				var events = "";
 				var user = "";
 				var divContents = "";
 
-				xhrEvents.open("GET", "/user", true);
-				xhrEvents.send();
-				xhrEvents.onreadystatechange = function() {
-					if (xhrEvents.readyState == 4 && xhrEvents.state == 200) {
-						user = xhrEvents.responseText;
+				xhrPlayer.open("GET", "/user", true);
+				xhrPlayer.send();
+				xhrPlayer.onreadystatechange = function() {
+					if (xhrPlayer.readyState == 4 && xhrPlayer.status == 200) {
+						user = xhrPlayer.responseText;
 					}
 				}
 
@@ -114,6 +117,7 @@
 						events = JSON.parse(events);
 						if("event" in events[0]) {
 							console.log("No events to show");
+							eventsDiv.innerHTML = "";
 						} else {
 							var eventsDiv = document.getElementById("events");
 							for(i in events) {
@@ -127,8 +131,6 @@
 								divContents += "</p>";
 							}
 							eventsDiv.innerHTML = divContents;
-						} else {
-							eventsDiv.innerHTML = "";
 						}
 
 					}

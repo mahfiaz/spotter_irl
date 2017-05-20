@@ -18,7 +18,7 @@ import json
 app = Flask(__name__, static_url_path = "", static_folder = "www/static")
 SESSION_TYPE = 'Redis'
 app.config.from_object(__name__)
-app.secret_key = "huehuehuehuehuehuehue"#os.urandom(24)
+app.secret_key = os.urandom(24)
 
 
 
@@ -40,7 +40,6 @@ def pending_template():
 def playing_template():
 	return render_template("p_stats")
 
-
 def login_status():
 	try:
 		if session["user"] == None:
@@ -50,8 +49,19 @@ def login_status():
 	except KeyError:
 		return False
 
+
+@app.route("/logstat")
+def login_status1():
+	try:
+		if session["user"] == None:
+			return str(False)
+		else:
+			return str(True)
+	except KeyError:
+		return str(False)
+
 @app.route("/")
-def is_logged_in():
+def index():
 	if login_status() and is_free():
 		return playing_template()
 	elif login_status():
@@ -69,7 +79,7 @@ def save_new():
 
 	if _user and _phone:
 		if Action.addPlayerWOEmail(_user, _phone):
-			return is_logged_in()
+			return index()
 		else:
 			return registration_template()
 	else:
@@ -82,22 +92,45 @@ def wrong_info():
 	session.clear()
 	return "User data removed"
 
-@app.route("/jf")
 def is_free():
 	if login_status:
 		user = session["user"]
-		with open('stats.json') as data_file:
-			stats = json.load(data_file)
-		if stats["roundName"] != None:
-			for player in stats["teamlessPlayers"]:
-				if player["name"] == user:
-					return str(player["nowInLiberty"])
-			for team in stats["teams"]:
-				for player in team["players"]:
+		try:
+			with open('stats.json') as data_file:
+				stats = json.load(data_file)
+			if stats["roundName"] != None:
+				for player in stats["teamlessPlayers"]:
 					if player["name"] == user:
-						return str(player["nowInLiberty"])
-		else:
-			return "False"
+						return player["nowInLiberty"]
+				for team in stats["teams"]:
+					for player in team["players"]:
+						if player["name"] == user:
+							return player["nowInLiberty"]
+			else:
+				return False
+		except:
+			return False
+
+
+@app.route("/jf")
+def is_free1():
+	if login_status:
+		user = session["user"]
+		try:
+			with open('stats.json') as data_file:
+				stats = json.load(data_file)
+			if stats["roundName"] != None:
+				for player in stats["teamlessPlayers"]:
+					if player["name"] == user:
+						return str(player["nowInLiberty"])+" - teamless"
+				for team in stats["teams"]:
+					for player in team["players"]:
+						if player["name"] == user:
+							return str(player["nowInLiberty"])+" - in team"
+			else:
+				return "False - roundname == none"
+		except:
+			return "False - no file"
 
 
 # Player registration
