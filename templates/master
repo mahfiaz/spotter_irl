@@ -4,10 +4,10 @@
         
         <title>Spotter IRL Base</title>
 
-        <link href="bootstrap.min.css" rel="stylesheet">
-        <link href="jumbotron-narrow.css" rel="stylesheet">
-        <link href="/style.css" rel="stylesheet">
-        <script src="/script.js" charset="utf-8"></script>
+        <link href="static/bootstrap.min.css" rel="stylesheet">
+        <link href="static/jumbotron-narrow.css" rel="stylesheet">
+        <link href="static/style.css" rel="stylesheet">
+        <script src="static/script.js" charset="utf-8"></script>
 
         <script type="text/javascript">
             
