@@ -12,7 +12,7 @@
 			/*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */img,legend{border:0}legend,td,th{padding:0}html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,optgroup,strong{font-weight:700}dfn{font-style:italic}h1{font-size:2em;margin:.67em 0}mark{background:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{box-sizing:content-box;height:0}pre,textarea{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{color:inherit;font:inherit;margin:0}button{overflow:visible}button,select{text-transform:none}button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}input{line-height:normal}input[type=checkbox],input[type=radio]{box-sizing:border-box;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{height:auto}input[type=search]{-webkit-appearance:textfield;box-sizing:content-box}input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none}fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}table{border-collapse:collapse;border-spacing:0}
 
 			body {
-				background-image: url("css_dust2.jpg");
+				background-image: url("/css_dust2.jpg");
 				background-size: cover;
 
 			}
@@ -39,36 +39,35 @@
 
 		<script type="text/javascript">
 			
-			var xhr = new XMLHttpRequest();
+			var xhrStats = new XMLHttpRequest();
+			var xhrEvents = new XMLHttpRequest();
 
 			function getStats() {
 				var stats = "";
 				var user = "";
 				var divContents = "";
 
-				xhr.open("GET", "/user", true);
-				xhr.send();
-				xhr.onreadystatechange = function() {
-					if (xhr.readyState == 4 && xhr.state == 200) {
-						user = xhr.responseText;
+				xhrStats.open("GET", "/user", true);
+				xhrStats.send();
+				xhrStats.onreadystatechange = function() {
+					if (xhrStats.readyState == 4 && xhrStats.state == 200) {
+						user = xhrStats.responseText;
 					}
 				}
 
-				xhr.open("GET", "/stats", true);
-				xhr.send();
-				xhr.onreadystatechange = function() {
-					if (xhr.readyState == 4 && xhr.status == 200) {
-						stats = xhr.responseText;
+				xhrStats.open("GET", "/stats", true);
+				xhrStats.send();
+				xhrStats.onreadystatechange = function() {
+					if (xhrStats.readyState == 4 && xhrStats.status == 200) {
+						stats = xhrStats.responseText;
 						stats = JSON.parse(stats);
 						if(stats["roundName"] != null) {
-							var statsDiv = document.getElementById("stats")
+							var statsDiv = document.getElementById("stats");
 							divContents = "<table style='width:100%;'><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>";
 							for(i in stats["teams"]) {
 								team = stats["teams"][i];
 								divContents += "<tr style='color:#"+team["color"]+";'><th>"+team["name"]+"</th><th>"+team["spotCount"]+"</th><th>"+team["touchCount"]+"</th><th>"+team["disloyality"]+"</th><th>"+team["score"]+"</th></tr>";
-								console.log("done");
 								for (i in team["players"]) {
-									console.log(i);
 									player = team["players"][i];
 									if (player["name"] == user) {
 										divContents += "<tr style='color:#"+team["color"]+";'><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>p"+ayer["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
@@ -76,7 +75,6 @@
 								}
 							}
 							for(i in stats["teamlessPlayers"]) {
-								console.log("teamless");
 								player = stats["teamlessPlayers"][i];
 								if(player["name"] == user) {
 									divContents += "<tr><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>p"+ayer["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
@@ -89,10 +87,46 @@
 				}
 			}
 
+
+			function getEvents() {
+				var events = "";
+				var user = "";
+				var divContents = "";
+
+				xhrEvents.open("GET", "/user", true);
+				xhrEvents.send();
+				xhrEvents.onreadystatechange = function() {
+					if (xhrEvents.readyState == 4 && xhrEvents.state == 200) {
+						user = xhrEvents.responseText;
+					}
+				}
+
+				xhrEvents.open("GET", "/events", true);
+				xhrEvents.send();
+				xhrEvents.onreadystatechange = function() {
+					if (xhrEvents.readyState == 4 && xhrEvents.status == 200) {
+						events = xhrEvents.responseText;
+						events = JSON.parse(events);
+						if(!events[0]["event"]) {
+							var eventsDiv = document.getElementById("events");
+							for(i in events) {
+								event = events[i];
+								divContents += "<p>"+event["time"]+" <span style='color:#"+event["text1"]["color"]+";'>"+event["text1"]["text"]+"</span> <span style='color:#"+event["text2"]["color"]+";'>"+event["text2"]["text"]+"</span> <span style='color:#"+event["text3"]["color"]+";'>"+event["text3"]["text"]+"</span></p>";
+							}
+							eventsDiv.innerHTML = divContents;
+						}
+
+					}
+				}
+			}
+
+			
 			window.onload = function() {
+				getEvents();
 				getStats();
 				window.setInterval(function() {
 					getStats();
+					getEvents();
 				}, 4000);
 			}
 
@@ -111,13 +145,13 @@
 		<div class="sm-col-12">
 			<div class="col-sm-10 col-sm-offset-1">
 				<p>
-					<div class="textarea" style="text-align:center; font-size:200%"></div>
+					<div class="textarea" style="text-align:center; font-size:200%; min-height: 6vh;"></div>
 				</p>
 				<p>
-					<div id="stats" class="textarea"></div>
+					<div id="stats" class="textarea" style="min-height:20vh; max-height:20vh; overflow:scroll;"></div>
 				</p>
 				<p>
-					<div id="events" class="textarea"></div>
+					<div id="events" class="textarea" style="min-height:30vh; max-height:30vh; overflow:scroll;"></div>
 				</p>
 				<p style="text-align:center;">
 					<input class="form-control" id="fleeingCode" type="text" placeholder="Silmasin koodi">

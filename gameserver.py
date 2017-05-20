@@ -36,6 +36,7 @@ def registration_template():
 def pending_template():
 	return render_template("pending", user=session["user"], phone=session["phone"])
 
+@app.route("/ps")
 def playing_template():
 	return render_template("p_stats")
 

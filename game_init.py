@@ -15,9 +15,12 @@ from game_config import file_events, file_stats
 def addTestRoundsNormal():
     time.strftime(dateformat)
     time3 = format(datetime.datetime.now() + datetime.timedelta(seconds = -2), dateformat)
-    time4 = format(datetime.datetime.now() + datetime.timedelta(seconds = 10 * 60), dateformat)
+    time4 = format(datetime.datetime.now() + datetime.timedelta(seconds = 100 * 60), dateformat)
+    #time5 = format(datetime.datetime.now() + datetime.timedelta(seconds = 120 * 60), dateformat)
+    #time6 = format(datetime.datetime.now() + datetime.timedelta(seconds = 200 * 60), dateformat)
 
     Round.add("third", time3, time4)
+    #Round.add("fourth", time5, time6)
     Round.updateActiveId()
 
 def initGame():
