@@ -92,11 +92,11 @@ def sms_receiver(queue):
             event = parse_incoming_sms(number, contents, sent, received)
             queue.put(event)
 
-        time.sleep(0.05)
-
 
 def connector():
     print("SMS server started")
+    actually_send = False
+
     while True:
         r = requests.get('http://fusiongame.tk/sms')
         print(r.text)
