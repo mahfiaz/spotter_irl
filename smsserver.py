@@ -1,16 +1,13 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# vim: ai ts=4 sts=4 et sw=4
+#!/usr/bin/env python3
 
 import codecs
 from glob import glob
+import os
 import random
 import re
-import os
+import requests
 import shutil
 import time
-
-from engine.message import parseIncomingSms as parse_incoming_sms
 
 incoming_dir = '/var/spool/sms/incoming/'
 incoming_parsed = '/var/spool/sms/processed/'
@@ -68,19 +65,19 @@ def sms_receiver(queue):
             f = codecs.open(path, 'r', encoding='utf8')
             data = f.read()
             f.close()
-            
+
             folder, filename = os.path.split(path)
             destination = os.path.join(incoming_parsed, filename)
             shutil.move(path, destination)
-            
+
             split = data.find("\n\n")
             headers = data[:split]
             contents = data[split+2:]
-            
+
             number = ''
             sent = ''
             received = ''
-            
+
             for line in headers.split("\n"):
                 header, value = line.split(": ")
                 if header == "From":
@@ -91,11 +88,23 @@ def sms_receiver(queue):
                     sent = value
                 elif header == "Received":
                     received = value
-            
+
             event = parse_incoming_sms(number, contents, sent, received)
             queue.put(event)
-        
+
         time.sleep(0.05)
+
+
+def connector():
+    print("SMS server started")
+    while True:
+        r = requests.get('http://fusiongame.tk/sms')
+        print(r.text)
+        time.sleep(0.2)
+
+if __name__ == "__main__":
+    connector()
 
 # Testing
 #send_sms(512345, u"Rõõmsat päeva, kuidas läheb")
+
