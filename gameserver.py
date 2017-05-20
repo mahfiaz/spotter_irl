@@ -41,7 +41,7 @@ def playing_template():
 	else:
 		return "403 Connection Forbidden"
 
-@app.route("/isFree")
+@app.route("/isJailed")
 def playing_templateasd():
 	if logged_in():
 		return str(Event.isPlayerJailed(Player._getIdByName(session["user"])))

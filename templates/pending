@@ -10,15 +10,6 @@
         <script src="static/script.js" charset="utf-8"></script>
 
         <script type="text/javascript">
-            
-            $(document).ready(function(){
-                // Check if user is free.
-                $.ajax({
-                    url: "isFree"
-                }).done(function(data) {
-                    $("#status").html(data);
-                });
-            });
 
             var xhr = new XMLHttpRequest();
 
@@ -26,8 +17,8 @@
                 if(window.location.href != "http://localhost:5000/") {
                     window.location.assign("/");
                     setInterval(function() {
-                        var jailed = isJailed();
-                        if (jailed == "False") {
+                        isJailed();
+                        if (userJailed == "False") {
                             window.location.assign("/");
                         } else {
                         }
@@ -60,7 +51,7 @@
             <p>user <span style="font-size:250%;">{{ user }}</span></p></b>
             <p style="font-size:200%;">{{ phone }}</p>
             <p>Go show your screen to spawnmaster @Keila päevade noorteala.</p>
-            <div id="status"></div>
+            <div id="isJailed" hidden></div>
             <p><input id="invalidRegistration" type="submit" class="btn btn-danger btn-sm btn-block" value="I made a mistake, go back" onclick="logout()"></p>
         </div>
     </body>

@@ -1,3 +1,5 @@
+userJailed = "";
+
 function getAllStats() {
 	var xhrStats = new XMLHttpRequest();
 	var stats = "";
@@ -300,17 +302,13 @@ function timeToEnd() {
 
 
 function isJailed() {
-	var xhrJail = new XMLHttpRequest();
-	var status = "";
-
-	xhrJail.open("GET", "/isFree", true);
-	xhrJail.send();
-	xhrJail.onreadystatechange = function() {
-		if (xhrJail.readyState == 4 && xhrJail.status == 200) {
-			status = xhrJail.responseText;
-		}
+	if (document.getElementById("isJailed")) {
+        $.ajax({
+            url: "isJailed"
+        }).done(function(data) {
+        	userJailed = data;
+        });
 	}
-	return status;
 }
 
 
