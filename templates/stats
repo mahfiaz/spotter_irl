@@ -14,12 +14,39 @@
 			
 			var xhr = new XMLHttpRequest();
 
+			window.addEventListener("keypress", function(e) {
+				var key = e.which || e.keyCode;
+			    if (key === 13) {
+			    	fleeJail();
+			    }
+			})
+
+			window.onload = function() {
+
+				document.getElementById("fleeingCode").innerHTML = "";
+			}
+
 			function fleeJail() {
 				var code = document.getElementById("fleeingCode").value;
-				xhr.open("GET", "/flee?tagCode="+code, true);
+				xhr.open("GET", "/flee?fleeingCode="+code, true);
 				xhr.send();
 				window.location.assign("/s");
+			}
 
+			window.onload = function() {
+				getRoundInfoBase();
+				getAllEvents();
+				getAllStats();
+				timeToEnd();
+				window.setInterval(function() {
+					getRoundInfoBase();
+					getAllStats();
+					getAllEvents();
+					timeToEnd();
+				}, 4000);
+				window.setInterval(function() {
+					timeToEnd();
+				}, 1000);
 			}
 
 		</script>
@@ -30,66 +57,18 @@
 	<body>
 		<div class="sm-col-12">
 			<div class="col-sm-10 col-sm-offset-1">
-				<div class="textarea">
-					<p style="text-align:center; font-size:200%"> Lahing "{{ stats['roundName'] }}" seis: Baas</p>
-				</div>
+				<div id="roundInfo" class="textarea"></div>
 			</div>
 			<div class="col-sm-10 col-sm-offset-1" style="top:20px; padding:0;">
 				<div class="col-sm-7 col-sm-offset">
-					<div class="textarea" style="min-height:70vh;">
-						{% for team in stats['teams'] %}
-						<table style="color:#{{ team['color'] }};width:100%;">
-							<tr>
-								<th></th>
-								<th>Tabatud</th>
-								<th>Puude</th>
-								<th>Miinus</th>
-								<th>Skoor</th>
-							</tr>
-							<tr>
-								<th>{{ team['name'] }}</th>
-								<th>{{ team['potCount'] }}</th>
-								<th>{{ team['touchCount'] }}</th>
-								<th>{{ team['disloyality'] }}</th>
-								<th>{{ team['score'] }}</th>
-							</tr>
-							{% for player in team["players"] %}
-	                        <tr>
-	                            <td>{{ player['name'] }}</td>
-	                            <td>{{ player['spotCount'] }}</td>
-	                            <td>{{ player['touchCount'] }}</td>
-	                            <td>{{ player['disloyality'] }}</td>
-	                            <td>{{ player['score'] }}</td>
-	                        </tr>
-	                        {% endfor %}
-						</table>
-
-						<div class="col-sm-12" style="min-height: 20vh"></div>
-						{% endfor %}
-
-						<div class="col-sm-12"></div>
-
-						<p class="bottom">Battle ending in {{ stats['roundEnd'][-8:-3] }}</p>
-					</div>
+					<div id="stats" class="textarea base"></div>
 				</div>
 				<div class="col-sm-4 col-sm-offset-1">
-					<div class="textarea" style="min-height:70vh;overflow: auto;">
-						{% for event in events %}
-						<p>
-							{{ event['time'][-8:-3] }}
-							<span style="color:#{{ event['text1']['color'] }};">{{ event['text1']['text'] }} </span>
-							<span style="color:#{{ event['text2']['color'] }};">{{ event['text2']['text'] }} </span>
-							<span style="color:#{{ event['text3']['color'] }};">{{ event['text3']['text'] }} </span>
-						</p>
-						{% endfor %}
-						<div id="fleeMessage" class="bottom"></div>
-
-					</div>
+					<div id="events" class="textarea base"></div>
 				</div>
 				<div class="col-sm-3 col-sm-offset-8" style="top:20px;">
 					<p>
-						<input id="fleeingCode" type="text" placeholder="Pagemiskood">
-						<input type="submit" value="Page" onclick="fleeJail()">
+						<input id="fleeingCode" type="text" placeholder="Pagemiskood" autofocus>
 					</p>
 				</div>
 			</div>
