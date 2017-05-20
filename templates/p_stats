@@ -39,10 +39,9 @@
 
 		<script type="text/javascript">
 			
-			var xhrStats = new XMLHttpRequest();
-			var xhrEvents = new XMLHttpRequest();
 
 			function getStats() {
+				var xhrStats = new XMLHttpRequest();
 				var stats = "";
 				var user = "";
 				var divContents = "";
@@ -80,6 +79,7 @@
 									divContents += "<tr><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>p"+ayer["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
 								}
 							}
+							divContents += "<div class='bottom' id='toEnd'></div>";
 							statsDiv.innerHTML = divContents;
 						}
 
@@ -89,6 +89,7 @@
 
 
 			function getEvents() {
+				var xhrEvents = new XMLHttpRequest();
 				var events = "";
 				var user = "";
 				var divContents = "";
@@ -107,7 +108,9 @@
 					if (xhrEvents.readyState == 4 && xhrEvents.status == 200) {
 						events = xhrEvents.responseText;
 						events = JSON.parse(events);
-						if(!events[0]["event"]) {
+						if("event" in events[0]) {
+							console.log("No events to show");
+						} else {
 							var eventsDiv = document.getElementById("events");
 							for(i in events) {
 								event = events[i];
@@ -120,14 +123,48 @@
 				}
 			}
 
+			function timeToEnd() {
+				var xhrTime = new XMLHttpRequest();
+				currentDate = new Date();
+				xhrTime.open("GET", "/stats", true);
+				xhrTime.send();
+				xhrTime.onreadystatechange = function() {
+					if (xhrTime.readyState == 4 && xhrTime.status == 200) {
+						stats = xhrTime.responseText;
+						stats = JSON.parse(stats);
+						if(stats["roundName"] != null) {
+							var ending = stats["roundEnd"];
+							endTime = new Date(ending.substring(0,4),ending.substring(5,7),ending.substring(8,10),ending.substring(11,13),ending.substring(14,16),ending.substring(17,19));
+							var timeDiv = document.getElementById("toEnd");
+							var toEnd = new Date(endTime.getTime() - currentDate.getTime());
+							var divContents = "Aega vooru lõpuni " + addZerobefore(toEnd.getUTCHours()) + ":" + addZerobefore(toEnd.getUTCMinutes()) + ":" + addZerobefore(toEnd.getUTCSeconds());
+							timeDiv.innerHTML = divContents;
+						}
+					}
+				}
+
+			}
+
 			
+			function addZerobefore(number) {
+				if(parseInt(number) < 10 && parseInt(number) > -10) {
+					number = "0" + parseInt(number);
+				}
+				return number;
+			}
+
 			window.onload = function() {
 				getEvents();
 				getStats();
+				timeToEnd();
 				window.setInterval(function() {
 					getStats();
 					getEvents();
+					timeToEnd();
 				}, 4000);
+				window.setInterval(function() {
+					timeToEnd();
+				}, 1000);
 			}
 
 			function tag() {
@@ -148,7 +185,9 @@
 					<div class="textarea" style="text-align:center; font-size:200%; min-height: 6vh;"></div>
 				</p>
 				<p>
-					<div id="stats" class="textarea" style="min-height:20vh; max-height:20vh; overflow:scroll;"></div>
+					<div id="stats" class="textarea" style="min-height:20vh; max-height:20vh; overflow:scroll; position: relative;">
+						<div class="bottom" id="toEnd"></div>
+					</div>
 				</p>
 				<p>
 					<div id="events" class="textarea" style="min-height:30vh; max-height:30vh; overflow:scroll;"></div>
