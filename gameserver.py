@@ -36,49 +36,39 @@ def registration_template():
 def pending_template():
 	return render_template("pending", user=session["user"], phone=session["phone"])
 
-@app.route("/ps")
+#@app.route("/p")
 def playing_template():
-	return render_template("p_stats")
+	if return render_template("p_stats")
 
-def login_status():
+def logged_in():
 	try:
-		if session["user"] == None:
+		if session["user"] == None or session["web_hash"]:
 			return False
 		else:
 			return True
 	except KeyError:
 		return False
 
-
-@app.route("/logstat")
-def login_status1():
-	try:
-		if session["user"] == None:
-			return str(False)
-		else:
-			return str(True)
-	except KeyError:
-		return str(False)
-
 @app.route("/")
 def index():
-	if login_status() and is_free():
-		return playing_template()
-	elif login_status():
+	if logged_in():
+		if not Event.isPlayerJailed(Player._getIdByName(user)):
+			return playing_template()
 		return pending_template()
 	else:
 		return registration_template()
 
 
 @app.route("/register", methods=["GET"])
-def save_new():
-	_user = request.args.get("user")
-	_phone = request.args.get("phone")
-	session["user"] = _user
-	session["phone"] = _phone
+def new_player():
+	user = request.args.get("user")
+	phone = request.args.get("phone")
 
-	if _user and _phone:
-		if Action.addPlayerWOEmail(_user, _phone):
+	if user and phone:
+		if Action.addPlayerWOEmail(user, phone):
+			session["user"] = user
+			session["phone"] = phone
+			session["web_hash"] = Player.getHashById(Player._getIdByName(user))
 			return index()
 		else:
 			return registration_template()
@@ -88,52 +78,43 @@ def save_new():
 
 @app.route("/wrongInfo")
 def wrong_info():
-	Player.delPlayer(session["user"])
-	session.clear()
-	return "User data removed"
-
-def is_free():
-	if login_status:
-		user = session["user"]
-		try:
-			with open('stats.json') as data_file:
-				stats = json.load(data_file)
-			if stats["roundName"] != None:
-				for player in stats["teamlessPlayers"]:
-					if player["name"] == user:
-						return player["nowInLiberty"]
-				for team in stats["teams"]:
-					for player in team["players"]:
-						if player["name"] == user:
-							return player["nowInLiberty"]
-			else:
-				return False
-		except:
-			return False
-
-
-@app.route("/jf")
-def is_free1():
-	if login_status:
-		user = session["user"]
-		try:
-			with open('stats.json') as data_file:
-				stats = json.load(data_file)
-			if stats["roundName"] != None:
-				for player in stats["teamlessPlayers"]:
-					if player["name"] == user:
-						return str(player["nowInLiberty"])
-				for team in stats["teams"]:
-					for player in team["players"]:
-						if player["name"] == user:
-							return str(player["nowInLiberty"])
-			else:
-				return "False"
-		except:
-			return "False"
+	if logged_in():
+		Player.delPlayer(session["user"])
+		session.clear()
+		return "User data removed"
+	else:
+		return "403 Connection Forbidden"
 
 
 # Player registration
+# END BLOCK
+
+
+# START BLOCK
+# Player actions
+
+
+@app.route("/flee")
+def flee_jail():
+	fleeing_code = request.args.get("fleeingCode")
+	if Action.fleePlayerWithCode(fleeing_code):
+		return "Said põgenema"
+	else:
+		return "Põgenemiskatse nurjus"
+
+
+@app.route("/tag")
+def tag():
+	if logged_in():
+		tag_code = request.args.get("tagCode")
+		if Action.handleWeb(session["web_hash"], tag_code):
+			return "Tabasid"
+		else:
+			return "Ebaõnnestunud katse"
+	else:
+		return "403 Connection Forbidden"
+
+# Player actions
 # END BLOCK
 
 
@@ -142,8 +123,10 @@ def is_free1():
 
 @app.route("/user")
 def userName():
-	if login_status():
+		if logged_in():
 		return session["user"]
+	else:
+		return "403 Connection Forbidden"
 
 @app.route("/events")
 def events():
@@ -154,7 +137,7 @@ def events():
 		return response
 	except:
 		return "File not found"
-
+	
 @app.route("/stats")
 def stats():
 	try:
@@ -164,7 +147,7 @@ def stats():
 		return response
 	except:
 		return "File not found"
-
+	
 # Getting data
 # END BLOCK
 
@@ -227,12 +210,8 @@ def masterLogout():
 
 
 @app.route("/s")
-def hue():
-	with open('events.json') as data_file:
-		events = json.load(data_file)
-	with open('stats.json') as data_file:
-		stats = json.load(data_file)
-	return render_template("stats", events = events, stats = stats)
+def base_Template():
+	return render_template("stats")
 # Spawnmaster screen
 # END BLOCK
 
@@ -291,32 +270,6 @@ def addToTeam():
 
 # START BLOCK
 # Routes to player screen templates
-
-
-@app.route("/tagging")
-def tagging():
-	user = "rjurik"
-	team = 2
-	if team == 1:
-		team = "blue"
-	else:
-		team = "red"
-	score = 520
-	rank = 3
-	return render_template("playerPlaying.html", user=user, team=team, score=score, rank=rank)
-
-@app.route("/tagged")
-def tagged():
-	user = "rjurik"
-	team = 1
-	if team == 1:
-		team = "blue"
-	else:
-		team = "red"
-	score = 520
-	rank = 3
-	tagger = "LOLer"
-	return render_template("playerTagged.html", team=team, tagger=tagger, user=user, score=score, rank=rank)
 
 
 # Routes to player screen templates
