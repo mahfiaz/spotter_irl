@@ -190,6 +190,9 @@ class Action:
     def sayToMyTeam(playerId, message):
         if not playerId:
             return
+        if Player.isBannedChat(playerId):
+            print("Banned", Player.getNameById(playerId), "wanted to say:", message)
+            return
         teamId = Team.getPlayerTeamId(playerId, Round.getActiveId())
         message = re.sub('[^A-Za-z0-9 \.,:;\-\?!#/ÕõÄäÖöÜü]', '', message)
         message = message[:60]
@@ -232,21 +235,28 @@ class Action:
                 BaseMsg.cantFleeFromLiberty(Player.getNameById(playerId))
                 return False
 
-# round calls
-    def _roundStartedCall(playerMobileName, roundName):
-        BaseMsg.roundStarted()
-        for (mobile, name) in playerMobileName:
-            Sms.roundStarted(mobile, roundName)
+    def _unbanAllChats():
+        for playerId in Player.getAllPlayerIds():
+            Player.unbanChat(playerId)
 
-    def _roundEndingCall(playerMobileName, roundName, left):
+# round calls
+    def _roundStartedCall(mobileNameList, roundName):
+        BaseMsg.roundStarted()
+        for (mobile, name) in mobileNameList:
+            Sms.roundStarted(mobile, roundName)
+        for id in Player.getAllPlayerIds():
+            Player.unbanChat(id)
+
+
+    def _roundEndingCall(mobileNameList, roundName, left):
         BaseMsg.roundEnding(left)
-        for (mobile, name) in playerMobileName:
+        for (mobile, name) in mobileNameList:
             Sms.roundEnding(mobile, roundName, left)
 
 
-    def _roundEndedCall(playerMobileName, roundName):
+    def _roundEndedCall(mobileNameList, roundName):
         BaseMsg.roundEnded()
-        for (mobile, name) in playerMobileName:
+        for (mobile, name) in mobileNameList:
             Sms.roundEnded(mobile, roundName)
 
 

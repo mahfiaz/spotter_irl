@@ -24,6 +24,7 @@ class Player:
             player_mobile varchar(16) UNIQUE,
             player_email varchar(64),
             player_code_id int DEFAULT 0,
+            player_chat_banned boolean DEFAULT false,
             player_fleeing_code int DEFAULT 0,
             player_web_hash char(6) UNIQUE,
             player_created timestamp DEFAULT statement_timestamp() )""")
@@ -105,6 +106,22 @@ class Player:
         Player.cur.execute("""SELECT player_fleeing_code FROM player_data
             WHERE player_id = %s""", [playerId])
         return iterateZero(Player.cur.fetchone())
+
+# ban chat
+    def banChat(playerId):
+        Player.cur.execute("""UPDATE player_data SET player_chat_banned = %s 
+            WHERE player_id = %s""", ('true', playerId))
+
+    def unbanChat(playerId):
+        Player.cur.execute("""UPDATE player_data SET player_chat_banned = %s 
+            WHERE player_id = %s""", ('false', playerId))
+
+    def isBannedChat(playerId):
+        Player.cur.execute("""SELECT player_chat_banned FROM player_data
+            WHERE player_id = %s""", (playerId,))
+        if(Player.cur.fetchone()[0]):
+            return True
+
 
 # list
     def getAllPlayerIds():
