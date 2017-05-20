@@ -172,7 +172,7 @@ table {
     border-spacing: 0
 }
 body {
-    background-image: url("/css_dust2.jpg");
+    background-image: url("css_dust2.jpg");
     background-size: cover;
 }
 .form-control {
@@ -186,6 +186,7 @@ body {
     opacity: 0.65;
     border-radius: 5px;
     padding: 5px;
+    overflow: scroll;
 }
 .bottom {
     position: absolute;

@@ -21,11 +21,6 @@ app.config.from_object(__name__)
 app.secret_key = os.urandom(24)
 
 
-
-
-
-
-
 # START BLOCK
 # Player registration
 
@@ -34,15 +29,21 @@ def registration_template():
 	return render_template("regi")
 
 def pending_template():
-	return render_template("pending", user=session["user"], phone=session["phone"])
+	if logged_in():
+		return render_template("pending", user=session["user"], phone=session["phone"])
+	else:
+		return "403 Connection Forbidden"
 
 #@app.route("/p")
 def playing_template():
-	if return render_template("p_stats")
+	if logged_in():
+		return render_template("p_stats")
+	else:
+		return "403 Connection Forbidden"
 
 def logged_in():
 	try:
-		if session["user"] == None or session["web_hash"]:
+		if session["user"] == None or session["web_hash"] == None:
 			return False
 		else:
 			return True
@@ -52,7 +53,7 @@ def logged_in():
 @app.route("/")
 def index():
 	if logged_in():
-		if not Event.isPlayerJailed(Player._getIdByName(user)):
+		if not Event.isPlayerJailed(Player._getIdByName(session["user"])):
 			return playing_template()
 		return pending_template()
 	else:
@@ -123,7 +124,7 @@ def tag():
 
 @app.route("/user")
 def userName():
-		if logged_in():
+	if logged_in():
 		return session["user"]
 	else:
 		return "403 Connection Forbidden"
