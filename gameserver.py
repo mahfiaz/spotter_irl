@@ -15,7 +15,7 @@ import os
 import json
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path = "", static_folder = "www/static")
 SESSION_TYPE = 'Redis'
 app.config.from_object(__name__)
 app.secret_key = "huehuehuehuehuehuehue"#os.urandom(24)
