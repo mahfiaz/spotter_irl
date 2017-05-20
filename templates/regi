@@ -9,16 +9,16 @@
         <script src="static/script.js" charset="utf-8"></script>
     </head>
     <body class="page-regi">
+    <div class="container">
         <div class="col-xs-12"  style="text-align:center;">
                 <b><p style="font-size:500%;">Mänguks valmis?</p>
-                <p style="font-size:200%;">Liitumiseks sisesta oma nimi ja mobiil.</p>
-            <form action="register" method="GET">
+                <p style="font-size:200%;">Liitumine on lihtne: sisesta nimi ja mobiil.</p>
+            <form action="/" method="GET">
                 <input name="user" type="text" placeholder="Mängija nimi" size="20">
-                <br>
                 <input name="phone" type="text" placeholder="Mobiil" size="20">
-                <br>
                 <input type="submit" value="Valmis">
             </form>
         </div>
+    </div>
     </body>
 </html>

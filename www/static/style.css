@@ -195,3 +195,49 @@ body {
 div {
     position: relative;
 }
+
+
+.container {
+    width: 100%;
+    max-width: 450px;
+    margin: 1em auto;
+}
+
+/* Input styling */
+
+input {
+    width: 100%;
+    margin: 1em 0;
+}
+
+input[type="text"] {
+    display: block;
+    width: 100%;
+    font-family: sans-serif;
+    font-size: 18px;
+    appearance: none;
+    box-shadow: none;
+    border-radius: none;
+}
+
+input[type="text"]:focus {
+    outline: none;
+}
+
+input[type="submit"] {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 0.2em;
+}
+
+
+/* Registration page style */
+.page-regi {
+    background: #eee;
+}
