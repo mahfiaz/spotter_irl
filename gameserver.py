@@ -34,10 +34,17 @@ def pending_template():
 	else:
 		return "403 Connection Forbidden"
 
-#@app.route("/p")
+@app.route("/p")
 def playing_template():
 	if logged_in():
 		return render_template("p_stats")
+	else:
+		return "403 Connection Forbidden"
+
+@app.route("/isFree")
+def playing_templateasd():
+	if logged_in():
+		return str(Event.isPlayerJailed(Player._getIdByName(session["user"])))
 	else:
 		return "403 Connection Forbidden"
 

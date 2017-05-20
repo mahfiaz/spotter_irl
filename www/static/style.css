@@ -175,9 +175,11 @@ body {
     background-image: url("css_dust2.jpg");
     background-size: cover;
 }
+
 .form-control {
     background-color: #ab4621;
 }
+
 .textarea {
     color: white;
     font-weight: bold;
@@ -187,12 +189,32 @@ body {
     border-radius: 5px;
     padding: 5px;
     overflow: scroll;
+    overflow: hidden;
 }
+
 .bottom {
     position: absolute;
     margin-top: 100px;
     bottom: 0;
 }
+
+.base {
+    min-height: 70vh;
+    max-height: 70vh;
+}
+
+.player {
+    min-height: 30vh;
+    max-height: 30vh;
+}
+
+#roundInfo {
+    text-align: center;
+    font-size: 200%;
+    min-height: 60px;
+    max-height: 60px;
+}
+
 div {
     position: relative;
 }

@@ -35,7 +35,6 @@ function getAllStats() {
 					statsDiv.innerHTML = "";
 				}
 			}
-
 		}
 	}
 }
@@ -80,7 +79,6 @@ function getAllEvents() {
 					eventsDiv.innerHTML = divContents;
 				}
 			}
-
 		}
 	}
 }
@@ -114,8 +112,6 @@ function getRoundInfoBase() {
 		}
 	}
 }
-
-
 
 
 
@@ -176,7 +172,6 @@ function getStats() {
 					statsDiv.innerHTML = "";
 				}
 			}
-
 		}
 	}
 }
@@ -230,7 +225,6 @@ function getEvents() {
 					eventsDiv.innerHTML = divContents;
 				}
 			}
-
 		}
 	}
 }
@@ -302,7 +296,21 @@ function timeToEnd() {
 			}
 		}
 	}
+}
 
+
+function isJailed() {
+	var xhrJail = new XMLHttpRequest();
+	var status = "";
+
+	xhrJail.open("GET", "/isFree", true);
+	xhrJail.send();
+	xhrJail.onreadystatechange = function() {
+		if (xhrJail.readyState == 4 && xhrJail.status == 200) {
+			status = xhrJail.responseText;
+		}
+	}
+	return status;
 }
 
 
