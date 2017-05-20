@@ -30,3 +30,4 @@ class Spawn:
 	def addDefaultMaster():
 		Spawn.cur.execute("""INSERT INTO spawnmasters (master_name, master_pw) 
 				VALUES (%s, %s)""", ("spawn", "master"))
+
