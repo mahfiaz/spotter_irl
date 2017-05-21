@@ -15,9 +15,9 @@
             <p>
                 <b><p style="font-size:400%;">Welcome</p>
                 <p style="font-size:300%;">to spotter IRL</p></b>
-                <p style="font-size:200%;">Spawnmaster login</p>
+                <p style="font-size:200%;">Base login</p>
             
-            <form action="/masterLogin" method="GET">
+            <form action="/baseLogin" method="GET">
                 <input id="user" name="user" type="text" placeholder="Player name" size="20">
                 <br>
                 <input id="pw" name="pw" type="password" placeholder="Password" size="20">

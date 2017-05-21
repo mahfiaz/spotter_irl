@@ -87,7 +87,7 @@ function getAllEvents() {
 
 
 
-function getRoundInfoBase() {
+function getRoundInfoBase(role) {
 	var xhrRound = new XMLHttpRequest();
 	var stats = "";
 	var user = "";
@@ -106,7 +106,7 @@ function getRoundInfoBase() {
 			stats = xhrRound.responseText;
 			stats = JSON.parse(stats);
 			if(stats["roundName"] != null) {
-				divContents += "<p>Lahing \"" + stats["roundName"] + "\", Kasutaja: Baas</p>";
+				divContents += "<p>Lahing \"" + stats["roundName"] + "\", Kasutaja: " + role + "</p>";
 				if (isDiv) {
 					roundDiv.innerHTML = divContents;
 				}

@@ -12,37 +12,13 @@
 
 		<script type="text/javascript">
 			
-			var xhr = new XMLHttpRequest();
-
-			window.addEventListener("keypress", function(e) {
-				var key = e.which || e.keyCode;
-			    if (key === 13) {
-			    	fleeJail();
-			    }
-			})
-
 			window.onload = function() {
-
-				document.getElementById("fleeingCode").innerHTML = "";
-			}
-
-			function fleeJail() {
-				var code = document.getElementById("fleeingCode").value;
-				xhr.open("GET", "/flee?fleeingCode="+code, true);
-				xhr.send();
-				window.location.assign("/base");
-			}
-
-			window.onload = function() {
-				if(window.location.href != "http://localhost:5000/base") {
-                    window.location.assign("/base");
-                }
-				getRoundInfoBase("Baas");
+				getRoundInfoBase("Pealtvaataja");
 				getAllEvents();
 				getAllStats();
 				timeToEnd();
 				window.setInterval(function() {
-					getRoundInfoBase("Baas");
+					getRoundInfoBase("Pealtvaataja");
 					getAllStats();
 					getAllEvents();
 					timeToEnd();
@@ -68,11 +44,6 @@
 				</div>
 				<div class="col-sm-4 col-sm-offset-1">
 					<div id="events" class="textarea base"></div>
-				</div>
-				<div class="col-sm-3 col-sm-offset-8" style="top:20px;">
-					<p>
-						<input id="fleeingCode" type="text" placeholder="Pagemiskood" autofocus>
-					</p>
 				</div>
 			</div>
 		</div>

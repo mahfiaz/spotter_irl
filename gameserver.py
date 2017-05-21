@@ -163,16 +163,19 @@ def stats():
 # START BLOCK
 # Spawnmaster screen
 
-def masterLoginTemplate():
+def master_login_template():
     return render_template("m_auth")
 
-def masterView():
-	Round.updateActiveId()
-	players, teamless = Stats.playersDetailed()
-	rounds = Round.getRounds()
-	return render_template("master", rounds=rounds, teamless=teamless, players = players)
+def master_view():
+	if is_master():
+		Round.updateActiveId()
+		players, teamless = Stats.playersDetailed()
+		rounds = Round.getRounds()
+		return render_template("master", rounds=rounds, teamless=teamless, players = players)
+	else:
+		return "403 Connection Forbidden"
 
-def isMaster():
+def is_master():
     try:
         if session["master"] == 1:
             return True
@@ -183,14 +186,13 @@ def isMaster():
 
 @app.route("/spawn")
 def spawnmaster():
-    if isMaster():
-        return masterView()
+    if is_master():
+        return master_view()
     else:
-        return masterLoginTemplate()
+        return master_login_template()
 
-
-@app.route("/login", methods=["GET"])
-def masterLogin():
+@app.route("/masterLogin", methods=["GET"])
+def master_login():
     try:
         user = request.args.get("user")
         pw = request.args.get("pw")
@@ -204,25 +206,72 @@ def masterLogin():
     except:
         return "403 Connection Forbidden"
 
-
 @app.route("/masterout")
-def masterLogout():
-    session.clear()
-    return "Spanwmaster has logged out"
-
-
-@app.route("/base")
-def base_Template():
-	return render_template("stats")
+def master_logout():
+	if is_master():
+		session.clear()
+		return "Spanwmaster has logged out"
+	else:
+		return "403 Connection Forbidden"
 
 # Spawnmaster screen
 # END BLOCK
 
 
+# START BLOCK
+# Stats screens
+
+def base_login_template():
+	return render_template("b_auth")
+
+@app.route("/baseLogin", methods=["GET"])
+def base_login():
+    try:
+        user = request.args.get("user")
+        pw = request.args.get("pw")
+
+        if user == "base" and pw == "master":
+            session["base"] = 1
+            return base_template()
+        else:
+            return "403 Connection Forbidden"
+    except:
+        return "403 Connection Forbidden"
+
+def is_base():
+    try:
+        if session["base"] == 1:
+            return True
+        else:
+            return False
+    except KeyError:
+        return False
+
+@app.route("/base")
+def base_template():
+	if is_base():
+		return render_template("stats")
+	else:
+		return base_login_template()
+
+@app.route("/spectate")
+def spectator_template():
+	return render_template("spectate")
+
+@app.route("/baseout")
+def base_logout():
+	if is_base():
+		session.clear()
+		return "Basemaster has logged out"
+	else:
+		return "403 Connection Forbidden"
+
+# Stats screens
+# END BLOCK
+
 
 # START BLOCK
 # Spawnmaster's actions
-
 
 # Adding a new round
 @app.route("/addRound", methods=["GET"])
