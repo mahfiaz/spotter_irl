@@ -97,13 +97,14 @@ if __name__ == "__main__":
     connector()
 
 test = """
-{'player': {
-    'name': 'Villu', 
-    'spotcode': 2374, 
-    'touchcode': 2440987, 
-    'team': {
-        'name': 'Sinised', 
-        'color': '3399FF'}}, 
+{'  player': {
+        'name': 'Villu',
+        'spotcode': 2374,
+        'touchcode': 2440987,
+        'team': {
+            'name': 'Sinised',
+            'color': '3399FF'}
+    },
     'printer': 'PDF', 
     'eventlist': [
         '13:35 Villu pages ', 
