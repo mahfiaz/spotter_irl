@@ -167,8 +167,10 @@ def masterLoginTemplate():
     return render_template("m_auth")
 
 def masterView():
-    rounds = Round.getRounds()
-    return render_template("master", rounds=rounds)
+	Round.updateActiveId()
+	players, teamless = Stats.playersDetailed()
+	rounds = Round.getRounds()
+	return render_template("master", rounds=rounds, teamless=teamless, players = players)
 
 def isMaster():
     try:
@@ -244,25 +246,26 @@ def startRound():
         return "Puudulik info uue roundi jaoks."
     else:
         if Round.add(roundName, startTimeString, endTimeString):
-            return "New round \"" + roundName + "\" start time " + startTimeString + ", end time " + endTimeString + "."
+        	Action.addTeamsToAllRounds()
+        	return "New round \"" + roundName + "\" start time " + startTimeString + ", end time " + endTimeString + "."
         else:
             return "Error: New round has overlapping time. not added: \"" + roundName + "\" start time " + startTimeString + ", end time " + endTimeString + "."
 
 
 
-# Adding player to a team in a round
+# Adding player to a team in active round
 @app.route("/addToTeam", methods = ["GET"])
 def addToTeam():
-    roundId = request.args.get("roundId")
-    playerId = request.args.get("playerId")
-    if roundId and playerId:
+    team_name = request.args.get("teamName")
+    player_id = request.args.get("playerId")
+    if team_name and player_id:
         try:
-            team.add(playerId, roundId)
-            return "Player " + Player.getNameById(playerId) + " added to round" + roundId
+            Action.addPlayerToTeam(Player.getNameById(player_id), team_name)
+            return "Player " + Player.getNameById(player_id) + " added to team" + team_name
         except:
-            return "Round or player id were given as invalid values."
+            return "Team or player id were given as invalid values."
     else:
-        return "Missing round or player id."
+        return "Missing team or player id."
 
 
 # Spawnmaster's actions

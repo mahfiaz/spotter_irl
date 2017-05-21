@@ -14,6 +14,12 @@
 
             var xhr = new XMLHttpRequest();
 
+            window.onload = function() {
+                if(window.location.href != "http://localhost:5000/spawn") {
+                    window.location.assign("/spawn");
+                }
+            }
+
             function newRound() {
 
                 var name = prompt("Name of the round");
@@ -38,11 +44,23 @@
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState == 4 && xhr.status == 200) {
                         console.log(xhr.responseText)
-                        window.location.assign("/masterlogin")
+                        window.location.assign("/spawn")
                     }
                 }
             }
+
+            function to2(playerId) {
+                xhr.open("GET", "/addToTeam?teamName=Punased&playerId="+playerId, true);
+                xhr.send();
+                window.location.assign("/spawn")
+            }
             
+
+            function to1(playerId) {
+                xhr.open("GET", "/addToTeam?teamName=Sinised&playerId="+playerId, true);
+                xhr.send();
+                window.location.assign("/spawn")
+            }
             
 
         </script>
@@ -53,11 +71,69 @@
     <body>
         <div class="col-sm-12">
             <div class="col-sm-10 col-sm-offset-1">
-                <div id="roundInfo" class="textarea" style="max-height: 65px;"> ---Spawnmaster--- </div>
+                <div id="roundInfo" class="textarea" style="max-height: 65px;"> ---Spawnmaster--- <button onclick="masterLogout()">Log Out</button></div>
             </div>
 
             <div class="col-sm-10 col-sm-offset-1">
-                <p><div id="stats" class="textarea base"></div></p>
+                <p><div class="textarea base">
+                    <p><table id="teamlessPlayers" style="width:100%;">
+                        <tr>
+                            <th>Id</th>
+                            <th>Nimi</th>
+                            <th>Telefon</th>
+                            <th>Web Hash</th>
+                            <th>Põgenemise kood</th>
+                            <th>Spot Code</th>
+                            <th>Touch Code</th>
+                            <th>Jailed</th>
+                            <th>Team</th>
+                        </tr>
+                        {% for player in teamless %}
+                        <tr>
+                            <td>{{ player[0] }}</td>
+                            <td>{{ player[1] }}</td>
+                            <td>{{ player[2] }}</td>
+                            <td>{{ player[3] }}</td>
+                            <td>{{ player[4] }}</td>
+                            <td>{{ player[5] }}</td>
+                            <td>{{ player[6] }}</td>
+                            <td>{{ player[7] }}</td>
+                            <td>{{ player[8] }}</td>
+                            <td><button onclick="to1({{ player[0] }})">Sinised</button></td>
+                            <td><button onclick="to2({{ player[0] }})">Punased</button></td>
+                        </tr>
+                        {% endfor %}
+                    </table></p>
+
+                    <p><table id="teamedPlayers" style="width:100%;">
+                        <tr>
+                            <th>Id</th>
+                            <th>Nimi</th>
+                            <th>Telefon</th>
+                            <th>Web Hash</th>
+                            <th>Põgenemise kood</th>
+                            <th>Spot Code</th>
+                            <th>Touch Code</th>
+                            <th>Jailed</th>
+                            <th>Team</th>
+                        </tr>
+                        {% for player in players %}
+                        <tr>
+                            <td>{{ player[0] }}</td>
+                            <td>{{ player[1] }}</td>
+                            <td>{{ player[2] }}</td>
+                            <td>{{ player[3] }}</td>
+                            <td>{{ player[4] }}</td>
+                            <td>{{ player[5] }}</td>
+                            <td>{{ player[6] }}</td>
+                            <td>{{ player[7] }}</td>
+                            <td>{{ player[8] }}</td>
+                            <td><button onclick="to1({{ player[0] }})">Sinised</button></td>
+                            <td><button onclick="to2({{ player[0] }})">Punased</button></td>
+                        </tr>
+                        {% endfor %}
+                    </table></p>
+                </div></p>
                     <p>
                         <div id="rounds" class="textarea base">
                             <table style="width:100%;">
