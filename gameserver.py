@@ -25,8 +25,8 @@ app.secret_key = os.urandom(24)
 # Player registration
 
 
-def registration_template():
-    return render_template("regi")
+def registration_template(error):
+    return render_template("regi", error=error)
 
 def pending_template():
 	if logged_in():
@@ -64,7 +64,7 @@ def index():
 			return playing_template()
 		return pending_template()
 	else:
-		return registration_template()
+		return registration_template("")
 
 
 @app.route("/register", methods=["GET"])
@@ -79,9 +79,9 @@ def new_player():
 			session["web_hash"] = Player.getHashById(Player._getIdByName(user))
 			return index()
 		else:
-			return registration_template()
+			return registration_template("Nimi või mobiil juba kasutusel.")
 	else:
-		return registration_template()
+		return registration_template("Mõlemad väljad on kohustuslikud.")
 
 
 @app.route("/wrongInfo")
