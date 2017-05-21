@@ -11,7 +11,7 @@
         var xhr = new XMLHttpRequest();
 
         window.onload = function() {
-            if(window.location.href != "http://fusiongame.tk/spawn") {
+            if(window.location.href != gameServerAdress+"spawn") {
                 window.location.assign("/spawn");
             }
         }

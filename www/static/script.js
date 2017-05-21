@@ -1,4 +1,5 @@
 userJailed = "";
+gameServerAdress = "http://fusiongame.tk/";
 
 function getAllStats() {
 	var xhrStats = new XMLHttpRequest();
