@@ -47,4 +47,13 @@
    <FileRef
       location = "group:../game_run.py">
    </FileRef>
+   <FileRef
+      location = "group:../smsserver.py">
+   </FileRef>
+   <FileRef
+      location = "group:../printserver.py">
+   </FileRef>
+   <FileRef
+      location = "group:../gameserver.py">
+   </FileRef>
 </Workspace>

@@ -8,6 +8,9 @@ class Sms:
     _statsCallback = None
     queue = None
 
+    def setQueue(queue):
+        Sms.queue = queue
+
     def setCallback(call):
         Sms._statsCallback = call
 
@@ -29,8 +32,9 @@ class Sms:
                     'number': mobile,
                     'contents': data
                     }
-                Sms.queue.put(smsdata)
-                Sms._count += 1
+                if Sms.queue:
+                    Sms.queue.put(smsdata)
+                    Sms._count += 1
         else:
             print(" Errror! send sms", mobile, data)
 
