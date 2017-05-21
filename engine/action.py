@@ -4,7 +4,7 @@ from .player import Player
 from .round import Round
 from .team import Team
 from .message import Sms, BaseMsg
-from .spawn import Spawn
+from .spawn import Spawn, Base
 import game_config
 
 import json
@@ -17,6 +17,7 @@ from threading import Timer
 
 class Action:
     compactPrint = pprint.PrettyPrinter(width=41, compact=True)
+    printer_queue = None
 # init
     def initAllDB(cursor):
         Round.initDB(cursor)
@@ -26,8 +27,9 @@ class Action:
         Event.initDB(cursor)
         Stats.updateStats()
         Spawn.initDB(cursor)
+        Base.initDB(cursor)
 
-    def initAllConnect(cursor):
+    def initAllConnect(cursor, sms_queue, printer_queue):
         Round.initConnect(cursor)
         Player.initConnect(cursor)
         Code.initConnect(cursor)
@@ -35,8 +37,11 @@ class Action:
         Event.initConnect(cursor)
         Round.setCallbacks(roundStarted = Action._roundStartedCall, roundEnding = Action._roundEndingCall, roundEnded = Action._roundEndedCall)
         Stats.updateStats()
+        Sms.queue = sms_queue
         Sms.setCallback(Stats.getTeamPlayerStatsStringByMobile)
         Spawn.initConnect(cursor)
+        Base.initConnect(cursor)
+        Action.printer_queue = printer_queue
 
 # modify
     def addPlayerWOEmail(name, mobile):
@@ -46,8 +51,8 @@ class Action:
         if not mobile.isdigit():
             BaseMsg.mobileNotDigits(mobile)
             return
-        name = re.sub('[^a-zA-Z0-9-_]', '', name)
-        email = re.sub('[^a-zA-Z0-9-_@\.]', '', email)
+        name = re.sub('[^a-zA-Z0-9-_]+', '', name)
+        email = re.sub('[^a-zA-Z0-9-_@\.]+', '', email)
         newPlayerId = Player.add(name, mobile, email)
         if newPlayerId:
             Event.addPlayer(newPlayerId)
@@ -93,7 +98,7 @@ class Action:
             print("Warning. code input missing", code)
             return
         if isinstance(code, str):
-            code = re.sub('[^0-9]', '', code)
+            code = re.sub('[^0-9]+', '', code)
             if code:
                 return int(code)
 
@@ -102,14 +107,14 @@ class Action:
             print("Warning. mobile input missing", mobile)
             return
         assert isinstance(mobile, str)
-        return re.sub('[^0-9+]', '', mobile)
+        return re.sub('[^0-9+]+', '', mobile)
 
     def _hashValidate(hash):
         if not hash:
             print("Warning. hash input missing", hash)
             return
         assert isinstance(hash, str)
-        return re.sub('[^a-z0-9]', '', hash)
+        return re.sub('[^a-z0-9]+', '', hash)
 
 
     def handleSms(mobile, message):
@@ -117,6 +122,7 @@ class Action:
         code = Action._codeValidate(message)
         senderId = Player.getMobileOwnerId(mobile)
         Action._handleCode(senderId, code, byMobile = True)
+        print('Received SMS', mobile, message)
 
     def handleWeb(hash, code):
         hash = Action._hashValidate(hash)
@@ -216,6 +222,9 @@ class Action:
         if playerId:
             Action._flee(playerId)
             Stats.updateStats()
+            # Print
+            Action.printer_queue.put('Tere')
+            #sms_outgoing.put('tore')
         else:
             BaseMsg.fleeingCodeMismatch()
 
@@ -247,7 +256,6 @@ class Action:
 #        BaseMsg.roundStarted()
         for (mobile, name) in mobileNameList:
             Sms.roundStarted(mobile, roundName)
-            time.sleep(0.05)
         for id in Player.getAllPlayerIds():
             Player.unbanChat(id)
 
@@ -257,7 +265,6 @@ class Action:
 #        BaseMsg.roundEnding(left)
         for (mobile, name) in mobileNameList:
             Sms.roundEnding(mobile, roundName, left)
-            time.sleep(0.05)
 
 
     def _roundEndedCall(mobileNameList, roundName):
@@ -265,7 +272,6 @@ class Action:
 #        BaseMsg.roundEnded()
         for (mobile, name) in mobileNameList:
             Sms.roundEnded(mobile, roundName)
-            time.sleep(0.05)
 
 
 class Stats:

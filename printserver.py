@@ -1,11 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# vim: ai ts=4 sts=4 et sw=4
 
-import json
 import codecs
+import datetime
+import json
 import os.path
+import requests
 import subprocess
+import time
 
 def generate(data):
     team = data['team']
@@ -13,9 +15,9 @@ def generate(data):
 
     qr_url = "http://fusiongame.tk/s/%s" % data['jailcode']
 
-    pngpath = "gen/%s.png" % code
-    svgpath = "gen/%s.svg" % code
-    pdfpath = "gen/%s.pdf" % code
+    pngpath = "spotter_printer/gen/%s.png" % code
+    svgpath = "spotter_printer/gen/%s.svg" % code
+    pdfpath = "spotter_printer/gen/%s.pdf" % code
 
     replacements = {
         '$code$': data['spotcode'],
@@ -32,7 +34,7 @@ def generate(data):
 
 
     # Read SVG template to memory
-    f = codecs.open('template.svg', 'rb', encoding='utf8')
+    f = codecs.open('spotter_printer/template.svg', 'rb', encoding='utf8')
     svg = f.read()
     f.close()
 
@@ -73,9 +75,31 @@ def generate(data):
 
 
 def send_printer(pdf, printer="PDF"):
-    subprocess.call('lp -d "%s" "%s"' % (printer, pdfpath), shell=True)
+    subprocess.call('lp -d "%s" "%s"' % (printer, pdf), shell=True)
 
 
+def connector():
+    print("Printing server started")
+    actually_print = True
+
+    while True:
+        datestr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        r = requests.get('http://localhost:5000/print?pass=htpT2U8UMpApV852DGSncBP7')
+        response = json.loads(r.text)
+        for page in response['print']:
+            print(datestr, 'Page printed')
+            pdf = generate(page)
+            print(pdf)
+            if actually_print:
+                send_printer(pdf, "PDF")
+
+        time.sleep(0.5)
+
+
+if __name__ == "__main__":
+    connector()
+
+test = """
 testdata = {
     'team': 'blue',
     'printer': 'PDF',
@@ -88,6 +112,7 @@ testdata = {
         'red': 23,
         },
     }
+"""
 
-pdf = generate(testdata)
+#pdf = generate(testdata)
 # send_printer(pdf, "PDF")

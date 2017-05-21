@@ -4,8 +4,6 @@ from .round import Round
 from .helper import iterateZero
 
 class Team:
-
-# init
     def initDB(cursor):
         Team.cur = cursor
         Team._createTeamTable()

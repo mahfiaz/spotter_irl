@@ -172,12 +172,14 @@ table {
     border-spacing: 0
 }
 body {
-    background-image: url("/css_dust2.jpg");
+    background-image: url("css_dust2.jpg");
     background-size: cover;
 }
+
 .form-control {
     background-color: #ab4621;
 }
+
 .textarea {
     color: white;
     font-weight: bold;
@@ -186,21 +188,58 @@ body {
     opacity: 0.65;
     border-radius: 5px;
     padding: 5px;
+    overflow: scroll;
+    overflow: hidden;
 }
+
 .bottom {
     position: absolute;
     margin-top: 100px;
     bottom: 0;
 }
+
+.base {
+    min-height: 70vh;
+    max-height: 70vh;
+}
+
+.player {
+    min-height: 30vh;
+    max-height: 30vh;
+}
+
+#roundInfo {
+    text-align: center;
+    font-size: 200%;
+    min-height: 60px;
+    max-height: 60px;
+}
+
 div {
     position: relative;
 }
 
 
+
+html {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    background: url("css_dust2.jpg") no-repeat center center fixed;
+    background-size: cover;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
 .container {
     width: 100%;
     max-width: 450px;
-    margin: 1em auto;
 }
 
 /* Input styling */
@@ -236,8 +275,22 @@ input[type="submit"] {
     margin-top: 0.2em;
 }
 
+input[type="submit"].danger {
+    background-color: #f44336; /* Red */
+}
 
 /* Registration page style */
-.page-regi {
-    background: #eee;
+.page-regi .container,
+.page-pending .container {
+    background: rgba(255, 255, 255, 0.4);
+    text-align: center;
+}
+
+h1 {
+    font-size: 3em;
+    font-weight: bold;
+}
+
+.large {
+    font-size: 2em;
 }

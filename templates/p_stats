@@ -1,171 +1,16 @@
 <!DOCTYPE html>
-<meta charset="utf-8"/>
-<html lang="en">
-	<head>
+<html lang="en"><head>
+<meta charset="utf-8">
 		
 		<title>Spotter IRL Base</title>
 
-		<link href="bootstrap.min.css" rel="stylesheet">
-		<link href="jumbotron-narrow.css" rel="stylesheet">
-		<link href="/style.css" rel="stylesheet">
-		<script src="/script.js" charset="utf-8"></script>
+		<link href="/static/bootstrap.min.css" rel="stylesheet">
+		<link href="/static/jumbotron-narrow.css" rel="stylesheet">
+		<link href="/static/style.css" rel="stylesheet">
+		<script src="static/jquery-3.2.1.min.js" charset="utf-8"></script>
+		<script src="/static/script.js" charset="utf-8"></script>
 
 		<script type="text/javascript">
-			
-			function getRoundInfo() {
-				var xhrRound = new XMLHttpRequest();
-				var xhrPlayer = new XMLHttpRequest();
-				var stats = "";
-				var user = "";
-				var divContents = "";
-
-				xhrPlayer.open("GET", "/user", true);
-				xhrPlayer.send();
-				xhrPlayer.onreadystatechange = function() {
-					if (xhrPlayer.readyState == 4 && xhrPlayer.status == 200) {
-						user = xhrPlayer.responseText;
-					}
-				}
-
-				xhrRound.open("GET", "/stats", true);
-				xhrRound.send();
-				xhrRound.onreadystatechange = function() {
-					if (xhrRound.readyState == 4 && xhrRound.status == 200) {
-						stats = xhrRound.responseText;
-						stats = JSON.parse(stats);
-						if(stats["roundName"] != null) {
-							var roundDiv = document.getElementById("roundInfo");
-							divContents += "<p>Lahing \"" + stats["roundName"] + "\", mängija: " + user + "</p>";
-							roundDiv.innerHTML = divContents;
-						}
-					}
-				}
-			}
-
-
-			function getStats() {
-				var xhrStats = new XMLHttpRequest();
-				var xhrPlayer = new XMLHttpRequest();
-				var stats = "";
-				var user = "";
-				var divContents = "";
-				var playerStatus = "";
-
-				xhrPlayer.open("GET", "/user", true);
-				xhrPlayer.send();
-				xhrPlayer.onreadystatechange = function() {
-					if (xhrPlayer.readyState == 4 && xhrPlayer.status == 200) {
-						user = xhrPlayer.responseText;
-					}
-				}
-
-				xhrStats.open("GET", "/stats", true);
-				xhrStats.send();
-				xhrStats.onreadystatechange = function() {
-					if (xhrStats.readyState == 4 && xhrStats.status == 200) {
-						stats = xhrStats.responseText;
-						stats = JSON.parse(stats);
-						if(stats["roundName"] != null) {
-							var statsDiv = document.getElementById("stats");
-							divContents += "<table style='width:100%;'><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>";
-							for(i in stats["teams"]) {
-								team = stats["teams"][i];
-								divContents += "<tr style='color:#"+team["color"]+";'><th>"+team["name"]+"</th><th>"+team["spotCount"]+"</th><th>"+team["touchCount"]+"</th><th>"+team["disloyality"]+"</th><th>"+team["score"]+"</th></tr>";
-							}
-							for(i in stats["teams"]) {
-								team = stats["teams"][i];
-								for (i in team["players"]) {
-									player = team["players"][i];
-									if (player["name"] == user) {
-										divContents += "<tr style='color:#"+team["color"]+";'><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>"+player["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
-										playerStatus = player["nowInLiberty"];
-									}
-								}
-							}
-							for(i in stats["teamlessPlayers"]) {
-								player = stats["teamlessPlayers"][i];
-								if(player["name"] == user) {
-									divContents += "<tr><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>"+player["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
-									playerStatus = player["nowInLiberty"];
-								}
-							}
-							divContents += "<div class='bottom' id='toEnd'></div>";
-							statsDiv.innerHTML = divContents;
-						} else {
-							eventsDiv.innerHTML = "";
-						}
-
-					}
-				}
-			}
-
-
-			function getEvents() {
-				var xhrEvents = new XMLHttpRequest();
-				var xhrPlayer = new XMLHttpRequest();
-				var events = "";
-				var user = "";
-				var divContents = "";
-
-				xhrPlayer.open("GET", "/user", true);
-				xhrPlayer.send();
-				xhrPlayer.onreadystatechange = function() {
-					if (xhrPlayer.readyState == 4 && xhrPlayer.status == 200) {
-						user = xhrPlayer.responseText;
-					}
-				}
-
-				xhrEvents.open("GET", "/events", true);
-				xhrEvents.send();
-				xhrEvents.onreadystatechange = function() {
-					if (xhrEvents.readyState == 4 && xhrEvents.status == 200) {
-						events = xhrEvents.responseText;
-						events = JSON.parse(events);
-						if("event" in events[0]) {
-							console.log("No events to show");
-							eventsDiv.innerHTML = "";
-						} else {
-							var eventsDiv = document.getElementById("events");
-							for(i in events) {
-								event = events[i];
-								divContents += "<p>"+event["time"];
-								divContents += " <span style='color:#"+event["text1"]["color"]+";'>"+event["text1"]["text"]+"</span>";
-								divContents += " <span style='color:#"+event["text2"]["color"]+";'>"+event["text2"]["text"]+"</span>";
-								if (event["text3"]["text"] != null) {
-									divContents += " <span style='color:#"+event["text3"]["color"]+";'>"+event["text3"]["text"]+"</span>";
-								}
-								divContents += "</p>";
-							}
-							eventsDiv.innerHTML = divContents;
-						}
-
-					}
-				}
-			}
-
-			function timeToEnd() {
-				var xhrTime = new XMLHttpRequest();
-				currentDate = new Date();
-				xhrTime.open("GET", "/stats", true);
-				xhrTime.send();
-				xhrTime.onreadystatechange = function() {
-					if (xhrTime.readyState == 4 && xhrTime.status == 200) {
-						stats = xhrTime.responseText;
-						stats = JSON.parse(stats);
-						if(stats["roundName"] != null) {
-							var ending = stats["roundEnd"];
-							endTime = new Date(ending.substring(0,4),ending.substring(5,7),ending.substring(8,10),ending.substring(11,13),ending.substring(14,16),ending.substring(17,19));
-							var timeDiv = document.getElementById("toEnd");
-							var toEnd = new Date(endTime.getTime() - currentDate.getTime());
-							var divContents = "Aega vooru lõpuni " + addZerobefore(toEnd.getUTCHours()) + ":" + addZerobefore(toEnd.getUTCMinutes()) + ":" + addZerobefore(toEnd.getUTCSeconds());
-							timeDiv.innerHTML = divContents;
-						}
-					}
-				}
-
-			}
-
-			
 
 			window.onload = function() {
 				getRoundInfo();
@@ -177,16 +22,22 @@
 					getStats();
 					getEvents();
 					timeToEnd();
+					isJailed();
+                    if (userJailed == "True") {
+                        window.location.assign("/");
+                    }
 				}, 4000);
 				window.setInterval(function() {
 					timeToEnd();
-					if (!player["nowInLiberty"]) {
-						window.location.assign("/");
-					}
 				}, 1000);
 			}
 
 			function tag() {
+				var xhrTag = new XMLHttpRequest();
+				var code = document.getElementById("tagCode").value;
+				xhrTag.open("GET", "/tag?tagCode="+code, true);
+				xhrTag.send();
+				window.location.assign("/");
 				console.log("Tagged someone");
 			}
 
@@ -198,27 +49,29 @@
 
 	</head>
 	<body>
-		<div class="sm-col-12">
+		<div class="col-sm-12">
 			<div class="col-sm-10 col-sm-offset-1">
 				<p>
-					<div id="roundInfo" class="textarea" style="text-align:center; font-size:200%; min-height: 6vh;"></div>
+					<div id="roundInfo" class="textarea"></div>
 				</p>
 				<p>
-					<div id="stats" class="textarea" style="min-height:20vh; max-height:20vh; overflow:scroll;">
+					<div id="stats" class="textarea player">
+						<div class='bottom' id='toEnd'></div>
 					</div>
 				</p>
 				<p>
-					<div id="events" class="textarea" style="min-height:30vh; max-height:30vh; overflow:scroll;"></div>
+					<div id="events" class="textarea player"></div>
 				</p>
 				<p style="text-align:center;">
-					<input class="form-control" id="fleeingCode" type="text" placeholder="Silmasin koodi">
+					<input class="form-control" id="tagCode" placeholder="Silmasin koodi" type="text">
 					<button class="btn-sm btn-danger btn-block" type="button" value="Taba" onclick="tag()">Taba</button>
 				</p>
 				<p style="text-align:center;width: 100%">
-					<input class="form-control" id="fleeingCode" type="text" placeholder="Teade">
+					<input class="form-control" id="message" placeholder="Teade" type="text">
 					<button class="btn-sm btn-danger btn-block" type="button" value="Saada" onclick="message()">Teade meeskonnale</button>
 				</p>
 			</div>
 		</div>
-	</body>
-</html>
+		<div id="isJailed" hidden></div>
+	
+</body></html>

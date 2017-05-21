@@ -1,35 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        
-        <title>Spotter IRL</title>
-        <link href="static/bootstrap.min.css" rel="stylesheet">
-        <link href="static/jumbotron-narrow.css" rel="stylesheet">
-        <link href="static/style.css" rel="stylesheet">
-        <script src="static/script.js" charset="utf-8"></script>
+<head>
+    <title>Spotter IRL</title>
+    <link href="static/bootstrap.min.css" rel="stylesheet">
+    <link href="static/jumbotron-narrow.css" rel="stylesheet">
+    <link href="static/style.css" rel="stylesheet">
+    <script src="static/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="static/script.js" charset="utf-8"></script>
 
-        <script type="text/javascript">
-            
-            var xhr = new XMLHttpRequest();
+    <script type="text/javascript">
 
-            window.onload = function() {
-                if(window.location.href != "http://localhost:5000/") {
-                    window.location.assign("/");
-                    setInterval(function() {
-                        var xhrJailCheck = new XMLHttpRequest();
-                        xhrJailCheck.open("GET","/jf",true);
-                        xhrJailCheck.send();
-                        if (xhrJailCheck.responseText == "True") {
-                            window.location.assign("/");
-                        } else {
-                        }
-                    }, 2000);
-                }
+        var xhr = new XMLHttpRequest();
+
+        window.onload = function() {
+            if(window.location.href != "http://localhost:5000/") {
+                window.location.assign("/");
             }
+            setInterval(function() {
+                isJailed();
+                if (userJailed == "False") {
+                    window.location.assign("/");
+                }
+            }, 2000);
+        }
 
 
-            function logout() {
-                xhr.open("GET", "/wrongInfo", true);
+        function logout() {
+            if(confirm("Kas oled kindel, et tahad kasutaja ja kõik tulemused kustutada?")) {
+                var phone = prompt("Kinnitamiseks sisesta telefoni number");
+                xhr.open("GET", "/wrongInfo?phone="+phone, true);
                 xhr.send();
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState == 4 && xhr.status == 200) {
@@ -38,21 +37,22 @@
                     }
                 }
             }
+        }
 
-            function checkStatus() {
-                
-            }
+        function checkStatus() {
+            
+        }
 
-        </script>
-
-    </head>
-    <body>
-        <div class="col-xs-12 col-sm-2 col-sm-offset-5">
-            <b><p style="font-size:400%; text-align:center;">Welcome</p>
-            <p>user <span style="font-size:250%;">{{ user }}</span></p></b>
-            <p style="font-size:200%;">{{ phone }}</p>
-            <p>Go show your screen to spawnmaster @Keila päevade noorteala.</p>
-            <p><input id="invalidRegistration" type="submit" class="btn btn-danger btn-sm btn-block" value="I made a mistake, go back" onclick="logout()"></p>
-        </div>
-    </body>
+    </script>
+</head>
+<body class="page-pending">
+    <div class="container">
+        <h1>Oled sees!</h1>
+        <p>kasutaja <span id="username" class="large">{{ user }}</span></p>
+        <p>telefon <span id="phone" class="large">{{ phone }}</span></p>
+        <p class="large">Saad kohe SMSi. Edasine @Keila päevade noorteala</p>
+        <div id="isJailed" hidden></div>
+        <p><input id="invalidRegistration" type="submit" class="danger" value="Tegid vea, tahad muuta?" onclick="logout()"></p>
+    </div>
+</body>
 </html>
