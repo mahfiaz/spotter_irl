@@ -1,80 +1,72 @@
 <!DOCTYPE html>
 <meta charset="utf-8"/>
 <html lang="en">
-	<head>
-		
-		<title>Spotter IRL Base</title>
+<head>
+    <title>Spotter IRL Base</title>
+    <link href="/static/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/jumbotron-narrow.css" rel="stylesheet">
+    <link href="/static/style.css" rel="stylesheet">
+    <script src="/static/script.js" charset="utf-8"></script>
+    <script type="text/javascript">
+        var xhr = new XMLHttpRequest();
 
-		<link href="/static/bootstrap.min.css" rel="stylesheet">
-		<link href="/static/jumbotron-narrow.css" rel="stylesheet">
-		<link href="/static/style.css" rel="stylesheet">
-		<script src="/static/script.js" charset="utf-8"></script>
+        window.addEventListener("keypress", function(e) {
+            var key = e.which || e.keyCode;
+            if (key === 13) {
+                fleeJail();
+            }
+        })
 
-		<script type="text/javascript">
-			
-			var xhr = new XMLHttpRequest();
+        window.onload = function() {
 
-			window.addEventListener("keypress", function(e) {
-				var key = e.which || e.keyCode;
-			    if (key === 13) {
-			    	fleeJail();
-			    }
-			})
+            document.getElementById("fleeingCode").innerHTML = "";
+        }
 
-			window.onload = function() {
+        function fleeJail() {
+            var code = document.getElementById("fleeingCode").value;
+            xhr.open("GET", "/flee?fleeingCode="+code, true);
+            xhr.send();
+            window.location.assign("/base");
+        }
 
-				document.getElementById("fleeingCode").innerHTML = "";
-			}
-
-			function fleeJail() {
-				var code = document.getElementById("fleeingCode").value;
-				xhr.open("GET", "/flee?fleeingCode="+code, true);
-				xhr.send();
-				window.location.assign("/base");
-			}
-
-			window.onload = function() {
-				if(window.location.href != "http://localhost:5000/base") {
-                    window.location.assign("/base");
-                }
-				getRoundInfoBase("Baas");
-				getAllEvents();
-				getAllStats();
-				timeToEnd();
-				window.setInterval(function() {
-					getRoundInfoBase("Baas");
-					getAllStats();
-					getAllEvents();
-					timeToEnd();
-				}, 4000);
-				window.setInterval(function() {
-					timeToEnd();
-				}, 1000);
-			}
-
-		</script>
-
-
-
-	</head>
-	<body>
-		<div class="col-sm-12">
-			<div class="col-sm-10 col-sm-offset-1">
-				<div id="roundInfo" class="textarea"></div>
-			</div>
-			<div class="col-sm-10 col-sm-offset-1" style="top:20px; padding:0;">
-				<div class="col-sm-7 col-sm-offset">
-					<div id="stats" class="textarea base"></div>
-				</div>
-				<div class="col-sm-4 col-sm-offset-1">
-					<div id="events" class="textarea base"></div>
-				</div>
-				<div class="col-sm-3 col-sm-offset-8" style="top:20px;">
-					<p>
-						<input id="fleeingCode" type="text" placeholder="Pagemiskood" autofocus>
-					</p>
-				</div>
-			</div>
-		</div>
-	</body>
+        window.onload = function() {
+            if(window.location.href != "http://localhost:5000/base") {
+                window.location.assign("/base");
+            }
+            getRoundInfoBase("Baas");
+            getAllEvents();
+            getAllStats();
+            timeToEnd();
+            window.setInterval(function() {
+                getRoundInfoBase("Baas");
+                getAllStats();
+                getAllEvents();
+                timeToEnd();
+            }, 4000);
+            window.setInterval(function() {
+                timeToEnd();
+            }, 1000);
+        }
+    </script>
+</head>
+<body>
+    <div class="col-sm-12">
+        <div class="col-sm-10 col-sm-offset-1">
+            <div id="roundInfo" class="textarea"></div>
+        </div>
+        <div class="col-sm-10 col-sm-offset-1" style="top:20px; padding:0;">
+            <div class="col-sm-7 col-sm-offset">
+                <div id="stats" class="textarea base"></div>
+            </div>
+            <div class="col-sm-4 col-sm-offset-1">
+                <div id="events" class="textarea base"></div>
+            </div>
+            <div class="col-sm-3 col-sm-offset-8" style="top:20px;">
+                <p>
+                    <input id="fleeingCode" type="text" placeholder="Pagemiskood" autofocus>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
 </html>

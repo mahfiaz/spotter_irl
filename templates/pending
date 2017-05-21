@@ -7,9 +7,7 @@
     <link href="static/style.css" rel="stylesheet">
     <script src="static/jquery-3.2.1.min.js" charset="utf-8"></script>
     <script src="static/script.js" charset="utf-8"></script>
-
     <script type="text/javascript">
-
         var xhr = new XMLHttpRequest();
 
         window.onload = function() {
@@ -42,7 +40,6 @@
         function checkStatus() {
             
         }
-
     </script>
 </head>
 <body class="page-pending">

@@ -1,32 +1,29 @@
  <!DOCTYPE html>
 <html lang="en">
-    <head>
-        
-        <title>Spotter IRL</title>
-        <link href="static/bootstrap.min.css" rel="stylesheet">
-        <link href="static/jumbotron-narrow.css" rel="stylesheet">
-        <link href="static/style.css" rel="stylesheet">
-        <script src="static/script.js" charset="utf-8"></script>
-
-    </head>
-    <body class="page-regi">
+<head>
+    <title>Spotter IRL</title>
+    <link href="static/bootstrap.min.css" rel="stylesheet">
+    <link href="static/jumbotron-narrow.css" rel="stylesheet">
+    <link href="static/style.css" rel="stylesheet">
+    <script src="static/script.js" charset="utf-8"></script>
+</head>
+<body class="page-regi">
     <div class="container">
-        <div class="col-xs-12"  style="text-align:center;">
-
-            <p>
-                <b><p style="font-size:400%;">Welcome</p>
-                <p style="font-size:300%;">to spotter IRL</p></b>
-                <p style="font-size:200%;">Spawnmaster login</p>
-            
-            <form action="/masterLogin" method="GET">
-                <input id="user" name="user" type="text" placeholder="Username" size="20">
-                <br>
-                <input id="pw" name="pw" type="password" placeholder="Password" size="20">
-                <br>
-                <input id="masterLogin" type="submit" value="Login">
-            </form>
-            </p>
-        </div>
+    <div class="col-xs-12"  style="text-align:center;">
+        <p>
+            <b><p style="font-size:400%;">Welcome</p>
+            <p style="font-size:300%;">to spotter IRL</p></b>
+            <p style="font-size:200%;">Spawnmaster login</p>
+        
+        <form action="/masterLogin" method="GET">
+            <input id="user" name="user" type="text" placeholder="Username" size="20">
+            <br>
+            <input id="pw" name="pw" type="password" placeholder="Password" size="20">
+            <br>
+            <input id="masterLogin" type="submit" value="Login">
+        </form>
+        </p>
     </div>
-    </body>
+    </div>
+</body>
 </html>
