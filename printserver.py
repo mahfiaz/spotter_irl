@@ -10,28 +10,25 @@ import subprocess
 import time
 
 def generate(data):
-    team = data['team']
+    team = data['team']['name']
     code = data['spotcode']
 
-    qr_url = "http://fusiongame.tk/s/%s" % data['jailcode']
+    qr_url = "http://fusiongame.tk/s/%s" % data['touchcode']
 
     pngpath = "spotter_printer/gen/%s.png" % code
     svgpath = "spotter_printer/gen/%s.svg" % code
     pdfpath = "spotter_printer/gen/%s.pdf" % code
 
+
+
     replacements = {
+        '$eventlist$' : "\n".join(data['eventlist']),
         '$code$': data['spotcode'],
         '$touchcode$': data['touchcode'],
-        '$bs$': data['score']['blue'],
-        '$rs$': data['score']['red'],
+        '$team1$' : data['teamScores'][0]['name'] + " " + data['teamScores'][0]['score']
+        '$team2$' : data['teamScores'][1]['name'] + " " + data['teamScores'][1]['score']
         'test.png': '%s.png' % code,
         }
-
-    if team == 'blue':
-        replacements['$team$'] = 'siniste'
-    else:
-        replacements['$team$'] = 'punaste'
-
 
     # Read SVG template to memory
     f = codecs.open('spotter_printer/template.svg', 'rb', encoding='utf8')
@@ -44,21 +41,21 @@ def generate(data):
         svg = svg.replace(marker, str(value))
 
     # Replace events data
-    line = 1
-    for row in data['lastevents'].split("\n"):
-        left, action, right = row.split(">")
-        svg = svg.replace("left%d" % line, left)
-        svg = svg.replace("right%d" % line, right)
-        a = """ xlink:href="#blank"
-       id="icon%s"
-""" % (line)
-        b = """ xlink:href="#%s"
-       id="icon%s"
-""" % (action, line)
-        svg = svg.replace(a, b)
-        line += 1
-        if line > 5:
-            break
+#    line = 1
+#    for row in data['lastevents'].split("\n"):
+#        left, action, right = row.split(">")
+#        svg = svg.replace("left%d" % line, left)
+#        svg = svg.replace("right%d" % line, right)
+#        a = """ xlink:href="#blank"
+#       id="icon%s"
+#""" % (line)
+#        b = """ xlink:href="#%s"
+#       id="icon%s"
+#""" % (action, line)
+#        svg = svg.replace(a, b)
+#        line += 1
+#        if line > 5:
+#            break
 
     # Write modified SVG to a new file
     f = codecs.open(svgpath, 'wb', encoding='utf8')
