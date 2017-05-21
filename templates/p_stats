@@ -7,6 +7,7 @@
 		<link href="/static/bootstrap.min.css" rel="stylesheet">
 		<link href="/static/jumbotron-narrow.css" rel="stylesheet">
 		<link href="/static/style.css" rel="stylesheet">
+		<script src="static/jquery-3.2.1.min.js" charset="utf-8"></script>
 		<script src="/static/script.js" charset="utf-8"></script>
 
 		<script type="text/javascript">
@@ -21,6 +22,10 @@
 					getStats();
 					getEvents();
 					timeToEnd();
+					isJailed();
+                    if (userJailed == "True") {
+                        window.location.assign("/");
+                    }
 				}, 4000);
 				window.setInterval(function() {
 					timeToEnd();
@@ -50,7 +55,9 @@
 					<div id="roundInfo" class="textarea"></div>
 				</p>
 				<p>
-					<div id="stats" class="textarea player"></div>
+					<div id="stats" class="textarea player">
+						<div class='bottom' id='toEnd'></div>
+					</div>
 				</p>
 				<p>
 					<div id="events" class="textarea player"></div>

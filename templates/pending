@@ -16,14 +16,13 @@
             window.onload = function() {
                 if(window.location.href != "http://localhost:5000/") {
                     window.location.assign("/");
-                    setInterval(function() {
-                        isJailed();
-                        if (userJailed == "False") {
-                            window.location.assign("/");
-                        } else {
-                        }
-                    }, 2000);
                 }
+                setInterval(function() {
+                    isJailed();
+                    if (userJailed == "False") {
+                        window.location.assign("/");
+                    }
+                }, 2000);
             }
 
 
