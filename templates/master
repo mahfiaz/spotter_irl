@@ -1,38 +1,35 @@
 <!DOCTYPE html>
+<meta charset="utf-8"/>
 <html lang="en">
     <head>
         
         <title>Spotter IRL Base</title>
 
-        <link href="static/bootstrap.min.css" rel="stylesheet">
-        <link href="static/jumbotron-narrow.css" rel="stylesheet">
-        <link href="static/style.css" rel="stylesheet">
-        <script src="static/script.js" charset="utf-8"></script>
+        <link href="/static/bootstrap.min.css" rel="stylesheet">
+        <link href="/static/jumbotron-narrow.css" rel="stylesheet">
+        <link href="/static/style.css" rel="stylesheet">
+        <script src="/static/script.js" charset="utf-8"></script>
 
         <script type="text/javascript">
-            
-            var xhr = new XMLHttpRequest();
 
-            if(window.location.href != "http://localhost:5000/spawn") {
-                window.location.assign("/spawn");
-            }
+            var xhr = new XMLHttpRequest();
 
             function newRound() {
 
                 var name = prompt("Name of the round");
                 var length = prompt("Lenght of round in minutes(integer)");
-                var startsIn = prompt("Time to start of round in minutes(integer)");
-                // 3 because Estonian summertime is GMT +3
-                var roundStartTime = new Date((3600000 * 3 + new Date().getTime()) + (startsIn * 60 * 1000))
-                var correct = confirm("Do you wish to add round:" + name + ", duration:" + length + ", starting at:" + roundStartTime);
-                if(correct) {
-                    xhr.open("GET", "addRound?roundName=" + name + "&roundLength=" + length + "&startsIn=" + startsIn, true);
-                    xhr.send();
-                    //So you won't have to refresh the page manually
-                    window.setTimeout(function() {}, 500);
-                    window.location.assign(window.location.href);
+                var startsAt = prompt("Time of round start(hh:mm)");
+                console.log(startsAt.length == 5);
+                if (length == parseInt(length, 10) && startsAt.substring(0,2) == parseInt(startsAt.substring(0,2), 10) && startsAt.substring(3,5) == parseInt(startsAt.substring(3,5), 10) && startsAt.length == 5) {
+                    var correct = confirm("Do you wish to add round:" + name + ", duration:" + length + ", starting at:" + startsAt);
+                    if(correct) {
+                        xhr.open("GET", "/addRound?roundName=" + name + "&roundLength=" + length + "&startsAt=" + startsAt, true);
+                        xhr.send();
+                        //So you won't have to refresh the page manually
+                        window.setTimeout(function() {}, 500);
+                        window.location.assign(window.location.href);
+                    }
                 }
-
             }
 
             function masterLogout() {
@@ -45,112 +42,47 @@
                     }
                 }
             }
+            
+            
 
         </script>
 
-       
+
 
     </head>
     <body>
-        <div class="col-sm-12" style="min-height:50vh;">
-            <div class="col-sm-8">
-                <div class="col-sm-7">
-                    <h2>Players without team</h2>
-                </div>
-                <div class="col-sm-5">
-                    <div class="col-sm-5" style="background-color:blue; color:white; text-align:center;">
-                        <h2>Blue: 20</h2>
-                    </div>
-                    <div class="col-sm-1">
-                    </div>
-                    <div class="col-sm-5" style="background-color:red; color:white; text-align:center;">
-                        <h2>Red: 15</h2>
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <table style="width:100%;">
-                        <tr>
-                            <th>Id</th>
-                            <th>Nimi</th>
-                            <th>Telefon</th>
-                            <th>Web Hash</th>
-                            <th>Põgenemise kood</th>
-                            <th>Spot Code</th>
-                            <th>Touch Code</th>
-                            <th>Jailed</th>
-                            <th>Team</th>
-                        </tr>
-                        {% for player in teamless %}
-                        <tr>
-                            <td>{{ player[0] }}</td>
-                            <td>{{ player[1] }}</td>
-                            <td>{{ player[2] }}</td>
-                            <td>{{ player[3] }}</td>
-                            <td>{{ player[4] }}</td>
-                            <td>{{ player[5] }}</td>
-                            <td>{{ player[6] }}</td>
-                            <td>{{ player[7] }}</td>
-                            <td>{{ player[8] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </div>
+        <div class="col-sm-12">
+            <div class="col-sm-10 col-sm-offset-1">
+                <div id="roundInfo" class="textarea" style="max-height: 65px;"> ---Spawnmaster--- </div>
             </div>
-            <div class="col-sm-4">
-                <div class="col-sm-10">
-                    <h2>Rounds</h2>
-                    <div id="roundsTable">
-                        <table style="width:100%;">
-                            <tr>
-                                <th>Aktiivne</th>
-                                <th>Id</th>
-                                <th>Nimi</th>
-                                <th>Algusaeg</th>
-                                <th>Lõpuaeg</th>
-                            </tr>
-                            {% for round in rounds %}
-                            <tr>
-                                <td>{{ round[0] }}</td>
-                                <td>{{ round[1] }}</td>
-                                <td>{{ round[2] }}</td>
-                                <td>{{ round[3] }}</td>
-                                <td>{{ round[4] }}</td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                </div>
-                <div class="col-sm-2">
-                    <br><input id="newRound" class="btn btn-success btn-sm btn-block" type="submit" value="uus" onclick="newRound()">
-                </div>
-            </div>
-        </div>
-        
-<!-- Lower part of the page -->
 
-        <div>
-                <div class="col-sm-8">
-                    <h2>Team list</h2>
-                    <div class="col-sm-12">
-                        <div class="col-sm-5" style="background-color:blue; color:white;">
-                            <table class="table"><tr><th style="text-align:left;">Blue</th><th style="text-align:center;">20</th><th  style="text-align:right;">1250?</th></tr></table>
+            <div class="col-sm-10 col-sm-offset-1">
+                <p><div id="stats" class="textarea base"></div></p>
+                    <p>
+                        <div id="rounds" class="textarea base">
+                            <table style="width:100%;">
+                                <tr>
+                                    <th>Aktiivne</th>
+                                    <th>Id</th>
+                                    <th>Nimi</th>
+                                    <th>Algusaeg</th>
+                                    <th>Lõpuaeg</th>
+                                    <th><input type="submit" value="Uus voor" onclick="newRound()"></th>
+                                </tr>
+                                {% for round in rounds %}
+                                <tr>
+                                    <td>{{ round[0] }}</td>
+                                    <td>{{ round[1] }}</td>
+                                    <td>{{ round[2] }}</td>
+                                    <td>{{ round[3] }}</td>
+                                    <td>{{ round[4] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
                         </div>
-                        <div class="col-sm-2"><!-- space between the two teams' list --></div>
-                        <div class="col-sm-5" style="background-color:red; color:white;">
-                            <table class="table"><tr><th style="text-align:left;">Red</th><th style="text-align:center;">15</th><th  style="text-align:right;">2450?</th></tr></table>
-                        </div>
-                    </div>
+                    </p>
+                <div class="col-sm-3 col-sm-offset-8" style="top:20px;">
                 </div>
-                
-            <div class="col-sm-3">
-                <h2>Send sms</h2>
-            </div>
-            <div class="col-sm-1">
-                <h2>Game</h2>
-                <p><input id="startRound" class="btn btn-success btn-lg btn-block" type="submit" value="Start"></p>
-                <p><input id="endRound" class="btn btn-success btn-lg btn-block" type="submit" value="End"></p>
-                <br><br><br>
-                <p><input id="logOut" class="btn btn-danger btn-sm btn-block" type="submit" value="Log out" onclick="masterLogout()"></p>
             </div>
         </div>
     </body>

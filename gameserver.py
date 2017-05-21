@@ -163,19 +163,12 @@ def stats():
 # START BLOCK
 # Spawnmaster screen
 
-
-@app.route("/masterlogin")
 def masterLoginTemplate():
     return render_template("m_auth")
 
-
 def masterView():
-    players, teamless = Stats.playersDetailed()
-    for person in teamless:
-        print(person)
     rounds = Round.getRounds()
-    return render_template("master", rounds=rounds, teamless=teamless)
-
+    return render_template("master", rounds=rounds)
 
 def isMaster():
     try:
@@ -185,7 +178,6 @@ def isMaster():
             return False
     except KeyError:
         return False
-
 
 @app.route("/spawn")
 def spawnmaster():
@@ -198,17 +190,17 @@ def spawnmaster():
 @app.route("/login", methods=["GET"])
 def masterLogin():
     try:
-        _user = request.args.get("user")
-        _pw = request.args.get("pw")
+        user = request.args.get("user")
+        pw = request.args.get("pw")
         acc = Spawn.login()
 
-        if _user == acc["name"][0] and _pw == acc["pw"][0]:
+        if user == acc["name"][0] and pw == acc["pw"][0]:
             session["master"] = 1
             return spawnmaster()
         else:
-            return "Connection foridden"
+            return "403 Connection Forbidden"
     except:
-        return "Connection forbidden"
+        return "403 Connection Forbidden"
 
 
 @app.route("/masterout")
@@ -217,7 +209,7 @@ def masterLogout():
     return "Spanwmaster has logged out"
 
 
-@app.route("/s")
+@app.route("/base")
 def base_Template():
 	return render_template("stats")
 
@@ -237,17 +229,18 @@ def startRound():
     # How many minutes does the round last
     roundLength = request.args.get("roundLength")
     # In how many minutes does the round begin
-    startsIn = request.args.get("startsIn")
+    startsAt = request.args.get("startsAt")
     try:
         int(roundLength)
-        int(startsIn)
+        #int(startsIn)
     except ValueError:
         return "Round length and starttime has to be entered as integers."
-    startTime = datetime.datetime.now() + datetime.timedelta(seconds = int(startsIn) * 60)
+    startTime = datetime.datetime.now()
+    startTime = startTime.replace(hour=int(startsAt[0:2]), minute=int(startsAt[3:5]), second=0, microsecond=0)
     endTime = startTime + datetime.timedelta(seconds = int(roundLength) * 60)
     startTimeString = format(startTime, dateformat)
     endTimeString = format(endTime, dateformat)
-    if not roundName or not roundLength or not startsIn:
+    if not roundName or not roundLength or not startsAt:
         return "Puudulik info uue roundi jaoks."
     else:
         if Round.add(roundName, startTimeString, endTimeString):
@@ -273,15 +266,6 @@ def addToTeam():
 
 
 # Spawnmaster's actions
-# END BLOCK
-
-
-
-# START BLOCK
-# Routes to player screen templates
-
-
-# Routes to player screen templates
 # END BLOCK
 
 
