@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import codecs
+import datetime
 from glob import glob
+import json
 import os
 import random
 import re
@@ -48,49 +50,45 @@ def send_sms(phone, text, message_id=None):
     #print text
 
 
-def sms_sender(queue):
-    while True:
-        sms = queue.get()
-        if len(sms) == 2:
-            phone, text = sms
-            send_sms(phone, text)
-        else:
-            print("SMS_SENDER: not a tuple in sms_out queue: %s" % sms)
+def receive_sms():
+    smslist = []
+    filelist = glob(os.path.join(incoming_dir, '*'))
+    for path in filelist:
+        f = codecs.open(path, 'r', encoding='utf8')
+        data = f.read()
+        f.close()
 
+        folder, filename = os.path.split(path)
+        destination = os.path.join(incoming_parsed, filename)
+        shutil.move(path, destination)
 
-def sms_receiver(queue):
-    while True:
-        filelist = glob(os.path.join(incoming_dir, '*'))
-        for path in filelist:
-            f = codecs.open(path, 'r', encoding='utf8')
-            data = f.read()
-            f.close()
+        split = data.find("\n\n")
+        headers = data[:split]
+        contents = data[split+2:]
 
-            folder, filename = os.path.split(path)
-            destination = os.path.join(incoming_parsed, filename)
-            shutil.move(path, destination)
+        number = ''
+        sent = ''
+        received = ''
 
-            split = data.find("\n\n")
-            headers = data[:split]
-            contents = data[split+2:]
+        for line in headers.split("\n"):
+            header, value = line.split(": ")
+            if header == "From":
+                number = value
+                if number.startswith("372"):
+                    number = number[3:]
+            elif header == "Sent":
+                sent = value
+            elif header == "Received":
+                received = value
 
-            number = ''
-            sent = ''
-            received = ''
-
-            for line in headers.split("\n"):
-                header, value = line.split(": ")
-                if header == "From":
-                    number = value
-                    if number.startswith("372"):
-                        number = number[3:]
-                elif header == "Sent":
-                    sent = value
-                elif header == "Received":
-                    received = value
-
-            event = parse_incoming_sms(number, contents, sent, received)
-            queue.put(event)
+        sms = {
+            'number': number,
+            'contents': contents,
+            'sent': sent,
+            'received': received
+            }
+        smslist.append(sms)
+    return smslist
 
 
 def connector():
@@ -98,13 +96,29 @@ def connector():
     actually_send = False
 
     while True:
-        r = requests.get('http://fusiongame.tk/sms')
-        print(r.text)
-        time.sleep(0.2)
+        smslist = receive_sms()
+        datestr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for sms in smslist:
+            print('%s From %s: %s' % (datestr, sms['number'], sms['contents']))
+        data = {'incoming': smslist}
+        r = requests.get('http://localhost:5000/sms?pass=avf2DA3XeJZmqy9KKVjFdGfU',
+                         data=json.dumps(data))
+        response = json.loads(r.text)
+        try:
+            for message in response['outgoing']:
+                number = message['number']
+                contents = message['contents']
+                if actually_send:
+                    send_sms(number, contents)
+                print('%s   To %s: %s' % (datestr, number, contents))
+        except:
+            pass
+
+        time.sleep(0.5)
+
 
 if __name__ == "__main__":
     connector()
 
 # Testing
 #send_sms(512345, u"Rõõmsat päeva, kuidas läheb")
-

@@ -276,7 +276,6 @@ def addToTeam():
 # END BLOCK
 
 
-
 # START BLOCK
 # Routes to player screen templates
 
@@ -287,17 +286,26 @@ def addToTeam():
 
 # Routes for SMS
 @app.route("/sms", methods=['GET'])
-def smsserver():    
+def smsserver():
+    # Check the stupid "password"
     if request.args.get('pass') != 'avf2DA3XeJZmqy9KKVjFdGfU':
-        return jsonify({'tervitus': 'mineara'})
-    data = {'outgoing': []}
-    while True:
-        try:
-            element = sms_outgoing.get_nowait()
-            data['outgoing'].append(element)
-        except queue.Empty:
-            break
-    return jsonify(data)
+        return jsonify({'error': 'error'})
+    # Receive incoming SMSes
+    incoming = json.loads(request.data.decode('utf8'))
+    for message in incoming['incoming']:
+        # Act on the message, it's something similar to
+        # {'number': 512314, 'contents': 'Welcome here',
+        #  'sent': sent, 'received': received}
+        #print(message)
+        Action.handleSms(message['number'], message['contents'])
+    out = []
+    try:
+        while True:
+            element = sms_queue.get_nowait()
+            out.append(element)
+    except queue.Empty:
+        pass
+    return jsonify({'outgoing': out})
 
 
 # Routes for printing
@@ -345,4 +353,3 @@ if __name__ == "__main__":
 
         while True:
             processInput()
-

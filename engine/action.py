@@ -117,6 +117,7 @@ class Action:
         code = Action._codeValidate(message)
         senderId = Player.getMobileOwnerId(mobile)
         Action._handleCode(senderId, code, byMobile = True)
+        print('Received SMS', mobile, message)
 
     def handleWeb(hash, code):
         hash = Action._hashValidate(hash)
