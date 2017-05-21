@@ -25,8 +25,8 @@ app.secret_key = os.urandom(24)
 # Player registration
 
 
-def registration_template():
-    return render_template("regi")
+def registration_template(error):
+    return render_template("regi", error=error)
 
 def pending_template():
 	if logged_in():
@@ -64,7 +64,7 @@ def index():
 			return playing_template()
 		return pending_template()
 	else:
-		return registration_template()
+		return registration_template("")
 
 
 @app.route("/register", methods=["GET"])
@@ -79,17 +79,21 @@ def new_player():
 			session["web_hash"] = Player.getHashById(Player._getIdByName(user))
 			return index()
 		else:
-			return registration_template()
+			return registration_template("Nimi või mobiil juba kasutusel.")
 	else:
-		return registration_template()
+		return registration_template("Mõlemad väljad on kohustuslikud.")
 
 
 @app.route("/wrongInfo")
 def wrong_info():
 	if logged_in():
-		Player.delPlayer(session["user"])
-		session.clear()
-		return "User data removed"
+		phone = request.args.get("phone")
+		if phone == session["phone"]:
+			Player.delPlayer(session["user"])
+			session.clear()
+			return "User data removed"
+		else:
+			return "User data preserved"
 	else:
 		return "403 Connection Forbidden"
 
@@ -163,21 +167,19 @@ def stats():
 # START BLOCK
 # Spawnmaster screen
 
-
-@app.route("/masterlogin")
-def masterLoginTemplate():
+def master_login_template():
     return render_template("m_auth")
 
+def master_view():
+	if is_master():
+		Round.updateActiveId()
+		players, teamless = Stats.playersDetailed()
+		rounds = Round.getRounds()
+		return render_template("master", rounds=rounds, teamless=teamless, players = players)
+	else:
+		return "403 Connection Forbidden"
 
-def masterView():
-    players, teamless = Stats.playersDetailed()
-    for person in teamless:
-        print(person)
-    rounds = Round.getRounds()
-    return render_template("master", rounds=rounds, teamless=teamless)
-
-
-def isMaster():
+def is_master():
     try:
         if session["master"] == 1:
             return True
@@ -186,49 +188,94 @@ def isMaster():
     except KeyError:
         return False
 
-
 @app.route("/spawn")
 def spawnmaster():
-    if isMaster():
-        return masterView()
+    if is_master():
+        return master_view()
     else:
-        return masterLoginTemplate()
+        return master_login_template()
 
-
-@app.route("/login", methods=["GET"])
-def masterLogin():
+@app.route("/masterLogin", methods=["GET"])
+def master_login():
     try:
-        _user = request.args.get("user")
-        _pw = request.args.get("pw")
+        user = request.args.get("user")
+        pw = request.args.get("pw")
         acc = Spawn.login()
 
-        if _user == acc["name"][0] and _pw == acc["pw"][0]:
+        if user == acc["name"][0] and pw == acc["pw"][0]:
             session["master"] = 1
             return spawnmaster()
         else:
-            return "Connection foridden"
+            return "403 Connection Forbidden"
     except:
-        return "Connection forbidden"
-
+        return "403 Connection Forbidden"
 
 @app.route("/masterout")
-def masterLogout():
-    session.clear()
-    return "Spanwmaster has logged out"
-
-
-@app.route("/s")
-def base_Template():
-	return render_template("stats")
+def master_logout():
+	if is_master():
+		session.clear()
+		return "Spanwmaster has logged out"
+	else:
+		return "403 Connection Forbidden"
 
 # Spawnmaster screen
 # END BLOCK
 
 
+# START BLOCK
+# Stats screens
+
+def base_login_template():
+	return render_template("b_auth")
+
+@app.route("/baseLogin", methods=["GET"])
+def base_login():
+    try:
+        user = request.args.get("user")
+        pw = request.args.get("pw")
+
+        if user == "base" and pw == "master":
+            session["base"] = 1
+            return base_template()
+        else:
+            return "403 Connection Forbidden"
+    except:
+        return "403 Connection Forbidden"
+
+def is_base():
+    try:
+        if session["base"] == 1:
+            return True
+        else:
+            return False
+    except KeyError:
+        return False
+
+@app.route("/base")
+def base_template():
+	if is_base():
+		return render_template("stats")
+	else:
+		return base_login_template()
+
+@app.route("/spectate")
+def spectator_template():
+	return render_template("spectate")
+
+@app.route("/baseout")
+def base_logout():
+	if is_base():
+		session.clear()
+		return "Basemaster has logged out"
+	else:
+		return "403 Connection Forbidden"
+
+# Stats screens
+# END BLOCK
+
 
 # START BLOCK
 # Spawnmaster's actions
-
 
 # Adding a new round
 @app.route("/addRound", methods=["GET"])
@@ -237,50 +284,44 @@ def startRound():
     # How many minutes does the round last
     roundLength = request.args.get("roundLength")
     # In how many minutes does the round begin
-    startsIn = request.args.get("startsIn")
+    startsAt = request.args.get("startsAt")
     try:
         int(roundLength)
-        int(startsIn)
+        #int(startsIn)
     except ValueError:
         return "Round length and starttime has to be entered as integers."
-    startTime = datetime.datetime.now() + datetime.timedelta(seconds = int(startsIn) * 60)
+    startTime = datetime.datetime.now()
+    startTime = startTime.replace(hour=int(startsAt[0:2]), minute=int(startsAt[3:5]), second=0, microsecond=0)
     endTime = startTime + datetime.timedelta(seconds = int(roundLength) * 60)
     startTimeString = format(startTime, dateformat)
     endTimeString = format(endTime, dateformat)
-    if not roundName or not roundLength or not startsIn:
+    if not roundName or not roundLength or not startsAt:
         return "Puudulik info uue roundi jaoks."
     else:
         if Round.add(roundName, startTimeString, endTimeString):
-            return "New round \"" + roundName + "\" start time " + startTimeString + ", end time " + endTimeString + "."
+        	Action.addTeamsToAllRounds()
+        	return "New round \"" + roundName + "\" start time " + startTimeString + ", end time " + endTimeString + "."
         else:
             return "Error: New round has overlapping time. not added: \"" + roundName + "\" start time " + startTimeString + ", end time " + endTimeString + "."
 
 
 
-# Adding player to a team in a round
+# Adding player to a team in active round
 @app.route("/addToTeam", methods = ["GET"])
 def addToTeam():
-    roundId = request.args.get("roundId")
-    playerId = request.args.get("playerId")
-    if roundId and playerId:
+    team_name = request.args.get("teamName")
+    player_id = request.args.get("playerId")
+    if team_name and player_id:
         try:
-            team.add(playerId, roundId)
-            return "Player " + Player.getNameById(playerId) + " added to round" + roundId
+            Action.addPlayerToTeam(Player.getNameById(player_id), team_name)
+            return "Player " + Player.getNameById(player_id) + " added to team" + team_name
         except:
-            return "Round or player id were given as invalid values."
+            return "Team or player id were given as invalid values."
     else:
-        return "Missing round or player id."
+        return "Missing team or player id."
 
 
 # Spawnmaster's actions
-# END BLOCK
-
-
-# START BLOCK
-# Routes to player screen templates
-
-
-# Routes to player screen templates
 # END BLOCK
 
 
