@@ -34,6 +34,8 @@ round_data = [
 
 teams = ({'name':'Sinised', 'color':'3399FF'}, {'name':'Punased', 'color':'FF6699'})
 
+master_player = {'name':'Master', 'mobile':'5254325'}
+
 game_link_sms = 'http://fusiongame.dk'
 
 def testConfigParams():

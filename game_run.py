@@ -17,7 +17,7 @@ from engine.team import *
 from spotter_sms.smsserver import sms_sender, sms_receiver
 
 def processInput():
-    userText = input("Enter command [Add player] [Team player] [Spot] [Web spot] [Flee jail] [Print] [teamChat] [BanChat]: \n")
+    userText = input("Enter command [Add player] [Team player] [Spot] [Web spot] [Flee jail] [Print] [teamChat] [BanChat] [MasterAnnounce]: \n")
     if 'f' in userText:
         jailCode = input("enter jail code: ")
         Action.fleePlayerWithCode(jailCode)
@@ -58,6 +58,9 @@ def processInput():
             Player.banChat(playerId)
         if 'n' in ban:
             Player.unbanChat(playerId)
+    if 'm' in userText:
+        message = input("enter master message: ")
+        Action.masterAnnounces(message)
 
 
 def main():

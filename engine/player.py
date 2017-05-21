@@ -90,6 +90,9 @@ class Player:
             WHERE player_id = %s""", [playerId])
         return iterateZero(Player.cur.fetchone())
 
+    def getMasterId():
+        return Player._getIdByName(game_config.master_player['name'])
+
 # flee
     def _generateFleeingCode(playerId):
         codeMax = math.pow(10, game_config.player_fleeingCodeDigits)
@@ -126,7 +129,8 @@ class Player:
 # list
     def getAllPlayerIds():
         Player.cur.execute("""SELECT player_id FROM player_data """)
-        return Player.cur.fetchall()
+        playerIds = Player.cur.fetchall()
+        return sum(playerIds, ())
 
     def getPlayerMobilesNamesList():
         playerList = []

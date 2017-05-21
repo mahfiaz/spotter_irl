@@ -10,7 +10,10 @@ from engine.round import *
 from engine.team import *
 
 import connect
-from game_config import file_events, file_stats
+from game_config import file_events, file_stats, master_player
+
+def addMasterPlayer():
+    Action.addPlayer(master_player['name'], master_player['mobile'], '')
 
 def addTestRoundsNormal():
     time.strftime(dateformat)
@@ -31,6 +34,7 @@ def initGame():
     Action.initAllDB(cursor)
 #    Round.addRealRounds()
     addTestRoundsNormal()
+    addMasterPlayer()
 
     Round.print()
 

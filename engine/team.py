@@ -108,12 +108,13 @@ class Team:
         Team.cur.execute("""SELECT player_id
             FROM team_players
             WHERE team_id = %s""", [teamId])
-        teams = Team.cur.fetchall()
-        return teams
+        playerIds = Team.cur.fetchall()
+        return sum(playerIds, ())
 
     def getTeamsIdList(roundId):
         Team.cur.execute("""SELECT team_id
             FROM team_list
             WHERE round_id = %s""", [roundId])
-        return Team.cur.fetchall()
+        teamIds = Team.cur.fetchall()
+        return sum(teamIds, ())
 

@@ -153,8 +153,8 @@ class Round:
     def getRoundIdList():
         Round.cur.execute("""SELECT round_id
             FROM round_data""")
-        return Round.cur.fetchall()
-
+        roundIds = Round.cur.fetchall()
+        return sum(roundIds, ())
 
 # callbacks
     def setCallbacks(roundStarted, roundEnding, roundEnded):

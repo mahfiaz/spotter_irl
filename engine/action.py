@@ -66,6 +66,9 @@ class Action:
         if not playerId:
             print("Warning! addPlayerToTeam(). no player found")
             return
+        if playerId == Player.getMasterId():
+            print("Warning! MasterPlayer can't be added to team.")
+            return
         if not Team._getIdByName(teamName, Round.getActiveId()):
             print("Warning! addPlayerToTeam(). no team found")
             return
@@ -191,11 +194,16 @@ class Action:
             print("Banned", Player.getNameById(playerId), "wanted to say:", message)
             return
         teamId = Team.getPlayerTeamId(playerId, Round.getActiveId())
+        if playerId == Player.getMasterId():
+            teamId = 0
         message = re.sub('[^A-Za-z0-9 \.,:;\-\?!#/ÕõÄäÖöÜü]', '', message)
         message = message[:60]
         print(Player.getNameById(playerId), "said ", message)
         Event.addChatMessage(playerId, teamId, message)
         Stats.updateEvents()
+
+    def masterAnnounces(message):
+        Action.sayToMyTeam(Player.getMasterId(), message)
 
 # flee
     def fleePlayerWithCode(fleeingCode):
@@ -235,7 +243,8 @@ class Action:
 
 # round calls
     def _roundStartedCall(mobileNameList, roundName):
-        BaseMsg.roundStarted()
+        Action.masterAnnounces("Lahing " + roundName + " algas.")
+#        BaseMsg.roundStarted()
         for (mobile, name) in mobileNameList:
             Sms.roundStarted(mobile, roundName)
             time.sleep(0.05)
@@ -244,14 +253,16 @@ class Action:
 
 
     def _roundEndingCall(mobileNameList, roundName, left):
-        BaseMsg.roundEnding(left)
+        Action.masterAnnounces("Lahing " + roundName + " lõpeb " + left + " min pärast. Tule autasustamisele baasi.")
+#        BaseMsg.roundEnding(left)
         for (mobile, name) in mobileNameList:
             Sms.roundEnding(mobile, roundName, left)
             time.sleep(0.05)
 
 
     def _roundEndedCall(mobileNameList, roundName):
-        BaseMsg.roundEnded()
+        Action.masterAnnounces("Lahing " + roundName + " lõppes. Oled oodatud baasi autasustamisele.")
+#        BaseMsg.roundEnded()
         for (mobile, name) in mobileNameList:
             Sms.roundEnded(mobile, roundName)
             time.sleep(0.05)
@@ -318,7 +329,9 @@ class Stats:
     def _getTeamplessPlayerStats(roundId):
         teamless = []
         for player in Team.getTeamlessPlayerIdList(roundId):
-            teamless.append(Stats._getPlayerStats(player, roundId))
+            print(player, Player.getMasterId())
+            if not (player == Player.getMasterId()):
+                teamless.append(Stats._getPlayerStats(player, roundId))
         return teamless
 
     def _calcAllStats(roundId):

@@ -138,7 +138,7 @@ class Event:
             ORDER BY timestamp DESC""", (playerId, EventType.didFlee.value))
         timestamp = Event.cur.fetchall()
         if timestamp:
-            return timestamp[0]
+            return timestamp[0][0]
 
 
 # get player stats
