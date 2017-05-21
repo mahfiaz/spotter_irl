@@ -36,7 +36,7 @@ teams = ({'name':'Sinised', 'color':'3399FF'}, {'name':'Punased', 'color':'FF669
 
 master_player = {'name':'Master', 'mobile':'5254325'}
 
-game_link_sms = 'http://fusiongame.dk'
+game_link_sms = 'http://fusiongame.tk'
 
 def testConfigParams():
     assert player_fleeingCodeDigits != code_spotCodeDigits
@@ -88,13 +88,13 @@ msgBaseEng['mobileNotDigits'] = 'Error. {} is not valid phone number. Start all 
 
 msgCellularEst = {}
 msgCellularEst['notSignedUp'] = '({}), sa pole mängu veel regatud. Tule Fusion telki @ linnavalituse parklas.'
-msgCellularEst['playerAdded'] = '{} oled vahistatud. Põgenemiseks kasuta koodi {}.'
-msgCellularEst['senderJailed'] = '{}, oled vahistatud, seega ei saa kedagi tabada. Parem põgene koodiga {}.'
-msgCellularEst['victimJailedVictim'] = '{}, kui sa poleks vahistatud, oleks {} sind tabanud. Põgene ruttu koodiga {}.'
+msgCellularEst['playerAdded'] = '{} oled vahistatud. Mine baasi ja kasuta koodi {}.'
+msgCellularEst['senderJailed'] = '{}, oled vahistatud, seega ei saa kedagi tabada. Parem mine baasi ja kasuta koodi {}.'
+msgCellularEst['victimJailedVictim'] = '{}, kui sa poleks vahistatud, oleks {} sind tabanud. Põgeneda saad baasis ruttu koodiga {}.'
 msgCellularEst['victimJailedSender'] = '{}, kui {} poleks vahistatud, oleksid teda tabanud. Kui see on sulle turvaline, soovita tal põgeneda.'
 msgCellularEst['missed'] = 'Kuule {}, mõtlesid selle koodi ise välja? Säänset ei leitud.'
 msgCellularEst['oldCode'] = '{}, selle koodi parim-enne on möödas. Kas sul on hea mälu või {} kannab vana koodi, kuigi tal on juba uus käes.'
-msgCellularEst['exposedSelf'] = '{}, andsid end ametivõimude kätte. Tegid enekat? Põgene koodiga {}.'
+msgCellularEst['exposedSelf'] = '{}, andsid end ametivõimude kätte. Tegid enekat? Põgene baasis koodiga {}.'
 msgCellularEst['spotMateSender'] = '{}, kas oled värvipime? {} on ikkagi tiimikaaslane.'
 msgCellularEst['spotMateVictim'] = '{}, su meeskonnakaaslane lasi su üle. Põgenemise vihje {}.'
 msgCellularEst['spottedSender'] = '{}, tabasid {}. Väga kõvv!'

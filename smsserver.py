@@ -47,7 +47,6 @@ def send_sms(phone, text, message_id=None):
     f = open(os.path.join(outgoing_dir, str(message_id)), 'w')
     f.write(message)
     f.close()
-    #print text
 
 
 def receive_sms():
@@ -93,7 +92,8 @@ def receive_sms():
 
 def connector():
     print("SMS server started")
-    actually_send = False
+
+    actually_send = True
 
     while True:
         smslist = receive_sms()
@@ -104,15 +104,12 @@ def connector():
         r = requests.get('http://localhost:5000/sms?pass=avf2DA3XeJZmqy9KKVjFdGfU',
                          data=json.dumps(data))
         response = json.loads(r.text)
-        try:
-            for message in response['outgoing']:
-                number = message['number']
-                contents = message['contents']
-                if actually_send:
-                    send_sms(number, contents)
-                print('%s   To %s: %s' % (datestr, number, contents))
-        except:
-            pass
+        for message in response['outgoing']:
+            number = message['number']
+            contents = message['contents']
+            if actually_send:
+                send_sms(number, contents)
+            print('%s   To %s: %s' % (datestr, number, contents))
 
         time.sleep(0.5)
 
