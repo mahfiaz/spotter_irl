@@ -217,9 +217,13 @@ class Action:
         if not code:
             return
         if not Round.getActiveId():
+            print("Warning. No active team. No fleeing for" ,fleeingCode)
             return
         playerId = Player.checkFleeingCode(code)
         if playerId:
+            if not Team.getPlayerTeamId(playerId, Round.getActiveId()):
+                print("Warning. You are not in a team. No fleeing." ,fleeingCode)
+                return
             Action._flee(playerId)
             Stats.updateStats()
             # Print
