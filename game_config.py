@@ -9,7 +9,7 @@ connection_password='securityFirst'
 database_dateformat = '%Y-%m-%d %H:%M:%S'
 database_dateformat_hours_minutes = '%H:%M'
 
-player_fleeingProtectionTime = 2 #120
+player_fleeingProtectionTime = 120
 
 player_fleeingCodeDigits = 3
 code_spotCodeDigits = 4

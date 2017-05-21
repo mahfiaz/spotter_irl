@@ -223,10 +223,37 @@ class Action:
             Action._flee(playerId)
             Stats.updateStats()
             # Print
-            Action.printer_queue.put('Tere')
+            Action.printer_queue.put(Action.prepareDataForPrinter(playerId))
             #sms_outgoing.put('tore')
         else:
             BaseMsg.fleeingCodeMismatch()
+
+    def prepareDataForPrinter(playerId):
+        teamId = Team.getPlayerTeamId(playerId, Round.getActiveId())
+        data = {
+            'player' : {
+                'name' : Player.getNameById(playerId),
+                'spotcode': Code.getSpotCodeByPlayerId(playerId),
+                'touchcode': Code.getTouchCodeByPlayerId(playerId),
+                'team': { 'name': Team.getNameById(teamId), 'color': Team.getColorById(teamId) },
+            },
+            'printer': 'PDF',
+            'eventlist': Action.eventListFlatten(Stats.getRoundEvents()),
+            'teamScores' : Stats._getTeamScores(Stats.getRoundStats())
+        }
+        return data
+
+    def eventListFlatten(eventlist):
+        output = []
+        for event in eventlist:
+            if event['visible'] == 'All':
+                line = ''
+                dlist = [event['time'], event['text1']['text'], event['text2']['text'], event['text3']['text']]
+                for el in dlist:
+                    if el:
+                        line += el + " "
+                output.append(line)
+        return output
 
     def _fleeTimerCall(mobile, name):
         Sms.fleeingProtectionOver(mobile, name)

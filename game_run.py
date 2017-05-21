@@ -6,6 +6,7 @@ from queue import Queue
 from threading import Thread
 
 import connect
+import queue
 
 from engine.event import *
 from engine.action import *
@@ -14,7 +15,7 @@ from engine.player import *
 from engine.round import *
 from engine.team import *
 
-from spotter_sms.smsserver import sms_sender, sms_receiver
+from smsserver import send_sms, receive_sms
 
 def processInput():
     userText = input("Enter command [Add player] [Team player] [Spot] [Web spot] [Flee jail] [Print] [teamChat] [BanChat] [MasterAnnounce]: \n")
@@ -70,7 +71,11 @@ def main():
         return
     cursor = connection.cursor()
 
-    Action.initAllConnect(cursor)
+    # Queues 
+    sms_queue = queue.Queue()
+    printer_queue = queue.Queue()
+
+    Action.initAllConnect(cursor, sms_queue, printer_queue)
 
     Round.updateActiveId()
     Stats.updateStats()
@@ -83,16 +88,16 @@ def main():
 
     # Start SMS receiving thread
     # incoming SMSes will be parsed to events
-    sms_in_thread = Thread(target=sms_receiver, args=(incoming_events,))
-    sms_in_thread.setDaemon(True)
-    sms_in_thread.start()
+#    sms_in_thread = Thread(target=sms_receiver, args=(incoming_events,))
+#    sms_in_thread.setDaemon(True)
+#    sms_in_thread.start()
 
     # Start SMS sending thread with listening queue
     # queue expects tuples with (number, data)
-    sms_out = Queue()
-    sms_out_thread = Thread(target=sms_sender, args=(sms_out,))
-    sms_out_thread.setDaemon(True)
-    sms_out_thread.start()
+#    sms_out = Queue()
+#    sms_out_thread = Thread(target=sms_sender, args=(sms_out,))
+#    sms_out_thread.setDaemon(True)
+#    sms_out_thread.start()
 
     while True:
         processInput()

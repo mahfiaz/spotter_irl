@@ -100,19 +100,25 @@ if __name__ == "__main__":
     connector()
 
 test = """
-testdata = {
-    'team': 'blue',
-    'printer': 'PDF',
-    'spotcode': "56234",
-    'touchcode': "56234-432",
-    'jailcode': "56234-432-2345",
-    'lastevents': u"robin>spotted>Käsnakalle\nEnts>spotted>UXB\nCamperboy2>jailed>Robin\nToNT>touched>Kalle\nRobin>spotted>Ents",
-    'score': {
-        'blue': 19,
-        'red': 23,
-        },
+{'player': {
+    'name': 'Villu', 
+    'spotcode': 2374, 
+    'touchcode': 2440987, 
+    'team': {
+        'name': 'Sinised', 
+        'color': '3399FF'}}, 
+    'printer': 'PDF', 
+    'eventlist': [
+        '13:35 Villu pages ', 
+        '13:34 Volloi puutus Villu ', 
+        '13:33 Villu pages ', 
+        '13:30 Volloi värvati '], 
+    'teamScores': [
+        {'name': 'Sinised', 'score': 0}, 
+        {'name': 'Punased', 'score': 2}]
     }
 """
+
 
 #pdf = generate(testdata)
 # send_printer(pdf, "PDF")
