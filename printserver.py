@@ -10,10 +10,10 @@ import subprocess
 import time
 
 def generate(data):
-    team = data['team']['name']
-    code = data['spotcode']
+    team = data['player']['team']['name']
+    code = data['player']['spotcode']
 
-    qr_url = "http://fusiongame.tk/s/%s" % data['touchcode']
+    qr_url = "http://fusiongame.tk/s/%s" % data['player']['touchcode']
 
     pngpath = "spotter_printer/gen/%s.png" % code
     svgpath = "spotter_printer/gen/%s.svg" % code
@@ -22,13 +22,21 @@ def generate(data):
 
 
     replacements = {
-        '$eventlist$' : "\n".join(data['eventlist']),
-        '$code$': data['spotcode'],
-        '$touchcode$': data['touchcode'],
-        '$team1$' : data['teamScores'][0]['name'] + " " + data['teamScores'][0]['score']
-        '$team2$' : data['teamScores'][1]['name'] + " " + data['teamScores'][1]['score']
+        '$code$': data['player']['spotcode'],
+        '$touchcode$': data['player']['touchcode'],
+        '$team1$' : "%s %s" % (data['teamScores'][0]['name'], data['teamScores'][0]['score']),
+        '$team2$' : "%s %s" % (data['teamScores'][1]['name'], data['teamScores'][1]['score']),
         'test.png': '%s.png' % code,
+        '$team$': team,
         }
+
+    for i, line in enumerate(data['eventlist']):
+        replacements['$eventlist%s$' % i] = line
+
+    for i in range(len(data['eventlist']), 6):
+        replacements['$eventlist%s$' % i] = ''
+
+    replacements['$time$'] = datetime.datetime.now().strftime("%H:%M:%S")
 
     # Read SVG template to memory
     f = codecs.open('spotter_printer/template.svg', 'rb', encoding='utf8')
@@ -94,10 +102,11 @@ def connector():
 
 
 if __name__ == "__main__":
-    connector()
+    #connector()
+    pass
 
 test = """
-{'player': {
+testdata = {'player': {
     'name': 'Villu', 
     'spotcode': 2374, 
     'touchcode': 2440987, 
@@ -114,8 +123,7 @@ test = """
         {'name': 'Sinised', 'score': 0}, 
         {'name': 'Punased', 'score': 2}]
     }
+
+pdf = generate(testdata)
+send_printer(pdf, "PDF")
 """
-
-
-#pdf = generate(testdata)
-# send_printer(pdf, "PDF")
