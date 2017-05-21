@@ -275,8 +275,22 @@ input[type="submit"] {
     margin-top: 0.2em;
 }
 
+input[type="submit"].danger {
+    background-color: #f44336; /* Red */
+}
 
 /* Registration page style */
-.page-regi .container {
+.page-regi .container,
+.page-pending .container {
     background: rgba(255, 255, 255, 0.4);
+    text-align: center;
+}
+
+h1 {
+    font-size: 3em;
+    font-weight: bold;
+}
+
+.large {
+    font-size: 2em;
 }
