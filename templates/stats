@@ -30,7 +30,7 @@
         }
 
         window.onload = function() {
-            if(window.location.href != "http://localhost:5000/base") {
+            if(window.location.href != "http://fusiongame.tk/base") {
                 window.location.assign("/base");
             }
             getRoundInfoBase("Baas");
