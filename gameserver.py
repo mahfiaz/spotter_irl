@@ -87,9 +87,13 @@ def new_player():
 @app.route("/wrongInfo")
 def wrong_info():
 	if logged_in():
-		Player.delPlayer(session["user"])
-		session.clear()
-		return "User data removed"
+		phone = request.args.get("phone")
+		if phone == session["phone"]:
+			Player.delPlayer(session["user"])
+			session.clear()
+			return "User data removed"
+		else:
+			return "User data preserved"
 	else:
 		return "403 Connection Forbidden"
 

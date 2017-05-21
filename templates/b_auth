@@ -9,7 +9,8 @@
         <script src="static/script.js" charset="utf-8"></script>
 
     </head>
-    <body>
+    <body class="page-regi">
+    <div class="container">
         <div class="col-xs-12"  style="text-align:center;">
 
             <p>
@@ -18,7 +19,7 @@
                 <p style="font-size:200%;">Base login</p>
             
             <form action="/baseLogin" method="GET">
-                <input id="user" name="user" type="text" placeholder="Player name" size="20">
+                <input id="user" name="user" type="text" placeholder="Username" size="20">
                 <br>
                 <input id="pw" name="pw" type="password" placeholder="Password" size="20">
                 <br>
@@ -26,5 +27,6 @@
             </form>
             </p>
         </div>
+    </div>
     </body>
 </html>
