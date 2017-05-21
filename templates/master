@@ -1,165 +1,154 @@
 <!DOCTYPE html>
 <meta charset="utf-8"/>
 <html lang="en">
-    <head>
-        
-        <title>Spotter IRL Base</title>
+<head>
+    <title>Spotter IRL Base</title>
+    <link href="/static/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/jumbotron-narrow.css" rel="stylesheet">
+    <link href="/static/style.css" rel="stylesheet">
+    <script src="/static/script.js" charset="utf-8"></script>
+    <script type="text/javascript">
+        var xhr = new XMLHttpRequest();
 
-        <link href="/static/bootstrap.min.css" rel="stylesheet">
-        <link href="/static/jumbotron-narrow.css" rel="stylesheet">
-        <link href="/static/style.css" rel="stylesheet">
-        <script src="/static/script.js" charset="utf-8"></script>
+        window.onload = function() {
+            if(window.location.href != "http://localhost:5000/spawn") {
+                window.location.assign("/spawn");
+            }
+        }
 
-        <script type="text/javascript">
-
-            var xhr = new XMLHttpRequest();
-
-            window.onload = function() {
-                if(window.location.href != "http://localhost:5000/spawn") {
-                    window.location.assign("/spawn");
+        function newRound() {
+            var name = prompt("Name of the round");
+            var length = prompt("Lenght of round in minutes(integer)");
+            var startsAt = prompt("Time of round start(hh:mm)");
+            console.log(startsAt.length == 5);
+            if (length == parseInt(length, 10) && startsAt.substring(0,2) == parseInt(startsAt.substring(0,2), 10) && startsAt.substring(3,5) == parseInt(startsAt.substring(3,5), 10) && startsAt.length == 5) {
+                var correct = confirm("Do you wish to add round:" + name + ", duration:" + length + ", starting at:" + startsAt);
+                if(correct) {
+                    xhr.open("GET", "/addRound?roundName=" + name + "&roundLength=" + length + "&startsAt=" + startsAt, true);
+                    xhr.send();
+                    //So you won't have to refresh the page manually
+                    window.setTimeout(function() {}, 500);
+                    window.location.assign(window.location.href);
                 }
             }
+        }
 
-            function newRound() {
-
-                var name = prompt("Name of the round");
-                var length = prompt("Lenght of round in minutes(integer)");
-                var startsAt = prompt("Time of round start(hh:mm)");
-                console.log(startsAt.length == 5);
-                if (length == parseInt(length, 10) && startsAt.substring(0,2) == parseInt(startsAt.substring(0,2), 10) && startsAt.substring(3,5) == parseInt(startsAt.substring(3,5), 10) && startsAt.length == 5) {
-                    var correct = confirm("Do you wish to add round:" + name + ", duration:" + length + ", starting at:" + startsAt);
-                    if(correct) {
-                        xhr.open("GET", "/addRound?roundName=" + name + "&roundLength=" + length + "&startsAt=" + startsAt, true);
-                        xhr.send();
-                        //So you won't have to refresh the page manually
-                        window.setTimeout(function() {}, 500);
-                        window.location.assign(window.location.href);
-                    }
+        function masterLogout() {
+            xhr.open("GET", "/masterout", true);
+            xhr.send();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log(xhr.responseText)
+                    window.location.assign("/spawn")
                 }
             }
+        }
 
-            function masterLogout() {
-                xhr.open("GET", "/masterout", true);
-                xhr.send();
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        console.log(xhr.responseText)
-                        window.location.assign("/spawn")
-                    }
-                }
-            }
+        function to2(playerId) {
+            xhr.open("GET", "/addToTeam?teamName=Punased&playerId="+playerId, true);
+            xhr.send();
+            window.location.assign("/spawn")
+        }
 
-            function to2(playerId) {
-                xhr.open("GET", "/addToTeam?teamName=Punased&playerId="+playerId, true);
-                xhr.send();
-                window.location.assign("/spawn")
-            }
-            
+        function to1(playerId) {
+            xhr.open("GET", "/addToTeam?teamName=Sinised&playerId="+playerId, true);
+            xhr.send();
+            window.location.assign("/spawn")
+        }
+    </script>
+</head>
+<body>
+    <div class="col-sm-12">
+        <div class="col-sm-10 col-sm-offset-1">
+            <div id="roundInfo" class="textarea" style="max-height: 65px;"> ---Spawnmaster--- <button onclick="masterLogout()">Log Out</button></div>
+        </div>
 
-            function to1(playerId) {
-                xhr.open("GET", "/addToTeam?teamName=Sinised&playerId="+playerId, true);
-                xhr.send();
-                window.location.assign("/spawn")
-            }
-            
+        <div class="col-sm-10 col-sm-offset-1">
+            <p><div class="textarea base">
+                <p><table id="teamlessPlayers" style="width:100%;">
+                    <tr>
+                        <th>Id</th>
+                        <th>Nimi</th>
+                        <th>Telefon</th>
+                        <th>Web Hash</th>
+                        <th>Põgenemise kood</th>
+                        <th>Spot Code</th>
+                        <th>Touch Code</th>
+                        <th>Jailed</th>
+                        <th>Team</th>
+                    </tr>
+                    {% for player in teamless %}
+                    <tr>
+                        <td>{{ player[0] }}</td>
+                        <td>{{ player[1] }}</td>
+                        <td>{{ player[2] }}</td>
+                        <td>{{ player[3] }}</td>
+                        <td>{{ player[4] }}</td>
+                        <td>{{ player[5] }}</td>
+                        <td>{{ player[6] }}</td>
+                        <td>{{ player[7] }}</td>
+                        <td>{{ player[8] }}</td>
+                        <td><button onclick="to1({{ player[0] }})">Sinised</button></td>
+                        <td><button onclick="to2({{ player[0] }})">Punased</button></td>
+                    </tr>
+                    {% endfor %}
+                </table></p>
 
-        </script>
-
-
-
-    </head>
-    <body>
-        <div class="col-sm-12">
-            <div class="col-sm-10 col-sm-offset-1">
-                <div id="roundInfo" class="textarea" style="max-height: 65px;"> ---Spawnmaster--- <button onclick="masterLogout()">Log Out</button></div>
-            </div>
-
-            <div class="col-sm-10 col-sm-offset-1">
-                <p><div class="textarea base">
-                    <p><table id="teamlessPlayers" style="width:100%;">
-                        <tr>
-                            <th>Id</th>
-                            <th>Nimi</th>
-                            <th>Telefon</th>
-                            <th>Web Hash</th>
-                            <th>Põgenemise kood</th>
-                            <th>Spot Code</th>
-                            <th>Touch Code</th>
-                            <th>Jailed</th>
-                            <th>Team</th>
-                        </tr>
-                        {% for player in teamless %}
-                        <tr>
-                            <td>{{ player[0] }}</td>
-                            <td>{{ player[1] }}</td>
-                            <td>{{ player[2] }}</td>
-                            <td>{{ player[3] }}</td>
-                            <td>{{ player[4] }}</td>
-                            <td>{{ player[5] }}</td>
-                            <td>{{ player[6] }}</td>
-                            <td>{{ player[7] }}</td>
-                            <td>{{ player[8] }}</td>
-                            <td><button onclick="to1({{ player[0] }})">Sinised</button></td>
-                            <td><button onclick="to2({{ player[0] }})">Punased</button></td>
-                        </tr>
-                        {% endfor %}
-                    </table></p>
-
-                    <p><table id="teamedPlayers" style="width:100%;">
-                        <tr>
-                            <th>Id</th>
-                            <th>Nimi</th>
-                            <th>Telefon</th>
-                            <th>Web Hash</th>
-                            <th>Põgenemise kood</th>
-                            <th>Spot Code</th>
-                            <th>Touch Code</th>
-                            <th>Jailed</th>
-                            <th>Team</th>
-                        </tr>
-                        {% for player in players %}
-                        <tr>
-                            <td>{{ player[0] }}</td>
-                            <td>{{ player[1] }}</td>
-                            <td>{{ player[2] }}</td>
-                            <td>{{ player[3] }}</td>
-                            <td>{{ player[4] }}</td>
-                            <td>{{ player[5] }}</td>
-                            <td>{{ player[6] }}</td>
-                            <td>{{ player[7] }}</td>
-                            <td>{{ player[8] }}</td>
-                            <td><button onclick="to1({{ player[0] }})">Sinised</button></td>
-                            <td><button onclick="to2({{ player[0] }})">Punased</button></td>
-                        </tr>
-                        {% endfor %}
-                    </table></p>
-                </div></p>
-                    <p>
-                        <div id="rounds" class="textarea base">
-                            <table style="width:100%;">
-                                <tr>
-                                    <th>Aktiivne</th>
-                                    <th>Id</th>
-                                    <th>Nimi</th>
-                                    <th>Algusaeg</th>
-                                    <th>Lõpuaeg</th>
-                                    <th><input type="submit" value="Uus voor" onclick="newRound()"></th>
-                                </tr>
-                                {% for round in rounds %}
-                                <tr>
-                                    <td>{{ round[0] }}</td>
-                                    <td>{{ round[1] }}</td>
-                                    <td>{{ round[2] }}</td>
-                                    <td>{{ round[3] }}</td>
-                                    <td>{{ round[4] }}</td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                        </div>
-                    </p>
-                <div class="col-sm-3 col-sm-offset-8" style="top:20px;">
-                </div>
+                <p><table id="teamedPlayers" style="width:100%;">
+                    <tr>
+                        <th>Id</th>
+                        <th>Nimi</th>
+                        <th>Telefon</th>
+                        <th>Web Hash</th>
+                        <th>Põgenemise kood</th>
+                        <th>Spot Code</th>
+                        <th>Touch Code</th>
+                        <th>Jailed</th>
+                        <th>Team</th>
+                    </tr>
+                    {% for player in players %}
+                    <tr>
+                        <td>{{ player[0] }}</td>
+                        <td>{{ player[1] }}</td>
+                        <td>{{ player[2] }}</td>
+                        <td>{{ player[3] }}</td>
+                        <td>{{ player[4] }}</td>
+                        <td>{{ player[5] }}</td>
+                        <td>{{ player[6] }}</td>
+                        <td>{{ player[7] }}</td>
+                        <td>{{ player[8] }}</td>
+                        <td><button onclick="to1({{ player[0] }})">Sinised</button></td>
+                        <td><button onclick="to2({{ player[0] }})">Punased</button></td>
+                    </tr>
+                    {% endfor %}
+                </table></p>
+            </div></p>
+                <p>
+                    <div id="rounds" class="textarea base">
+                        <table style="width:100%;">
+                            <tr>
+                                <th>Aktiivne</th>
+                                <th>Id</th>
+                                <th>Nimi</th>
+                                <th>Algusaeg</th>
+                                <th>Lõpuaeg</th>
+                                <th><input type="submit" value="Uus voor" onclick="newRound()"></th>
+                            </tr>
+                            {% for round in rounds %}
+                            <tr>
+                                <td>{{ round[0] }}</td>
+                                <td>{{ round[1] }}</td>
+                                <td>{{ round[2] }}</td>
+                                <td>{{ round[3] }}</td>
+                                <td>{{ round[4] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </p>
+            <div class="col-sm-3 col-sm-offset-8" style="top:20px;">
             </div>
         </div>
-    </body>
+    </div>
+</body>
 </html>
