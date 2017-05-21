@@ -89,7 +89,7 @@ def connector():
 
     while True:
         datestr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        r = requests.get('http://localhost:5000/print?pass=htpT2U8UMpApV852DGSncBP7')
+        r = requests.get('http://fusiongame.tk/print?pass=htpT2U8UMpApV852DGSncBP7')
         response = json.loads(r.text)
         for page in response['print']:
             print(datestr, 'Page printed')
@@ -100,10 +100,6 @@ def connector():
 
         time.sleep(0.5)
 
-
-if __name__ == "__main__":
-    #connector()
-    pass
 
 test = """
 testdata = {'player': {
@@ -127,3 +123,6 @@ testdata = {'player': {
 pdf = generate(testdata)
 send_printer(pdf, "PDF")
 """
+
+if __name__ == "__main__":
+    connector()

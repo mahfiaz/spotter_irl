@@ -101,7 +101,7 @@ def connector():
         for sms in smslist:
             print('%s From %s: %s' % (datestr, sms['number'], sms['contents']))
         data = {'incoming': smslist}
-        r = requests.get('http://localhost:5000/sms?pass=avf2DA3XeJZmqy9KKVjFdGfU',
+        r = requests.get('http://fusiongame.tk/sms?pass=avf2DA3XeJZmqy9KKVjFdGfU',
                          data=json.dumps(data))
         response = json.loads(r.text)
         for message in response['outgoing']:

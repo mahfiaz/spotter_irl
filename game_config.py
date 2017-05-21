@@ -88,7 +88,7 @@ msgBaseEng['mobileNotDigits'] = 'Error. {} is not valid phone number. Start all 
 
 msgCellularEst = {}
 msgCellularEst['notSignedUp'] = '({}), sa pole mängu veel regatud. Tule Fusion telki @ linnavalituse parklas.'
-msgCellularEst['playerAdded'] = '{} oled vahistatud. Mine baasi ja kasuta koodi {}.'
+msgCellularEst['playerAdded'] = '{}, sa oled vahistatud. Mine baasi ja kasuta koodi {}.'
 msgCellularEst['senderJailed'] = '{}, oled vahistatud, seega ei saa kedagi tabada. Parem mine baasi ja kasuta koodi {}.'
 msgCellularEst['victimJailedVictim'] = '{}, kui sa poleks vahistatud, oleks {} sind tabanud. Põgeneda saad baasis ruttu koodiga {}.'
 msgCellularEst['victimJailedSender'] = '{}, kui {} poleks vahistatud, oleksid teda tabanud. Kui see on sulle turvaline, soovita tal põgeneda.'
