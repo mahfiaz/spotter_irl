@@ -353,15 +353,15 @@ def smsserver():
 @app.route("/print", methods=['GET'])
 def printserver():
     if request.args.get('pass') != 'htpT2U8UMpApV852DGSncBP7':
-        return jsonify({'tervitus': 'mineara'})
-    data = {'spool': []}
-    while True:
-        try:
+        return jsonify({'error': 'error'})
+    data = []
+    try:
+        while True:
             element = printer_queue.get_nowait()
-            data['spool'].append(element)
-        except queue.Empty:
-            break
-    return jsonify(data)
+            data.append(element)
+    except queue.Empty:
+        pass
+    return jsonify({'print': data})
 
 
 if __name__ == "__main__":
