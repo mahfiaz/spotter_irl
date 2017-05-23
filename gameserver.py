@@ -29,73 +29,73 @@ class App:
         return render_template("regi", error=error)
 
     def pending_template():
-    	if App.logged_in():
-    		return render_template("pending", user=session["user"], phone=session["phone"])
-    	else:
-    		return "403 Connection Forbidden"
+        if App.logged_in():
+            return render_template("pending", user=session["user"], phone=session["phone"])
+        else:
+            return "403 Connection Forbidden"
 
     @app.route("/p")
     def playing_template():
-    	if App.logged_in():
-    		return render_template("p_stats")
-    	else:
-    		return "403 Connection Forbidden"
+        if App.logged_in():
+            return render_template("p_stats")
+        else:
+            return "403 Connection Forbidden"
 
     @app.route("/isJailed")
     def playing_templateasd():
-    	if App.logged_in():
-    		return str(Event.isPlayerJailed(Player._getIdByName(session["user"])))
-    	else:
-    		return "403 Connection Forbidden"
+        if App.logged_in():
+            return str(Event.isPlayerJailed(Player._getIdByName(session["user"])))
+        else:
+            return "403 Connection Forbidden"
 
     def logged_in():
-    	try:
-    		if session["user"] == None or session["web_hash"] == None:
-    			return False
-    		else:
-    			return True
-    	except KeyError:
-    		return False
+        try:
+            if session["user"] == None or session["web_hash"] == None:
+                return False
+            else:
+                return True
+        except KeyError:
+            return False
 
     @app.route("/")
     def index():
-    	if App.logged_in():
-    		if not Event.isPlayerJailed(Player._getIdByName(session["user"])):
-    			return App.playing_template()
-    		return App.pending_template()
-    	else:
-    		return App.registration_template(" ")
+        if App.logged_in():
+            if not Event.isPlayerJailed(Player._getIdByName(session["user"])):
+                return App.playing_template()
+            return App.pending_template()
+        else:
+            return App.registration_template(" ")
 
 
     @app.route("/register", methods=["GET"])
     def new_player():
-    	user = request.args.get("user")
-    	phone = request.args.get("phone")
+        user = request.args.get("user")
+        phone = request.args.get("phone")
 
-    	if user and phone:
-    		if Action.addPlayerWOEmail(user, phone):
-    			session["user"] = user
-    			session["phone"] = phone
-    			session["web_hash"] = Player.getHashById(Player._getIdByName(user))
-    			return App.index()
-    		else:
-    			return App.registration_template("Nimi või mobiil juba kasutusel.")
-    	else:
-    		return App.registration_template("Mõlemad väljad on kohustuslikud.")
+        if user and phone:
+            if Action.addPlayerWOEmail(user, phone):
+                session["user"] = user
+                session["phone"] = phone
+                session["web_hash"] = Player.getHashById(Player._getIdByName(user))
+                return App.index()
+            else:
+                return App.registration_template("Nimi või mobiil juba kasutusel.")
+        else:
+            return App.registration_template("Mõlemad väljad on kohustuslikud.")
 
 
     @app.route("/wrongInfo")
     def wrong_info():
-    	if App.logged_in():
-    		phone = request.args.get("phone")
-    		if phone == session["phone"]:
-    			Player.delPlayer(session["user"])
-    			session.clear()
-    			return "User data removed"
-    		else:
-    			return "User data preserved"
-    	else:
-    		return "403 Connection Forbidden"
+        if App.logged_in():
+            phone = request.args.get("phone")
+            if phone == session["phone"]:
+                Player.delPlayer(session["user"])
+                session.clear()
+                return "User data removed"
+            else:
+                return "User data preserved"
+        else:
+            return "403 Connection Forbidden"
 
     # Player registration
     # END BLOCK
@@ -107,39 +107,39 @@ class App:
 
     @app.route("/flee")
     def flee_jail():
-    	fleeing_code = request.args.get("fleeingCode")
-    	if Action.fleePlayerWithCode(fleeing_code):
-    		return "You got out"
-    	else:
-    		return "Your escape failed"
+        fleeing_code = request.args.get("fleeingCode")
+        if Action.fleePlayerWithCode(fleeing_code):
+            return "You got out"
+        else:
+            return "Your escape failed"
 
 
     @app.route("/tag")
     def tag():
-    	if App.logged_in():
-    		tag_code = request.args.get("tagCode")
-    		if Action.handleWeb(session["web_hash"], tag_code):
-    			return "Hit"
-    		else:
-    			return "Your attempt to catch them failed"
-    	else:
-    		return "403 Connection Forbidden"
+        if App.logged_in():
+            tag_code = request.args.get("tagCode")
+            if Action.handleWeb(session["web_hash"], tag_code):
+                return "Hit"
+            else:
+                return "Your attempt to catch them failed"
+        else:
+            return "403 Connection Forbidden"
 
 
     @app.route("/message", methods=["GET"])
     def message():
-    	if App.logged_in():
-    		team_message = request.args.get("message")
-    		player_id = Player.getIdByHash(session["web_hash"])
-    		if team_message and player_id:
-    			if Action.sayToMyTeam(player_id, team_message):
-    				return "Message sent"
-    			else:
-    				return "Error sending message"
-    		else:
-    			return "Message missing, or invalid player info"
-    	else:
-    		return "403 Connection Forbidden"
+        if App.logged_in():
+            team_message = request.args.get("message")
+            player_id = Player.getIdByHash(session["web_hash"])
+            if team_message and player_id:
+                if Action.sayToMyTeam(player_id, team_message):
+                    return "Message sent"
+                else:
+                    return "Error sending message"
+            else:
+                return "Message missing, or invalid player info"
+        else:
+            return "403 Connection Forbidden"
 
 
     # Player actions
@@ -151,20 +151,20 @@ class App:
 
     @app.route("/user")
     def username():
-    	if App.logged_in():
-    		return session["user"]
-    	else:
-    		return "403 Connection Forbidden"
+        if App.logged_in():
+            return session["user"]
+        else:
+            return "403 Connection Forbidden"
 
     @app.route("/userTeam")
     def user_team():
-    	if App.logged_in():
-    		if Team.getPlayerTeamId(Player.getIdByHash(session["web_hash"]),Round.getActiveId()):
-    			return str(Team.getPlayerTeamId(Player.getIdByHash(session["web_hash"]),Round.getActiveId()))
-    		else:
-    			return "Player is not currently in a team"
-    	else:
-    		return "403 Connection Forbidden"
+        if App.logged_in():
+            if Team.getPlayerTeamId(Player.getIdByHash(session["web_hash"]),Round.getActiveId()):
+                return str(Team.getPlayerTeamId(Player.getIdByHash(session["web_hash"]),Round.getActiveId()))
+            else:
+                return "Player is not currently in a team"
+        else:
+            return "403 Connection Forbidden"
 
     # Getting data
     # END BLOCK
@@ -177,13 +177,13 @@ class App:
         return render_template("m_auth")
 
     def master_view():
-    	if App.is_master():
-    		Round.updateActiveId()
-    		players, teamless = Stats.playersDetailed()
-    		rounds = Round.getRounds()
-    		return render_template("master", rounds=rounds, teamless=teamless, players = players)
-    	else:
-    		return "403 Connection Forbidden"
+        if App.is_master():
+            Round.updateActiveId()
+            players, teamless = Stats.playersDetailed()
+            rounds = Round.getRounds()
+            return render_template("master", rounds=rounds, teamless=teamless, players = players)
+        else:
+            return "403 Connection Forbidden"
 
     def is_master():
         try:
@@ -218,11 +218,11 @@ class App:
 
     @app.route("/masterout")
     def master_logout():
-    	if App.is_master():
-    		session.clear()
-    		return "Spanwmaster has logged out"
-    	else:
-    		return "403 Connection Forbidden"
+        if App.is_master():
+            session.clear()
+            return "Spanwmaster has logged out"
+        else:
+            return "403 Connection Forbidden"
 
     # Spawnmaster screen
     # END BLOCK
@@ -232,7 +232,7 @@ class App:
     # Stats screens
 
     def base_login_template():
-    	return render_template("b_auth")
+        return render_template("b_auth")
 
     @app.route("/baseLogin", methods=["GET"])
     def base_login():
@@ -259,22 +259,22 @@ class App:
 
     @app.route("/base")
     def base_template():
-    	if App.is_base():
-    		return render_template("stats")
-    	else:
-    		return App.base_login_template()
+        if App.is_base():
+            return render_template("stats")
+        else:
+            return App.base_login_template()
 
     @app.route("/spectate")
     def spectator_template():
-    	return render_template("spectate")
+        return render_template("spectate")
 
     @app.route("/baseout")
     def base_logout():
-    	if App.is_base():
-    		session.clear()
-    		return "Basemaster has logged out"
-    	else:
-    		return "403 Connection Forbidden"
+        if App.is_base():
+            session.clear()
+            return "Basemaster has logged out"
+        else:
+            return "403 Connection Forbidden"
 
     # Stats screens
     # END BLOCK
@@ -305,8 +305,8 @@ class App:
             return "Insufficient info for a new round"
         else:
             if Round.add(roundName, startTimeString, endTimeString):
-            	Action.addTeamsToAllRounds()
-            	return "New round \"" + roundName + "\" start time " + startTimeString + ", end time " + endTimeString + "."
+                Action.addTeamsToAllRounds()
+                return "New round \"" + roundName + "\" start time " + startTimeString + ", end time " + endTimeString + "."
             else:
                 return "Error: New round has overlapping time. not added: \"" + roundName + "\" start time " + startTimeString + ", end time " + endTimeString + "."
 
