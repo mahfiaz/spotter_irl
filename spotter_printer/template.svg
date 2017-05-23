@@ -242,21 +242,26 @@
     <text
        sodipodi:linespacing="125%"
        id="text4195"
-       y="497.01001"
+       y="399.01001"
        x="708.33759"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:57.01415634px;line-height:125%;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          id="tspan4199"
-         y="497.01001"
+         y="399.01001"
          x="708.33759"
          sodipodi:role="line"
-         style="font-size:45px">aita meeskonnal</tspan><tspan
-         y="568.27771"
+         style="font-size:45px">aita</tspan><tspan
+         y="455.26001"
+         x="708.33759"
+         sodipodi:role="line"
+         style="font-size:45px"
+         id="tspan4252">meeskonnal</tspan><tspan
+         y="523.69147"
          x="708.33759"
          sodipodi:role="line"
          id="tspan4210">$team$</tspan><tspan
          id="tspan4201"
-         y="639.54541"
+         y="582.77771"
          x="708.33759"
          sodipodi:role="line"
          style="font-size:45px">lahing võita</tspan></text>
@@ -490,5 +495,18 @@
          x="698.77374"
          y="137.20822"
          style="font-size:17.59811783px">$eventlist5$</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4248"
+       y="663.08441"
+       x="367.04559"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:78.04043579px;line-height:125%;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"
+       transform="scale(1.0000067,0.99999331)"><tspan
+         style="font-size:37.5px;text-align:center;text-anchor:middle"
+         y="663.08441"
+         x="367.04559"
+         id="tspan4250"
+         sodipodi:role="line">mängija $playername$</tspan></text>
   </g>
 </svg>

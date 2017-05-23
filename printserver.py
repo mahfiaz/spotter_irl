@@ -22,6 +22,7 @@ def generate(data):
 
 
     replacements = {
+        '$playername$': data['player']['name'],
         '$code$': data['player']['spotcode'],
         '$touchcode$': data['player']['touchcode'],
         '$team1$' : "%s %s" % (data['teamScores'][0]['name'], data['teamScores'][0]['score']),
@@ -102,7 +103,7 @@ def connector():
 
 
 test = """
-{'  player': {
+testdata = {'player': {
         'name': 'Villu',
         'spotcode': 2374,
         'touchcode': 2440987,
@@ -121,8 +122,8 @@ test = """
         {'name': 'Punased', 'score': 2}]
     }
 
-pdf = generate(testdata)
-send_printer(pdf, "PDF")
+#pdf = generate(testdata)
+#send_printer(pdf, "PDF")
 """
 
 if __name__ == "__main__":

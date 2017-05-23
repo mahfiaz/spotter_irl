@@ -47,15 +47,22 @@ def send_sms(phone, text, message_id=None):
     f = open(os.path.join(outgoing_dir, str(message_id)), 'w')
     f.write(message)
     f.close()
+    print("Sent message to %s" % phone)
 
 
 def receive_sms():
     smslist = []
     filelist = glob(os.path.join(incoming_dir, '*'))
     for path in filelist:
-        f = codecs.open(path, 'r', encoding='utf8')
-        data = f.read()
-        f.close()
+        print("Opening file %s" % path)
+        try:
+            f = codecs.open(path, 'r', encoding='utf8')
+            data = f.read()
+            f.close()
+        except:
+            f = codecs.open(path, 'r', encoding='iso-8859-15')
+            data = f.read()
+            f.close()
 
         folder, filename = os.path.split(path)
         destination = os.path.join(incoming_parsed, filename)
@@ -110,12 +117,10 @@ def connector():
             if actually_send:
                 send_sms(number, contents)
             print('%s   To %s: %s' % (datestr, number, contents))
-
         time.sleep(0.5)
 
+# Testing
+#send_sms(37255546111, u"Rõõmsat päeva, kuidas läheb, test 8")
 
 if __name__ == "__main__":
     connector()
-
-# Testing
-#send_sms(512345, u"Rõõmsat päeva, kuidas läheb")
