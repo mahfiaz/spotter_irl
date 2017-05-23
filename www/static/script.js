@@ -7,7 +7,7 @@ function getAllStats() {
 	var divContents = "";
 	var isDiv = false;
 
-	xhrStats.open("GET", "/stats", true);
+	xhrStats.open("GET", "/stats.json", true);
 	xhrStats.send();
 	xhrStats.onreadystatechange = function() {
 		if (xhrStats.readyState == 4 && xhrStats.status == 200) {
@@ -56,7 +56,7 @@ function getAllEvents() {
 		isDiv = true;
 	}
 
-	xhrEvents.open("GET", "/events", true);
+	xhrEvents.open("GET", "/events.json", true);
 	xhrEvents.send();
 	xhrEvents.onreadystatechange = function() {
 		if (xhrEvents.readyState == 4 && xhrEvents.status == 200) {
@@ -103,7 +103,7 @@ function getRoundInfoBase(role) {
 		isDiv = true;
 	}
 
-	xhrRound.open("GET", "/stats", true);
+	xhrRound.open("GET", "/stats.json", true);
 	xhrRound.send();
 	xhrRound.onreadystatechange = function() {
 		if (xhrRound.readyState == 4 && xhrRound.status == 200) {
@@ -137,7 +137,7 @@ function getStats() {
 		}
 	}
 
-	xhrStats.open("GET", "/stats", true);
+	xhrStats.open("GET", "/stats.json", true);
 	xhrStats.send();
 	xhrStats.onreadystatechange = function() {
 		if (xhrStats.readyState == 4 && xhrStats.status == 200) {
@@ -217,7 +217,7 @@ function getEvents() {
 	}
 
 
-	xhrEvents.open("GET", "/events", true);
+	xhrEvents.open("GET", "/events.json", true);
 	xhrEvents.send();
 	xhrEvents.onreadystatechange = function() {
 		if (xhrEvents.readyState == 4 && xhrEvents.status == 200) {
@@ -271,7 +271,7 @@ function getRoundInfo() {
 		}
 	}
 
-	xhrRound.open("GET", "/stats", true);
+	xhrRound.open("GET", "/stats.json", true);
 	xhrRound.send();
 	xhrRound.onreadystatechange = function() {
 		if (xhrRound.readyState == 4 && xhrRound.status == 200) {
@@ -298,7 +298,7 @@ function timeToEnd() {
 		isDiv = true;
 	}
 
-	xhrTime.open("GET", "/stats", true);
+	xhrTime.open("GET", "/stats.json", true);
 	xhrTime.send();
 	xhrTime.onreadystatechange = function() {
 		if (xhrTime.readyState == 4 && xhrTime.status == 200) {

@@ -389,11 +389,11 @@ class Stats:
 
     def _storeStats(stats):
         if stats:
-            with open('stats.json', 'w') as jsonFile:
+            with open('www/stats.json', 'w') as jsonFile:
                 json.dump(stats, jsonFile, indent=4)
 
     def getRoundStats():
-        with open('stats.json') as jsonFile:
+        with open('www/stats.json') as jsonFile:
             return json.load(jsonFile)
 
     def printIndented(stats):
@@ -461,11 +461,11 @@ class Stats:
 
     def _storeEvents(events):
         if events:
-            with open('events.json', 'w') as jsonFile:
+            with open('www/events.json', 'w') as jsonFile:
                 json.dump(events, jsonFile, indent = 4)
 
     def getRoundEvents():
-        with open('events.json') as jsonFile:
+        with open('www/events.json') as jsonFile:
             return json.load(jsonFile)
 
 # print

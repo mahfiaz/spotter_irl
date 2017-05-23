@@ -166,27 +166,6 @@ class App:
     	else:
     		return "403 Connection Forbidden"
 
-    @app.route("/events")
-    def events():
-    	try:
-    		with open('events.json') as data_file:
-    			events = json.load(data_file)
-    		response = jsonify(events)
-    		return response
-    	except:
-    		return "File not found"
-    	
-    @app.route("/stats")
-    def stats():
-    	try:
-    		with open('stats.json') as data_file:
-    			stats = json.load(data_file)
-    		response = jsonify(stats)
-    		return response
-    	except:
-    		return "File not found"
-    	
-
     # Getting data
     # END BLOCK
 

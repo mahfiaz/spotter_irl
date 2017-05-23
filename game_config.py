@@ -15,8 +15,8 @@ player_fleeingCodeDigits = 3
 code_spotCodeDigits = 4
 code_touchCodeDigits = 7
 
-file_stats = 'stats.json'
-file_events = 'events.json'
+file_stats = 'www/stats.json'
+file_events = 'www/events.json'
 
 import datetime
 round_day = datetime.datetime.now().date().strftime(database_dateformat[:8])
