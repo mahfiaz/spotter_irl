@@ -11,7 +11,7 @@
         var xhr = new XMLHttpRequest();
 
         window.onload = function() {
-            if(window.location.href != gameServerAdress) {
+            if(window.location.href != gameServerAddress) {
                 window.location.assign("/");
             }
             setInterval(function() {

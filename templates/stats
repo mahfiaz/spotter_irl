@@ -30,7 +30,7 @@
         }
 
         window.onload = function() {
-            if(window.location.href != gameServerAdress + "base") {
+            if(window.location.href != gameServerAddress + "base") {
                 window.location.assign("/base");
             }
             getRoundInfoBase("Baas");
