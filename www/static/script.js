@@ -1,5 +1,5 @@
 userJailed = "";
-gameServerAdress = "http://fusiongame.tk/";
+gameServerAdress = "http://localhost:5000/";
 
 function getAllStats() {
 	var xhrStats = new XMLHttpRequest();
@@ -68,15 +68,18 @@ function getAllEvents() {
 					eventsDiv.innerHTML = "";
 				}
 			} else {
+				eventsDiv.innerHTML = divContents;
 				for(i in events) {
 					event = events[i];
-					divContents += "<p>"+event["time"];
-					divContents += " <span style='color:#"+event["text1"]["color"]+";'>"+event["text1"]["text"]+"</span>";
-					divContents += " <span style='color:#"+event["text2"]["color"]+";'>"+event["text2"]["text"]+"</span>";
-					if (event["text3"]["text"] != null) {
-						divContents += " <span style='color:#"+event["text3"]["color"]+";'>"+event["text3"]["text"]+"</span>";
+					if (event["visible"] == "All") {
+						divContents += "<p>"+event["time"];
+						divContents += " <span style='color:#"+event["text1"]["color"]+";'>"+event["text1"]["text"]+"</span>";
+						divContents += " <span style='color:#"+event["text2"]["color"]+";'>"+event["text2"]["text"]+"</span>";
+						if (event["text3"]["text"] != null) {
+							divContents += " <span style='color:#"+event["text3"]["color"]+";'>"+event["text3"]["text"]+"</span>";
+						}
+						divContents += "</p>";
 					}
-					divContents += "</p>";
 				}
 				if (isDiv) {
 					eventsDiv.innerHTML = divContents;
@@ -184,8 +187,10 @@ function getStats() {
 function getEvents() {
 	var xhrEvents = new XMLHttpRequest();
 	var xhrPlayer = new XMLHttpRequest();
+	var xhrTeam = new XMLHttpRequest();
 	var events = "";
 	var user = "";
+	var userTeam = "";
 	var divContents = "";
 	var isDiv = false;
 
@@ -202,6 +207,16 @@ function getEvents() {
 		}
 	}
 
+
+	xhrTeam.open("GET", "/userTeam", true);
+	xhrTeam.send();
+	xhrTeam.onreadystatechange = function() {
+		if (xhrTeam.readyState == 4 && xhrTeam.status == 200) {
+			userTeam = xhrTeam.responseText;
+		}
+	}
+
+
 	xhrEvents.open("GET", "/events", true);
 	xhrEvents.send();
 	xhrEvents.onreadystatechange = function() {
@@ -216,13 +231,15 @@ function getEvents() {
 			} else {
 				for(i in events) {
 					event = events[i];
-					divContents += "<p>"+event["time"];
-					divContents += " <span style='color:#"+event["text1"]["color"]+";'>"+event["text1"]["text"]+"</span>";
-					divContents += " <span style='color:#"+event["text2"]["color"]+";'>"+event["text2"]["text"]+"</span>";
-					if (event["text3"]["text"] != null) {
-						divContents += " <span style='color:#"+event["text3"]["color"]+";'>"+event["text3"]["text"]+"</span>";
+					if (event["visible"] == "All" || (event["visible"] == "Sinised" && userTeam == "1") || (event["visible"] == "Punased" && userTeam == "2")) {
+						divContents += "<p>"+event["time"];
+						divContents += " <span style='color:#"+event["text1"]["color"]+";'>"+event["text1"]["text"]+"</span>";
+						divContents += " <span style='color:#"+event["text2"]["color"]+";'>"+event["text2"]["text"]+"</span>";
+						if (event["text3"]["text"] != null) {
+							divContents += " <span style='color:#"+event["text3"]["color"]+";'>"+event["text3"]["text"]+"</span>";
+						}
+						divContents += "</p>";
 					}
-					divContents += "</p>";
 				}
 				if (isDiv) {
 					eventsDiv.innerHTML = divContents;

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-    <title>Spotter IRL Base</title>
+    <title>Fusion Game</title>
     <link href="/static/bootstrap.min.css" rel="stylesheet">
     <link href="/static/jumbotron-narrow.css" rel="stylesheet">
     <link href="/static/style.css" rel="stylesheet">
@@ -39,6 +39,11 @@
         }
 
         function message() {
+            var xhrMessage = new XMLHttpRequest();
+            var message = document.getElementById("message").value;
+            xhrMessage.open("GET", "/message?message="+message);
+            xhrMessage.send();
+            window.location.assign("/");
             console.log("Messaged team");
         }
     </script>

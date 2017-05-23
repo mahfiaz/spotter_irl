@@ -2,7 +2,7 @@
 <meta charset="utf-8"/>
 <html lang="en">
 <head>
-    <title>Spotter IRL Base</title>
+    <title>Fusion Game Base</title>
     <link href="/static/bootstrap.min.css" rel="stylesheet">
     <link href="/static/jumbotron-narrow.css" rel="stylesheet">
     <link href="/static/style.css" rel="stylesheet">
@@ -26,7 +26,7 @@
             var code = document.getElementById("fleeingCode").value;
             xhr.open("GET", "/flee?fleeingCode="+code, true);
             xhr.send();
-            //window.location.assign("/base");
+            window.location.assign("/base");
         }
 
         window.onload = function() {
