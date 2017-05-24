@@ -27,6 +27,9 @@ def addTestRoundsNormal():
     Round.updateActiveId()
 
 def initGame():
+    if not os.path.isfile('config.ini'):
+        import shutil
+        shutil.copyfile('config-default.ini', 'config.ini')
     connection = connect.connectDB()
     if not connection:
         return

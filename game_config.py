@@ -1,22 +1,29 @@
 # -*- coding: utf-8 -*-
+from configparser import ConfigParser
+
+config = ConfigParser()
+config.read('config.ini')
+
+language = ConfigParser()
+language.read(config['general']['languagefile'])
 
 # database connection parameters
-connection_dbname='game_database'
-connection_user='game_engine'
-connection_host='localhost'
-connection_password='securityFirst'
+db = config['database']
+connection_host = db['host']
+connection_dbname = db['dbname']
+connection_user = db['user']
+connection_password = db['password']
 
-database_dateformat = '%Y-%m-%d %H:%M:%S'
-database_dateformat_hours_minutes = '%H:%M'
+database_dateformat = config['date']['format']
+database_dateformat_hours_minutes = config['date']['shortformat']
 
-player_fleeingProtectionTime = 120
+player_fleeingProtectionTime = config['game']['flee_protection']
+player_fleeingCodeDigits = config['game']['flee_code_length']
+code_spotCodeDigits = config['game']['spot_code_length']
+code_touchCodeDigits = config['game']['touch_code_length']
 
-player_fleeingCodeDigits = 3
-code_spotCodeDigits = 4
-code_touchCodeDigits = 7
-
-file_stats = 'www/stats.json'
-file_events = 'www/events.json'
+file_stats = config['general']['stats_file']
+file_events = config['general']['events_file']
 
 import datetime
 round_day = datetime.datetime.now().date().strftime(database_dateformat[:8])
@@ -34,89 +41,17 @@ round_data = [
 
 teams = ({'name':'Sinised', 'color':'3399FF'}, {'name':'Punased', 'color':'FF6699'})
 
-master_player = {'name':'Master', 'mobile':'5254325'}
+master_player = {'name':'Master', 'mobile': config['general']['phone_alert']}
 
-game_link_sms = 'http://fusiongame.tk'
+game_link_sms = config['game']['link']
 
 def testConfigParams():
     assert player_fleeingCodeDigits != code_spotCodeDigits
     assert code_touchCodeDigits != code_spotCodeDigits
 
-event_type_translated_Est = {'didFlee' : 'pages',
-                'didSpot' : 'tabas',
-                'didTouch' : 'puutus',
-                'didSpotMate' : 'tabas',
-                'wasAddedToTeam' : 'värvati',
-                'teamChat' : 'teatas:'}
-
 # for alert messages, like player X not added to any team.
-game_master_mobile_number = '554433221'
+game_master_mobile_number = config['general']['phone_alert']
 
-event_type_translated = event_type_translated_Est
-
-msgCellularEng = {}
-msgCellularEng['notSignedUp'] = 'You ({}) have not been signed up for the game. Come to the base @ linnavalituses parkla.'
-msgCellularEng['playerAdded'] = '{} welcome to jail. To escape, enter code {}.'
-msgCellularEng['senderJailed'] = '{}, you are jailed and can not spot anybody. Escape jail with code {}.'
-msgCellularEng['victimJailedVictim'] = '{}, if you were not jailed you would have been spotted by {}. Teleport quickly to the base with {}.'
-msgCellularEng['victimJailedSender'] = '{}, if not jailed you would had spotted {}. If safe, tell {} to teleport to the base.'
-msgCellularEng['missed'] = 'Hey {}, did you make up that code yourself? It was not found.'
-msgCellularEng['oldCode'] = '{}, this code is old. Either have you good memory or {} is wearing old codes while having new ones.'
-msgCellularEng['exposedSelf'] = '{}, you have exposed yourself to authorities. Did you mean selfie? Escape the jail with code {}.'
-msgCellularEng['spotMateSender'] = '{}, are you colorblind? Hitting teammate {} is not OK.'
-msgCellularEng['spotMateVictim'] = '{}, you have been spotted by a teammate. You can escape jail with code {}.'
-msgCellularEng['spottedSender'] = '{}, you spotted {}. Good job!'
-msgCellularEng['spottedVictim'] = '{}, you were spotted. Escape the jail with code {}.'
-msgCellularEng['touchedSender'] = '{}, you touched {}. Excellent!'
-msgCellularEng['touchedVictim'] = '{}, you were touched! Gotta be more watchful! Escape the jail with code {}.'
-msgCellularEng['fleeingProtectionOver'] = '{}, your fleeing protection is over now, make the codes visible!'
-msgCellularEng['noActiveRound'] = 'No running round. Next round starts at {}.'
-msgCellularEng['roundStarted'] = '{} round just started!'
-msgCellularEng['roundEnding'] = '{} round ends in {} minutes.'
-msgCellularEng['roundEnded'] = '{} round ended. Come to the base and receive credits.'
-
-msgBaseEng = {}
-msgBaseEng['fleeingCodeMismatch'] = 'This code did not match. Try again or contact your lawyer!'
-msgBaseEng['fledSuccessful'] = '{}, you managed to flee the jail! You have {} minutes of protection, when you are allowed to hide the code sheets!'
-msgBaseEng['cantFleeFromLiberty'] = '{}, you are in freedom. Dont hang out at jail gates.'
-msgBaseEng['playerNotUnique'] = '{} or {} or {} has been entered already! Try something else.'
-msgBaseEng['playerAdded'] = '{}, welcome to the clan!'
-msgBaseEng['roundStarted'] = '{} round just started!'
-msgBaseEng['roundEnding'] = '{} round ends in {} minutes.'
-msgBaseEng['roundEnded'] = '{} round ended.'
-msgBaseEng['mobileNotDigits'] = 'Error. {} is not valid phone number. Start all over.'
-
-msgCellularEst = {}
-msgCellularEst['notSignedUp'] = '({}), sa pole mängu veel regatud. Tule Fusion telki @ linnavalituse parklas.'
-msgCellularEst['playerAdded'] = '{}, sa oled vahistatud. Mine baasi ja kasuta koodi {}.'
-msgCellularEst['senderJailed'] = '{}, oled vahistatud, seega ei saa kedagi tabada. Parem mine baasi ja kasuta koodi {}.'
-msgCellularEst['victimJailedVictim'] = '{}, kui sa poleks vahistatud, oleks {} sind tabanud. Põgeneda saad baasis ruttu koodiga {}.'
-msgCellularEst['victimJailedSender'] = '{}, kui {} poleks vahistatud, oleksid teda tabanud. Kui see on sulle turvaline, soovita tal põgeneda.'
-msgCellularEst['missed'] = 'Kuule {}, mõtlesid selle koodi ise välja? Säänset ei leitud.'
-msgCellularEst['oldCode'] = '{}, selle koodi parim-enne on möödas. Kas sul on hea mälu või {} kannab vana koodi, kuigi tal on juba uus käes.'
-msgCellularEst['exposedSelf'] = '{}, andsid end ametivõimude kätte. Tegid enekat? Põgene baasis koodiga {}.'
-msgCellularEst['spotMateSender'] = '{}, kas oled värvipime? {} on ikkagi tiimikaaslane.'
-msgCellularEst['spotMateVictim'] = '{}, su meeskonnakaaslane lasi su üle. Põgenemise vihje {}.'
-msgCellularEst['spottedSender'] = '{}, tabasid {}. Väga kõvv!'
-msgCellularEst['spottedVictim'] = '{}, sind tabati. Põgenemiseks kasuta {}.'
-msgCellularEst['touchedSender'] = '{}, sa lähitabasid võitlejat {}. Suurepärane!'
-msgCellularEst['touchedVictim'] = '{}, sind lähitabati! Põgene koodiga {} ja ole ettevaatlikum.'
-msgCellularEst['fleeingProtectionOver'] = '{}, su põgenemise kaitse on läbi, tee silt nähtavaks!'
-msgCellularEst['noActiveRound'] = 'Lahing on läbi. Järgmine algab {}.'
-msgCellularEst['roundStarted'] = '{} lahing just algas! Pane end valmis.'
-msgCellularEst['roundEnding'] = '{} lahing lõpeb {} minuti pärast.'
-msgCellularEst['roundEnded'] = '{} lahing on läbi. Baasis on auhindamine @ linnavalitsuse parkla.'
-
-msgBaseEst = {}
-msgBaseEst['fleeingCodeMismatch'] = 'See kood ei toiminud. Proovi mitte vigu sisse teha. Või kontakteeru oma juristiga.'
-msgBaseEst['fledSuccessful'] = '{}, sul õnnestus kinnipidamisasutusest pageda! {} min jooksul võid neid koode peita!'
-msgBaseEst['cantFleeFromLiberty'] = '{}, sa ju oled vaba!? Ära hängi kongi väravate ümbruses.'
-msgBaseEst['playerAdded'] = '{}, teretulemast-toretelemast sellesse põnevasse lahingusse!'
-msgBaseEst['playerNotUnique'] = '{} või {} või {} on kellegi poolt juba sisestatud! Proovi millegi muuga.'
-msgBaseEst['roundStarted'] = '{} lahing algas!'
-msgBaseEst['roundEnding'] = '{} lõpeb {} minuti pärast.'
-msgBaseEst['roundEnded'] = '{} lahing on läbi.'
-msgBaseEst['mobileNotDigits'] = 'Viga. {} pole ju telefoni number. Alusta uuesti.'
-
-msgCellular = msgCellularEst
-msgBase = msgBaseEst
+event_type_translated = language['events']
+msgCellular = language['sms']
+msgBase = language['messages']
