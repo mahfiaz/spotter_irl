@@ -18,9 +18,9 @@ database_dateformat = config['date']['format']
 database_dateformat_hours_minutes = config['date']['shortformat']
 
 player_fleeingProtectionTime = config['game']['flee_protection']
-player_fleeingCodeDigits = config['game']['flee_code_length']
-code_spotCodeDigits = config['game']['spot_code_length']
-code_touchCodeDigits = config['game']['touch_code_length']
+player_fleeingCodeDigits = int(config['game']['flee_code_length'])
+code_spotCodeDigits = int(config['game']['spot_code_length'])
+code_touchCodeDigits = int(config['game']['touch_code_length'])
 
 file_stats = config['general']['stats_file']
 file_events = config['general']['events_file']
