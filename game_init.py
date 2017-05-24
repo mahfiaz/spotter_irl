@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+import os
+if not os.path.isfile('config.ini'):
+    import shutil
+    shutil.copyfile('config-default.ini', 'config.ini')
+
 import configparser
 import os
 import psycopg2
