@@ -38,10 +38,6 @@ class Action:
         Sms.setCallback(Stats.getTeamPlayerStatsStringByMobile)
         Action.printer_queue = printer_queue
 
-# modify
-    def addPlayerWOEmail(name, mobile):
-        return Action.addPlayer(name, mobile, '')
-
     def addPlayer(name, mobile, email):
         if not mobile.isdigit():
             BaseMsg.mobileNotDigits(mobile)

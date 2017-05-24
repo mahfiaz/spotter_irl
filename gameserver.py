@@ -73,7 +73,7 @@ class App:
         phone = request.args.get("phone")
 
         if user and phone:
-            if Action.addPlayerWOEmail(user, phone):
+            if Action.addPlayer(user, phone, ''):
                 session["user"] = user
                 session["phone"] = phone
                 session["web_hash"] = Player.getHashById(Player._getIdByName(user))
