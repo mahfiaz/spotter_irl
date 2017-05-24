@@ -88,9 +88,9 @@ class Team:
         return iterateZero(Team.cur.fetchone())
 
     def getPlayerTeamId(playerId, roundId):
-        Team.cur.execute("""SELECT team_id 
-            FROM team_players 
-            WHERE player_id = %s AND team_id IN 
+        Team.cur.execute("""SELECT team_id
+            FROM team_players
+            WHERE player_id = %s AND team_id IN
             (SELECT team_id FROM team_list WHERE round_id = %s)""", (playerId, roundId))
         return iterateZero(Team.cur.fetchone())
 

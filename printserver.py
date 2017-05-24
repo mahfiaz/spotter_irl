@@ -111,14 +111,14 @@ testdata = {'player': {
             'name': 'Sinised',
             'color': '3399FF'}
     },
-    'printer': 'PDF', 
+    'printer': 'PDF',
     'eventlist': [
-        '13:35 Villu pages ', 
-        '13:34 Volloi puutus Villu ', 
-        '13:33 Villu pages ', 
-        '13:30 Volloi värvati '], 
+        '13:35 Villu pages ',
+        '13:34 Volloi puutus Villu ',
+        '13:33 Villu pages ',
+        '13:30 Volloi värvati '],
     'teamScores': [
-        {'name': 'Sinised', 'score': 0}, 
+        {'name': 'Sinised', 'score': 0},
         {'name': 'Punased', 'score': 2}]
     }
 

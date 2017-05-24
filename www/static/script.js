@@ -17,7 +17,7 @@ function getAllStats() {
                 isDiv = true;
                 var statsDiv = document.getElementById("stats");
             }
-            
+
             if(stats["roundName"] != null) {
                 divContents += "<table style='width:100%;'><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>";
                 for(i in stats["teams"]) {
@@ -147,7 +147,7 @@ function getStats() {
                 isDiv = true;
                 var statsDiv = document.getElementById("stats");
             }
-            
+
             if(stats["roundName"] != null) {
                 divContents += "<table style='width:100%;'><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>";
                 for(i in stats["teams"]) {

@@ -2,7 +2,7 @@ from .round import Round
 from .helper import iterateZero
 import game_config
 
-from enum import Enum   
+from enum import Enum
 
 #def enum(*args):
 #    enums = dict(zip(args, range(len(args))))
@@ -59,15 +59,15 @@ class Event:
             VALUES (%s, %s, %s)""", (Round.getActiveId(), playerId, EventType.wasAddedToTeam.value))
 
     def addSpot(hitterId, victimId):
-        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
             VALUES (%s, %s, %s), (%s, %s, %s)""", (Round.getActiveId(), hitterId, EventType.didSpot.value, Round.getActiveId(), victimId, EventType.wasSpotted.value))
 
     def addTouch(hitterId, victimId):
-        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
             VALUES (%s, %s, %s), (%s, %s, %s)""", (Round.getActiveId(), hitterId, EventType.didTouch.value, Round.getActiveId(), victimId, EventType.wasTouched.value))
 
     def addSpotMate(hitterId, victimId):
-        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
             VALUES (%s, %s, %s), (%s, %s, %s)""", (Round.getActiveId(), hitterId, EventType.didSpotMate.value, Round.getActiveId(), victimId, EventType.wasSpotted.value))
 
     def addFailedSpot(hitterId, code):
@@ -87,7 +87,7 @@ class Event:
             VALUES (%s, %s, %s)""", (Round.getActiveId(), playerId, EventType.didFlee.value))
 
     def addExposeSelf(victimId):
-        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type) 
+        Event.cur.execute("""INSERT INTO event_list (round_id, player_id, event_type)
             VALUES (%s, %s, %s)""", (Round.getActiveId(), victimId, EventType.wasExposingSelf.value))
 
     def addObscureMessage(playerId, message):

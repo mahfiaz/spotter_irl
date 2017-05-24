@@ -71,7 +71,7 @@ def main():
         return
     cursor = connection.cursor()
 
-    # Queues 
+    # Queues
     sms_queue = queue.Queue()
     printer_queue = queue.Queue()
 

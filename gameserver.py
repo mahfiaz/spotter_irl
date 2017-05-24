@@ -378,7 +378,7 @@ if __name__ == "__main__":
         print("Problem with the database connection")
     cursor = connection.cursor()
 
-    # Queues 
+    # Queues
     sms_queue = queue.Queue()
     printer_queue = queue.Queue()
 

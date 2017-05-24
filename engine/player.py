@@ -33,18 +33,18 @@ class Player:
 # Delete player, who added wrong data to avoid phonenumber and username conflicts
     def delPlayer(playerName):
         Player.cur.execute("""DELETE FROM player_data WHERE player_name = %s""",(playerName,))
-        
+
 
 
 # modify
     def add(name, mobile, email):
         Player.cur.execute("""SELECT player_name, player_mobile, player_email
-            FROM player_data 
+            FROM player_data
             WHERE player_name = %s OR player_mobile = %s""",
             (name, mobile))
         if not Player.cur.fetchone():
             hash = Player._generateHash(name)
-            Player.cur.execute("""INSERT INTO player_data (player_name, player_mobile, player_email, player_web_hash) 
+            Player.cur.execute("""INSERT INTO player_data (player_name, player_mobile, player_email, player_web_hash)
                 VALUES (%s, %s, %s, %s)""", (name, mobile, email, hash))
             newId = Player._getIdByName(name)
             Player._generateFleeingCode(newId)
@@ -112,11 +112,11 @@ class Player:
 
 # ban chat
     def banChat(playerId):
-        Player.cur.execute("""UPDATE player_data SET player_chat_banned = %s 
+        Player.cur.execute("""UPDATE player_data SET player_chat_banned = %s
             WHERE player_id = %s""", ('true', playerId))
 
     def unbanChat(playerId):
-        Player.cur.execute("""UPDATE player_data SET player_chat_banned = %s 
+        Player.cur.execute("""UPDATE player_data SET player_chat_banned = %s
             WHERE player_id = %s""", ('false', playerId))
 
     def isBannedChat(playerId):

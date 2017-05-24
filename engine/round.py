@@ -13,7 +13,7 @@ class Round:
     _callRoundStarted = None
     _callRoundEnding = None
     _callRoundEnded = None
-    
+
 # init
     def initDB(cursor):
         Round.cur = cursor
@@ -33,7 +33,7 @@ class Round:
 # modify
     def add(name, time_start, time_end):
         Round.cur.execute("""SELECT round_name
-            FROM round_data 
+            FROM round_data
             WHERE (round_start = %s OR (round_start < %s AND round_end > %s)) OR
             (round_end = %s AND (round_start < %s AND round_end > %s))""",
             (time_start, time_start, time_start, time_end, time_end, time_end))
@@ -63,14 +63,14 @@ class Round:
 
     def existingId(roundId):
         Round.cur.execute("""SELECT round_id
-            FROM round_data 
+            FROM round_data
             WHERE round_id = %s""", [roundId])
         if Round.cur.fetchone():
             return True
 
     def getName(roundId):
         Round.cur.execute("""SELECT round_name
-            FROM round_data 
+            FROM round_data
             WHERE round_id = %s""", [roundId])
         return iterateZero(Round.cur.fetchone())
 
@@ -83,33 +83,33 @@ class Round:
 
     def _getStartTimeOfNext():
         Round.cur.execute("""SELECT round_start
-            FROM round_data 
+            FROM round_data
             WHERE (round_start > statement_timestamp())
             ORDER BY round_start ASC""")
         return iterateZero(Round.cur.fetchone())
 
     def _getEndTimeOfActive():
         Round.cur.execute("""SELECT round_end
-            FROM round_data 
+            FROM round_data
             WHERE round_id = %s""", [Round.getActiveId()])
         return iterateZero(Round.cur.fetchone())
 
     def getStartTime(id):
         Round.cur.execute("""SELECT round_start
-            FROM round_data 
+            FROM round_data
             WHERE round_id = %s""", (id,))
         return iterateZero(Round.cur.fetchone())
 
     def getEndTime(id):
         Round.cur.execute("""SELECT round_end
-            FROM round_data 
+            FROM round_data
             WHERE round_id = %s""", (id,))
         return iterateZero(Round.cur.fetchone())
 
 # round automatic restarting and finishing
     def updateActiveId():
         Round.cur.execute("""SELECT round_id
-            FROM round_data 
+            FROM round_data
             WHERE (round_start <= statement_timestamp() AND round_end > statement_timestamp())""")
         activeId = iterateZero(Round.cur.fetchone())
         Round._checkRoundChange(activeId)

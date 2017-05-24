@@ -28,7 +28,7 @@ class Spawn:
         return master
 
     def add_default_master():
-        Spawn.cur.execute("""INSERT INTO spawnmasters (master_name, master_pw) 
+        Spawn.cur.execute("""INSERT INTO spawnmasters (master_name, master_pw)
                 VALUES (%s, %s)""", ("spawn", "master"))
 
 
@@ -60,6 +60,6 @@ class Base:
         return master
 
     def add_default_base():
-        Base.cur.execute("""INSERT INTO basemasters (base_name, base_pw) 
+        Base.cur.execute("""INSERT INTO basemasters (base_name, base_pw)
                 VALUES (%s, %s)""", ("base", "master"))
 
