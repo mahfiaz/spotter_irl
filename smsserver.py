@@ -99,8 +99,8 @@ def receive_sms():
 
 def connector():
     print("SMS server started")
-
     actually_send = True
+    successful = False
 
     while True:
         smslist = receive_sms()
@@ -110,7 +110,17 @@ def connector():
         data = {'incoming': smslist}
         r = requests.get('http://fusiongame.tk/sms?pass=avf2DA3XeJZmqy9KKVjFdGfU',
                          data=json.dumps(data))
-        response = json.loads(r.text)
+        try:
+            response = json.loads(r.text)
+            if not successful:
+                print('Connected')
+            successful = True
+        except json.decoder.JSONDecodeError:
+            if successful:
+                print('Disconnected')
+            successful = False
+            time.sleep(1)
+            continue
         for message in response['outgoing']:
             number = message['number']
             contents = message['contents']

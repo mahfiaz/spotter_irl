@@ -87,18 +87,28 @@ def send_printer(pdf, printer="PDF"):
 def connector():
     print("Printing server started")
     actually_print = True
+    successful = False
 
     while True:
         datestr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         r = requests.get('http://fusiongame.tk/print?pass=htpT2U8UMpApV852DGSncBP7')
-        response = json.loads(r.text)
+        try:
+            response = json.loads(r.text)
+            if not successful:
+                print('Connected')
+            successful = True
+        except json.decoder.JSONDecodeError:
+            if successful:
+                print('Disconnected')
+            successful = False
+            time.sleep(1)
+            continue
         for page in response['print']:
             print(datestr, 'Page printed')
             pdf = generate(page)
             print(pdf)
             if actually_print:
                 send_printer(pdf, "PDF")
-
         time.sleep(0.5)
 
 
