@@ -2,6 +2,5 @@
 *.json
 *.kate-swp
 __pycache__/
-project/spotter_irl.xcworkspace/xcshareddata/spotter_irl.xccheckout
-project/spotter_irl.xcworkspace/xcuserdata/Leevi.xcuserdatad/UserInterfaceState.xcuserstate
+project/
 help.py
