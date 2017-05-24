@@ -283,7 +283,7 @@ class Action:
 
 
     def _roundEndingCall(mobileNameList, roundName, left):
-        Action.masterAnnounces("Lahing " + roundName + " lõpeb " + left + " min pärast. Tule autasustamisele baasi.")
+        Action.masterAnnounces("Lahing " + roundName + " lõpeb " + str(left) + " min pärast. Tule autasustamisele baasi.")
 #        BaseMsg.roundEnding(left)
         for (mobile, name) in mobileNameList:
             Sms.roundEnding(mobile, roundName, left)
