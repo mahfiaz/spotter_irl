@@ -6,7 +6,6 @@ from engine.code import *
 from engine.player import *
 from engine.round import *
 from engine.team import *
-from engine.spawn import *
 
 import configparser
 from flask import Flask, render_template, request, json, session, jsonify
@@ -204,17 +203,14 @@ class App:
 
     @app.route("/masterLogin", methods=["GET"])
     def master_login():
-        try:
-            user = request.args.get("user")
-            pw = request.args.get("pw")
-            acc = Spawn.login()
+        user = request.args.get("user")
+        password = request.args.get("pw")
 
-            if user == acc["name"][0] and pw == acc["pw"][0]:
-                session["master"] = 1
-                return App.spawnmaster()
-            else:
-                return "403 Connection Forbidden"
-        except:
+        if user == config['users']['spawnuser'] and \
+            password == config['users']['spawnpassword']:
+            session["master"] = 1
+            return App.spawnmaster()
+        else:
             return "403 Connection Forbidden"
 
     @app.route("/masterout")
@@ -228,7 +224,6 @@ class App:
     # Spawnmaster screen
     # END BLOCK
 
-
     # START BLOCK
     # Stats screens
 
@@ -237,16 +232,14 @@ class App:
 
     @app.route("/baseLogin", methods=["GET"])
     def base_login():
-        try:
-            user = request.args.get("user")
-            pw = request.args.get("pw")
+        user = request.args.get("user")
+        password = request.args.get("pw")
 
-            if user == "base" and pw == "master":
-                session["base"] = 1
-                return App.base_template()
-            else:
-                return "403 Connection Forbidden"
-        except:
+        if user == config['users']['baseuser'] and \
+            password == config['users']['basepassword']:
+            session["base"] = 1
+            return App.base_template()
+        else:
             return "403 Connection Forbidden"
 
     def is_base():
@@ -397,7 +390,7 @@ if __name__ == "__main__":
     Stats.updateStats()
     Stats.printPlayersDetailed()
 
-    debug = False
+    debug = True
     if debug:
         App.app.run(debug=True)
     else:

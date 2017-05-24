@@ -4,7 +4,6 @@ from .player import Player
 from .round import Round
 from .team import Team
 from .message import Sms, BaseMsg
-from .spawn import Spawn, Base
 import game_config
 
 import json
@@ -26,8 +25,6 @@ class Action:
         Team.initDB(cursor)
         Event.initDB(cursor)
         Stats.updateStats()
-        Spawn.initDB(cursor)
-        Base.initDB(cursor)
 
     def initAllConnect(cursor, sms_queue, printer_queue):
         Round.initConnect(cursor)
@@ -39,8 +36,6 @@ class Action:
         Stats.updateStats()
         Sms.queue = sms_queue
         Sms.setCallback(Stats.getTeamPlayerStatsStringByMobile)
-        Spawn.initConnect(cursor)
-        Base.initConnect(cursor)
         Action.printer_queue = printer_queue
 
 # modify
