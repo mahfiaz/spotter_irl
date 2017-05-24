@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import configparser
 import os
+import psycopg2
 
 from engine.event import *
 from engine.action import *
@@ -9,8 +11,8 @@ from engine.player import *
 from engine.round import *
 from engine.team import *
 
-import connect
 from game_config import file_events, file_stats, master_player
+
 
 def addMasterPlayer():
     Action.addPlayer(master_player['name'], master_player['mobile'], '')
@@ -30,10 +32,20 @@ def initGame():
     if not os.path.isfile('config.ini'):
         import shutil
         shutil.copyfile('config-default.ini', 'config.ini')
-    connection = connect.connectDB()
-    if not connection:
-        return
-    cursor = connection.cursor()
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+
+    # Connect to database
+    try:
+        db = config['database']
+        parameters = "host='%s' dbname='%s' user='%s' password='%s'" % (
+            db['host'], db['dbname'], db['user'], db['password'])
+        connection = psycopg2.connect(parameters)
+        connection.set_session(autocommit=True)
+        cursor = connection.cursor()
+    except:
+        print ("Error. Unable to connect to the database. If losing data is acceptable, try running 'python reset_db.py'")
+        exit()
     Action.initAllDB(cursor)
 #    Round.addRealRounds()
     addTestRoundsNormal()

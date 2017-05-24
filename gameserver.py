@@ -8,10 +8,11 @@ from engine.round import *
 from engine.team import *
 from engine.spawn import *
 
-import connect
+import configparser
 from flask import Flask, render_template, request, json, session, jsonify
 import json
 import os
+import psycopg2
 import queue
 
 class App:
@@ -372,11 +373,20 @@ class App:
 
 if __name__ == "__main__":
     # Start program
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+
+    # Connect to database
     try:
-        connection = connect.connectDB()
+        db = config['database']
+        parameters = "host='%s' dbname='%s' user='%s' password='%s'" % (
+            db['host'], db['dbname'], db['user'], db['password'])
+        connection = psycopg2.connect(parameters)
+        connection.set_session(autocommit=True)
+        cursor = connection.cursor()
     except:
-        print("Problem with the database connection")
-    cursor = connection.cursor()
+        print ("Error. Unable to connect to the database. If losing data is acceptable, try running 'python reset_db.py'")
+        exit()
 
     # Queues
     sms_queue = queue.Queue()
