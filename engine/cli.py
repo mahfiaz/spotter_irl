@@ -1,10 +1,5 @@
-from engine.event import *
-from engine.action import *
-from engine.code import *
-from engine.player import *
-from engine.round import *
-from engine.team import *
-
+from engine.action import Action, Stats
+from engine.player import Player
 
 def processInput():
     userText = input("Enter command [Add player] [Team player] [Spot] [Web spot] [Flee jail] [Print] [teamChat]: \n")
@@ -40,4 +35,3 @@ def processInput():
         message = input("enter text: ")
         playerId = Player._getIdByName(name)
         Action.sayToMyTeam(playerId, message)
-
