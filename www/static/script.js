@@ -7,7 +7,7 @@ function getAllStats() {
 	if (document.getElementById("stats")) {
 		var divContents = "";
         $.ajax({
-	        url: "stats.json"
+	        url: "stats.json?time="+Date.now()
 	    }).done(function(stats) {
 	        if (stats["roundName"] == null) {
 	        	console.log("No active round");
@@ -35,7 +35,7 @@ function getAllEvents() {
 	if (document.getElementById("events")) {
 		var divContents = "";
         $.ajax({
-	        url: "events.json"
+	        url: "events.json?time="+Date.now()
 	    }).done(function(events) {
 	        if ("event" in events[0]) {
 	        	console.log("No events to show");
@@ -63,7 +63,7 @@ function getAllEvents() {
 function getRoundInfoBase(role) {
     if (document.getElementById("roundInfo")) {
         $.ajax({
-	        url: "stats.json"
+	        url: "stats.json?time="+Date.now()
 	    }).done(function(stats) {
 	        if(stats["roundName"] != null) {
 	        	$("#roundInfo").html("<p>Lahing \"" + stats["roundName"] + "\", Kasutaja: " + role + "</p>");
@@ -80,29 +80,21 @@ function getStats() {
 	if (document.getElementById("stats")) {
 		var divContents = "";
         $.ajax({
-	        url: "stats.json"
+	        url: "stats.json?time="+Date.now()
 	    }).done(function(stats) {
 	        if(stats["roundName"] != null) {
                 divContents += "<table style='width:100%;'><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>";
                 for(i in stats["teams"]) {
                     team = stats["teams"][i];
                     divContents += "<tr style='color:#"+team["color"]+";'><th>"+team["name"]+"</th><th>"+team["spotCount"]+"</th><th>"+team["touchCount"]+"</th><th>"+team["disloyality"]+"</th><th>"+team["score"]+"</th></tr>";
-                }
-                for(i in stats["teams"]) {
-                    team = stats["teams"][i];
-                    for (i in team["players"]) {
+                	for (i in team["players"]) {
                         player = team["players"][i];
                         if (player["name"] == user) {
-                            divContents += "<tr style='color:#"+team["color"]+";'><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>"+player["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
+                            divContents += "<tr style='color:#"+team["color"]+";'><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>"+player["disloyality"]+"</td><td>"+player["score"]+"</td></tr>";
                         }
                     }
                 }
-                for(i in stats["teamlessPlayers"]) {
-                    player = stats["teamlessPlayers"][i];
-                    if(player["name"] == user) {
-                        divContents += "<tr><td>"+player["name"]+"</td><td>"+player["spotCount"]+"</td><td>"+player["touchCount"]+"</td><td>"+player["disloyality"]+"</td><td>"+player["score"]+"</td></tr></table>";
-                    }
-                }
+                divContents += "</table>";
                 divContents += "<div class='bottom' id='toEnd'></div>";
                 $("#stats").html(divContents);
             } else {
@@ -118,7 +110,7 @@ function getEvents() {
     if (document.getElementById("events")) {
         var divContents = "";
         $.ajax({
-            url: "events.json"
+            url: "events.json?time="+Date.now()
         }).done(function(events) {
             if ("event" in events[0]) {
                 console.log("No events to show");
@@ -147,7 +139,7 @@ function getEvents() {
 function getRoundInfo() {
     if (document.getElementById("roundInfo")) {
         $.ajax({
-            url: "stats.json"
+            url: "stats.json?time="+Date.now()
         }).done(function(stats) {
             if(stats["roundName"] != null) {
                 $("#roundInfo").html("<p>Lahing \"" + stats["roundName"] + "\", mängija: " + user + "</p>");
@@ -163,7 +155,7 @@ function timeToEnd() {
     currentDate = new Date();
     if (document.getElementById("roundInfo")) {
         $.ajax({
-            url: "stats.json"
+            url: "stats.json?time="+Date.now()
         }).done(function(stats) {
             if(stats["roundName"] != null) {
                 var ending = stats["roundEnd"];
