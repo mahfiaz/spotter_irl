@@ -2,7 +2,7 @@
 <meta charset="utf-8"/>
 <html lang="en">
 <head>
-    <title>Spotter IRL Base</title>
+    <title>Fusion Game Spawnmaster</title>
     <link href="/static/bootstrap.min.css" rel="stylesheet">
     <link href="/static/jumbotron-narrow.css" rel="stylesheet">
     <link href="/static/style.css" rel="stylesheet">
@@ -65,8 +65,9 @@
         </div>
 
         <div class="col-sm-10 col-sm-offset-1">
-            <p><div class="textarea base">
-                <p><table id="teamlessPlayers" style="width:100%;">
+            <div class="textarea base">
+                <table id="teamlessPlayers" style="width:100%;">
+                    <tr><th colspan="11" style="text-align: center;">Meeskonnata mängijad</th></tr>
                     <tr>
                         <th>Id</th>
                         <th>Nimi</th>
@@ -89,13 +90,14 @@
                         <td>{{ player[6] }}</td>
                         <td>{{ player[7] }}</td>
                         <td>{{ player[8] }}</td>
-                        <td><button onclick="to1({{ player[0] }})">Sinised</button></td>
-                        <td><button onclick="to2({{ player[0] }})">Punased</button></td>
+                        <td><button class="btn btn-primary" onclick="to1({{ player[0] }})">Sinised</button></td>
+                        <td><button class="btn btn-danger" onclick="to2({{ player[0] }})">Punased</button></td>
                     </tr>
                     {% endfor %}
-                </table></p>
+                </table>
 
-                <p><table id="teamedPlayers" style="width:100%;">
+                <table id="teamedPlayers" style="width:100%;">
+                    <tr><th colspan="11" style="text-align: center;">Meeskonnas mängijad</th></tr>
                     <tr>
                         <th>Id</th>
                         <th>Nimi</th>
@@ -118,35 +120,33 @@
                         <td>{{ player[6] }}</td>
                         <td>{{ player[7] }}</td>
                         <td>{{ player[8] }}</td>
-                        <td><button onclick="to1({{ player[0] }})">Sinised</button></td>
-                        <td><button onclick="to2({{ player[0] }})">Punased</button></td>
+                        <td><button class="btn btn-primary" onclick="to1({{ player[0] }})">Sinised</button></td>
+                        <td><button class="btn btn-danger" onclick="to2({{ player[0] }})">Punased</button></td>
                     </tr>
                     {% endfor %}
-                </table></p>
-            </div></p>
-                <p>
-                    <div id="rounds" class="textarea base">
-                        <table style="width:100%;">
-                            <tr>
-                                <th>Aktiivne</th>
-                                <th>Id</th>
-                                <th>Nimi</th>
-                                <th>Algusaeg</th>
-                                <th>Lõpuaeg</th>
-                                <th><input type="submit" value="Uus voor" onclick="newRound()"></th>
-                            </tr>
-                            {% for round in rounds %}
-                            <tr>
-                                <td>{{ round[0] }}</td>
-                                <td>{{ round[1] }}</td>
-                                <td>{{ round[2] }}</td>
-                                <td>{{ round[3] }}</td>
-                                <td>{{ round[4] }}</td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                </p>
+                </table>
+            </div>
+            <div id="rounds" class="textarea base">
+                <table style="width:100%;">
+                    <tr>
+                        <th>Aktiivne</th>
+                        <th>Id</th>
+                        <th>Nimi</th>
+                        <th>Algusaeg</th>
+                        <th>Lõpuaeg</th>
+                        <th><input type="submit" value="Uus voor" onclick="newRound()"></th>
+                    </tr>
+                    {% for round in rounds %}
+                    <tr>
+                        <td>{{ round[0] }}</td>
+                        <td>{{ round[1] }}</td>
+                        <td>{{ round[2] }}</td>
+                        <td>{{ round[3] }}</td>
+                        <td>{{ round[4] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
             <div class="col-sm-3 col-sm-offset-8" style="top:20px;">
             </div>
         </div>
