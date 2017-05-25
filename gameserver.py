@@ -20,24 +20,21 @@ class App:
     app.config.from_object(__name__)
     app.secret_key = os.urandom(24)
 
-
     # START BLOCK
     # Player registration
 
-
     def registration_template(error):
-        return render_template("regi", error=error)
+        return render_template("registration.html", error=error)
 
     def pending_template():
         if App.logged_in():
-            return render_template("pending", user=session["user"], phone=session["phone"])
+            return render_template("pending.html", user=session["user"], phone=session["phone"])
         else:
             return "403 Connection Forbidden"
 
-    @app.route("/p")
     def playing_template():
         if App.logged_in():
-            return render_template("p_stats")
+            return render_template("game_view.html")
         else:
             return "403 Connection Forbidden"
 
@@ -173,15 +170,12 @@ class App:
     # START BLOCK
     # Spawnmaster screen
 
-    def master_login_template():
-        return render_template("m_auth")
-
-    def master_view():
+    def spawn_view():
         if App.is_master():
             Round.updateActiveId()
             players, teamless = Stats.playersDetailed()
             rounds = Round.getRounds()
-            return render_template("master", rounds=rounds, teamless=teamless, players = players)
+            return render_template("spawn.html", rounds=rounds, teamless=teamless, players = players)
         else:
             return "403 Connection Forbidden"
 
@@ -197,9 +191,9 @@ class App:
     @app.route("/spawn")
     def spawnmaster():
         if App.is_master():
-            return App.master_view()
+            return App.spawn_view()
         else:
-            return App.master_login_template()
+            return render_template("spawn_login.html")
 
     @app.route("/masterLogin", methods=["GET"])
     def master_login():
@@ -227,9 +221,6 @@ class App:
     # START BLOCK
     # Stats screens
 
-    def base_login_template():
-        return render_template("b_auth")
-
     @app.route("/baseLogin", methods=["GET"])
     def base_login():
         user = request.args.get("user")
@@ -254,13 +245,13 @@ class App:
     @app.route("/base")
     def base_template():
         if App.is_base():
-            return render_template("stats")
+            return render_template("base.html")
         else:
-            return App.base_login_template()
+            return render_template("base_login.html")
 
     @app.route("/spectate")
     def spectator_template():
-        return render_template("spectate")
+        return render_template("spectate.html")
 
     @app.route("/baseout")
     def base_logout():
