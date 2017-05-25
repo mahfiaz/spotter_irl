@@ -126,6 +126,7 @@ function getEvents() {
             } else {
                 for(i in events) {
                     event = events[i];
+                    console.log(userTeam);
                     if (event["visible"] == "All" || (event["visible"] == "Sinised" && (userTeam % 2) == 1) || (event["visible"] == "Punased" && (userTeam % 2) == 0)) {
                         divContents += "<p>"+event["time"];
                         divContents += " <span style='color:#"+event["text1"]["color"]+";'>"+event["text1"]["text"]+"</span>";
