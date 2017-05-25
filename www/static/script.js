@@ -64,8 +64,12 @@ function getRoundInfoBase(role) {
     if (document.getElementById("roundInfo")) {
         $.ajax({
 	        url: "stats.json"
-	    }).done(function(data) {
-	        $("#roundInfo").html("<p>Lahing \"" + data["roundName"] + "\", Kasutaja: " + role + "</p>");
+	    }).done(function(stats) {
+	        if(stats["roundName"] != null) {
+	        	$("#roundInfo").html("<p>Lahing \"" + stats["roundName"] + "\", Kasutaja: " + role + "</p>");
+	        } else {
+	        	$("#roundInfo").html("");
+	        }
 	    });
     }
 }
@@ -111,53 +115,18 @@ function getStats() {
 
 
 function getEvents() {
-    var xhrEvents = new XMLHttpRequest();
-    var xhrPlayer = new XMLHttpRequest();
-    var xhrTeam = new XMLHttpRequest();
-    var events = "";
-    var user = "";
-    var userTeam = "";
-    var divContents = "";
-    var isDiv = false;
-
     if (document.getElementById("events")) {
-        var eventsDiv = document.getElementById("events");
-        isDiv = true;
-    }
-
-    xhrPlayer.open("GET", "/user", true);
-    xhrPlayer.send();
-    xhrPlayer.onreadystatechange = function() {
-        if (xhrPlayer.readyState == 4 && xhrPlayer.status == 200) {
-            user = xhrPlayer.responseText;
-        }
-    }
-
-
-    xhrTeam.open("GET", "/userTeam", true);
-    xhrTeam.send();
-    xhrTeam.onreadystatechange = function() {
-        if (xhrTeam.readyState == 4 && xhrTeam.status == 200) {
-            userTeam = xhrTeam.responseText;
-        }
-    }
-
-
-    xhrEvents.open("GET", "/events.json", true);
-    xhrEvents.send();
-    xhrEvents.onreadystatechange = function() {
-        if (xhrEvents.readyState == 4 && xhrEvents.status == 200) {
-            events = xhrEvents.responseText;
-            events = JSON.parse(events);
-            if("event" in events[0]) {
+        var divContents = "";
+        $.ajax({
+            url: "events.json"
+        }).done(function(events) {
+            if ("event" in events[0]) {
                 console.log("No events to show");
-                if (isDiv) {
-                    eventsDiv.innerHTML = "";
-                }
+                $("#events").html("");
             } else {
                 for(i in events) {
                     event = events[i];
-                    if (event["visible"] == "All" || (event["visible"] == "Sinised" && userTeam == "1") || (event["visible"] == "Punased" && userTeam == "2")) {
+                    if (event["visible"] == "All" || (event["visible"] == "Sinised" && (userTeam % 2) == 1) || (event["visible"] == "Punased" && (userTeam % 2) == 0)) {
                         divContents += "<p>"+event["time"];
                         divContents += " <span style='color:#"+event["text1"]["color"]+";'>"+event["text1"]["text"]+"</span>";
                         divContents += " <span style='color:#"+event["text2"]["color"]+";'>"+event["text2"]["text"]+"</span>";
@@ -167,80 +136,43 @@ function getEvents() {
                         divContents += "</p>";
                     }
                 }
-                if (isDiv) {
-                    eventsDiv.innerHTML = divContents;
-                }
+                $("#events").html(divContents);
             }
-        }
+        });
     }
 }
 
 
 function getRoundInfo() {
-    var xhrRound = new XMLHttpRequest();
-    var xhrPlayer = new XMLHttpRequest();
-    var stats = "";
-    var user = "";
-    var divContents = "";
-    var isDiv = false;
-
     if (document.getElementById("roundInfo")) {
-        var roundDiv = document.getElementById("roundInfo");
-        isDiv = true;
-    }
-
-    xhrPlayer.open("GET", "/user", true);
-    xhrPlayer.send();
-    xhrPlayer.onreadystatechange = function() {
-        if (xhrPlayer.readyState == 4 && xhrPlayer.status == 200) {
-            user = xhrPlayer.responseText;
-        }
-    }
-
-    xhrRound.open("GET", "/stats.json", true);
-    xhrRound.send();
-    xhrRound.onreadystatechange = function() {
-        if (xhrRound.readyState == 4 && xhrRound.status == 200) {
-            stats = xhrRound.responseText;
-            stats = JSON.parse(stats);
+        $.ajax({
+            url: "stats.json"
+        }).done(function(stats) {
             if(stats["roundName"] != null) {
-                divContents += "<p>Lahing \"" + stats["roundName"] + "\", mängija: " + user +"</p>";
-                if (isDiv) {
-                    roundDiv.innerHTML = divContents;
-                }
+                $("#roundInfo").html("<p>Lahing \"" + stats["roundName"] + "\", mängija: " + user + "</p>");
+            } else {
+                $("#roundInfo").html("");
             }
-        }
+        });
     }
 }
 
 
 function timeToEnd() {
-    var xhrTime = new XMLHttpRequest();
     currentDate = new Date();
-    var isDiv = false;
-
     if (document.getElementById("roundInfo")) {
-        var roundDiv = document.getElementById("roundInfo");
-        isDiv = true;
-    }
-
-    xhrTime.open("GET", "/stats.json", true);
-    xhrTime.send();
-    xhrTime.onreadystatechange = function() {
-        if (xhrTime.readyState == 4 && xhrTime.status == 200) {
-            stats = xhrTime.responseText;
-            stats = JSON.parse(stats);
+        $.ajax({
+            url: "stats.json"
+        }).done(function(stats) {
             if(stats["roundName"] != null) {
                 var ending = stats["roundEnd"];
                 endTime = new Date(ending.substring(0,4),ending.substring(5,7),ending.substring(8,10),ending.substring(11,13),ending.substring(14,16),ending.substring(17,19));
-                var timeDiv = document.getElementById("toEnd");
                 var toEnd = new Date(endTime.getTime() - currentDate.getTime());
-                var divContents = "Aega vooru lõpuni " + addZerobefore(toEnd.getUTCHours()) + ":" + addZerobefore(toEnd.getUTCMinutes()) + ":" + addZerobefore(toEnd.getUTCSeconds());
-                if (isDiv) {
-                    timeDiv.innerHTML = divContents;
-                }
+                $("#toEnd").html("Aega vooru lõpuni " + addZerobefore(toEnd.getUTCHours()) + ":" + addZerobefore(toEnd.getUTCMinutes()) + ":" + addZerobefore(toEnd.getUTCSeconds()));
+            } else {
+                $("#toEnd").html("");
             }
-        }
+        });
     }
 }
 
@@ -259,8 +191,8 @@ function isJailed() {
 function getUser() {
     $.ajax({
         url: "user"
-    }).done(function(user) {
-        user = user;
+    }).done(function(username) {
+        user = username;
     });
 }
 
@@ -268,8 +200,8 @@ function getUser() {
 function getUserTeam() {
     $.ajax({
         url: "userTeam"
-    }).done(function(user) {
-        userTeam = userTeam;
+    }).done(function(team) {
+        userTeam = team;
     });
 }
 
