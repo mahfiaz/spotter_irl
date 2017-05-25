@@ -18,7 +18,7 @@ class App:
     app = Flask(__name__, static_url_path = "", static_folder = "www")
     SESSION_TYPE = 'Redis'
     app.config.from_object(__name__)
-    app.secret_key = os.urandom(24)
+    app.secret_key = "ExtraSecretSessionKey"#os.urandom(24)
 
     # START BLOCK
     # Player registration
