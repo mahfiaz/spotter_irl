@@ -1,25 +1,19 @@
+user = "";
+userTeam = "";
 userJailed = "";
 gameServerAddress = window.location.origin + "/";
 
 function getAllStats() {
-    var xhrStats = new XMLHttpRequest();
-    var stats = "";
-    var divContents = "";
-    var isDiv = false;
-
-    xhrStats.open("GET", "/stats.json", true);
-    xhrStats.send();
-    xhrStats.onreadystatechange = function() {
-        if (xhrStats.readyState == 4 && xhrStats.status == 200) {
-            stats = xhrStats.responseText;
-            stats = JSON.parse(stats);
-            if (document.getElementById("stats")) {
-                isDiv = true;
-                var statsDiv = document.getElementById("stats");
-            }
-
-            if(stats["roundName"] != null) {
-                divContents += "<table style='width:100%;'><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>";
+	if (document.getElementById("stats")) {
+		var divContents = "";
+        $.ajax({
+	        url: "stats.json"
+	    }).done(function(stats) {
+	        if (stats["roundName"] == null) {
+	        	console.log("No active round");
+	        	$("#stats").html("");
+	        } else {
+	        	divContents += "<table style='width:100%;'><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>";
                 for(i in stats["teams"]) {
                     team = stats["teams"][i];
                     divContents += "<tr style='color:#"+team["color"]+";'><th>"+team["name"]+"</th><th>"+team["spotCount"]+"</th><th>"+team["touchCount"]+"</th><th>"+team["disloyality"]+"</th><th>"+team["score"]+"</th></tr>";
@@ -30,46 +24,24 @@ function getAllStats() {
                 }
                 divContents += "</table>";
                 divContents += "<div class='bottom' id='toEnd'></div>";
-                if (isDiv) {
-                    statsDiv.innerHTML = divContents;
-                }
-            } else {
-                if (isDiv) {
-                    statsDiv.innerHTML = "";
-                }
-            }
-        }
+                $("#stats").html(divContents);
+	        }
+	    });
     }
 }
 
 
-
-
 function getAllEvents() {
-    var xhrEvents = new XMLHttpRequest();
-    var events = "";
-    var divContents = "";
-    var isDiv = false;
-
-    if (document.getElementById("events")) {
-        var eventsDiv = document.getElementById("events");
-        isDiv = true;
-    }
-
-    xhrEvents.open("GET", "/events.json", true);
-    xhrEvents.send();
-    xhrEvents.onreadystatechange = function() {
-        if (xhrEvents.readyState == 4 && xhrEvents.status == 200) {
-            events = xhrEvents.responseText;
-            events = JSON.parse(events);
-            if("event" in events[0]) {
-                console.log("No events to show");
-                if (isDiv) {
-                    eventsDiv.innerHTML = "";
-                }
-            } else {
-                eventsDiv.innerHTML = divContents;
-                for(i in events) {
+	if (document.getElementById("events")) {
+		var divContents = "";
+        $.ajax({
+	        url: "events.json"
+	    }).done(function(events) {
+	        if ("event" in events[0]) {
+	        	console.log("No events to show");
+	        	$("#events").html("");
+	        } else {
+	        	for(i in events) {
                     event = events[i];
                     if (event["visible"] == "All") {
                         divContents += "<p>"+event["time"];
@@ -81,74 +53,32 @@ function getAllEvents() {
                         divContents += "</p>";
                     }
                 }
-                if (isDiv) {
-                    eventsDiv.innerHTML = divContents;
-                }
-            }
-        }
+                $("#events").html(divContents);
+	        }
+	    });
     }
 }
 
 
-
 function getRoundInfoBase(role) {
-    var xhrRound = new XMLHttpRequest();
-    var stats = "";
-    var user = "";
-    var divContents = "";
-    var isDiv = false;
-
     if (document.getElementById("roundInfo")) {
-        var roundDiv = document.getElementById("roundInfo");
-        isDiv = true;
-    }
-
-    xhrRound.open("GET", "/stats.json", true);
-    xhrRound.send();
-    xhrRound.onreadystatechange = function() {
-        if (xhrRound.readyState == 4 && xhrRound.status == 200) {
-            stats = xhrRound.responseText;
-            stats = JSON.parse(stats);
-            if(stats["roundName"] != null) {
-                divContents += "<p>Lahing \"" + stats["roundName"] + "\", Kasutaja: " + role + "</p>";
-                if (isDiv) {
-                    roundDiv.innerHTML = divContents;
-                }
-            }
-        }
+        $.ajax({
+	        url: "stats.json"
+	    }).done(function(data) {
+	        $("#roundInfo").html("<p>Lahing \"" + data["roundName"] + "\", Kasutaja: " + role + "</p>");
+	    });
     }
 }
 
 
 
 function getStats() {
-    var xhrStats = new XMLHttpRequest();
-    var xhrPlayer = new XMLHttpRequest();
-    var stats = "";
-    var user = "";
-    var divContents = "";
-    var isDiv = false;
-
-    xhrPlayer.open("GET", "/user", true);
-    xhrPlayer.send();
-    xhrPlayer.onreadystatechange = function() {
-        if (xhrPlayer.readyState == 4 && xhrPlayer.status == 200) {
-            user = xhrPlayer.responseText;
-        }
-    }
-
-    xhrStats.open("GET", "/stats.json", true);
-    xhrStats.send();
-    xhrStats.onreadystatechange = function() {
-        if (xhrStats.readyState == 4 && xhrStats.status == 200) {
-            stats = xhrStats.responseText;
-            stats = JSON.parse(stats);
-            if (document.getElementById("stats")) {
-                isDiv = true;
-                var statsDiv = document.getElementById("stats");
-            }
-
-            if(stats["roundName"] != null) {
+	if (document.getElementById("stats")) {
+		var divContents = "";
+        $.ajax({
+	        url: "stats.json"
+	    }).done(function(stats) {
+	        if(stats["roundName"] != null) {
                 divContents += "<table style='width:100%;'><tr><th></th><th>Tabatud</th><th>Puude</th><th>Miinus</th><th>Skoor</th></tr>";
                 for(i in stats["teams"]) {
                     team = stats["teams"][i];
@@ -170,15 +100,11 @@ function getStats() {
                     }
                 }
                 divContents += "<div class='bottom' id='toEnd'></div>";
-                if (isDiv) {
-                    statsDiv.innerHTML = divContents;
-                }
+                $("#stats").html(divContents);
             } else {
-                if (isDiv) {
-                    statsDiv.innerHTML = "";
-                }
+            	$("#stats").html("");
             }
-        }
+	    });
     }
 }
 
@@ -323,10 +249,28 @@ function isJailed() {
     if (document.getElementById("isJailed")) {
         $.ajax({
             url: "isJailed"
-        }).done(function(data) {
-            userJailed = data;
+        }).done(function(inJail) {
+            userJailed = inJail;
         });
     }
+}
+
+
+function getUser() {
+    $.ajax({
+        url: "user"
+    }).done(function(user) {
+        user = user;
+    });
+}
+
+
+function getUserTeam() {
+    $.ajax({
+        url: "userTeam"
+    }).done(function(user) {
+        userTeam = userTeam;
+    });
 }
 
 

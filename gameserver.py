@@ -381,7 +381,7 @@ if __name__ == "__main__":
     Stats.updateStats()
     Stats.printPlayersDetailed()
 
-    debug = True
+    debug = False
     if debug:
         App.app.run(debug=True)
     else:

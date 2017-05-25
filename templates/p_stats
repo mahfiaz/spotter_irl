@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+    <title>Fusion Game</title>
+    <link href="/static/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/jumbotron-narrow.css" rel="stylesheet">
+    <link href="/static/style.css" rel="stylesheet">
+    <script src="static/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="/static/script.js" charset="utf-8"></script>
+    <script type="text/javascript">
+        window.onload = function() {
+            getRoundInfo();
+            getEvents();
+            getStats();
+            timeToEnd();
+            window.setInterval(function() {
+                getRoundInfo();
+                getStats();
+                getEvents();
+                timeToEnd();
+                isJailed();
+                if (userJailed == "True") {
+                    window.location.assign("/");
+                }
+            }, 4000);
+            window.setInterval(function() {
+                timeToEnd();
+            }, 1000);
+        }
+
+        function tag() {
+            var xhrTag = new XMLHttpRequest();
+            var code = document.getElementById("tagCode").value;
+            xhrTag.open("GET", "/tag?tagCode="+code, true);
+            xhrTag.send();
+            window.location.assign("/");
+            console.log("Tagged someone");
+        }
+
+        function message() {
+            var xhrMessage = new XMLHttpRequest();
+            var message = document.getElementById("message").value;
+            xhrMessage.open("GET", "/message?message="+message);
+            xhrMessage.send();
+            window.location.assign("/");
+            console.log("Messaged team");
+        }
+    </script>
+</head>
+<body>
+    <div class="col-sm-12">
+        <div class="col-sm-10 col-sm-offset-1">
+            <p>
+                <div id="roundInfo" class="textarea"></div>
+            </p>
+            <p>
+                <div id="stats" class="textarea player">
+                    <div class='bottom' id='toEnd'></div>
+                </div>
+            </p>
+            <p>
+                <div id="events" class="textarea player"></div>
+            </p>
+            <p style="text-align:center;">
+                <input class="form-control" id="tagCode" placeholder="Silmasin koodi" type="text">
+                <button class="btn-sm btn-danger btn-block" type="button" value="Taba" onclick="tag()">Taba</button>
+            </p>
+            <p style="text-align:center;width: 100%">
+                <input class="form-control" id="message" placeholder="Teade" type="text">
+                <button class="btn-sm btn-danger btn-block" type="button" value="Saada" onclick="message()">Teade meeskonnale</button>
+            </p>
+        </div>
+    </div>
+    <div id="isJailed" hidden></div>
+</body></html>
