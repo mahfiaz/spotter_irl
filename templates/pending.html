@@ -14,7 +14,9 @@
             if(window.location.href != gameServerAddress) {
                 window.location.assign("/");
             }
+            getMessage();
             setInterval(function() {
+                getMessage();
                 isJailed();
                 if (userJailed == "False") {
                     window.location.assign("/");
@@ -47,6 +49,7 @@
         <h1>Oled sees!</h1>
         <p>kasutaja <span id="username" class="large">{{ user }}</span></p>
         <p>telefon <span id="phone" class="large">{{ phone }}</span></p>
+        <div id="messages" class="textarea"></div>
         <p class="large">Saad kohe SMSi. Edasine @Keila päevade noorteala</p>
         <div id="isJailed" hidden></div>
         <p><input id="invalidRegistration" type="submit" class="button red" value="Tegid vea, tahad muuta?" onclick="logout()"></p>

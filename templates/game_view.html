@@ -16,16 +16,18 @@
             getEvents();
             getStats();
             timeToEnd();
+            getMessage();
             window.setInterval(function() {
                 getRoundInfo();
                 getStats();
                 getEvents();
                 timeToEnd();
+                getMessage();
                 isJailed();
                 if (userJailed == "True") {
                     window.location.assign("/");
                 }
-            }, 4000);
+            }, 2000);
             window.setInterval(function() {
                 timeToEnd();
             }, 1000);
@@ -39,10 +41,10 @@
             console.log("Tagged someone");
         }
 
-        function message() {
+        function messageTeam() {
             var xhrMessage = new XMLHttpRequest();
             var message = document.getElementById("message").value;
-            xhrMessage.open("GET", "/message?message="+message);
+            xhrMessage.open("GET", "/messageTeam?message="+message);
             xhrMessage.send();
             console.log("Messaged team");
         }
@@ -55,13 +57,13 @@
             <div id="stats" class="textarea scroll player">
                 <div class='bottom' id='toEnd'></div>
             </div>
+            <div id="messages" class="textarea"></div>
             <div id="events" class="textarea scroll player"></div>
 
             <input id="tagCode" placeholder="Silmasin koodi" type="text">
             <button class="button red fullwidth" type="button" value="Taba" onclick="tag()">Taba</button>
             <input id="message" placeholder="Teade" type="text">
-            <button class="button green fullwidth" type="button" value="Saada" onclick="message()">Teade meeskonnale</button>
+            <button class="button green fullwidth" type="button" value="Saada" onclick="messageTeam()">Teade meeskonnale</button>
         </div>
     </div>
-    <div id="isJailed" hidden></div>
 </body></html>

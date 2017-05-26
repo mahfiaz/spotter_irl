@@ -118,7 +118,6 @@ function getEvents() {
             } else {
                 for(i in events) {
                     event = events[i];
-                    console.log(userTeam);
                     if (event["visible"] == "All" || (event["visible"] == "Sinised" && (userTeam % 2) == 1) || (event["visible"] == "Punased" && (userTeam % 2) == 0)) {
                         divContents += "<p>"+event["time"];
                         divContents += " <span style='color:#"+event["text1"]["color"]+";'>"+event["text1"]["text"]+"</span>";
@@ -137,14 +136,14 @@ function getEvents() {
 
 
 function getRoundInfo() {
-    if (document.getElementById("roundInfo")) {
+    if (document.getElementById("round-info")) {
         $.ajax({
             url: "stats.json?time="+Date.now()
         }).done(function(stats) {
             if(stats["roundName"] != null) {
-                $("#roundInfo").html("<p>Lahing \"" + stats["roundName"] + "\", mängija: " + user + "</p>");
+                $("#round-info").html("<p>Lahing \"" + stats["roundName"] + "\", mängija: " + user + "</p>");
             } else {
-                $("#roundInfo").html("");
+                $("#round-info").html("");
             }
         });
     }
@@ -153,7 +152,7 @@ function getRoundInfo() {
 
 function timeToEnd() {
     currentDate = new Date();
-    if (document.getElementById("roundInfo")) {
+    if (document.getElementById("round-info")) {
         $.ajax({
             url: "stats.json?time="+Date.now()
         }).done(function(stats) {
@@ -195,6 +194,15 @@ function getUserTeam() {
         url: "userTeam"
     }).done(function(team) {
         userTeam = team;
+    });
+}
+
+
+function getMessage() {
+    $.ajax({
+        url: "data"
+    }).done(function(message) {
+        $("#messages").html(message)
     });
 }
 
