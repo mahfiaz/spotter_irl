@@ -28,8 +28,8 @@ def send_sms(phone, text, message_id=None):
 
     # Replace common Estonian non-ASCII characters with
     # non-umlauted ones.<
-    replace = u'ÕÄÖÜõäöüŠšŽž'
-    replacement = u'OAOUoaouSsZz'
+    replace = u'ÕõŠšŽž'
+    replacement = u'66SsZz'
 
     for i, char in enumerate(replace):
         text = text.replace(char, replacement[i])

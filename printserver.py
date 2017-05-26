@@ -34,7 +34,7 @@ def generate(data):
     for i, line in enumerate(data['eventlist']):
         replacements['$eventlist%s$' % i] = line
 
-    for i in range(len(data['eventlist']), 6):
+    for i in range(len(data['eventlist']), 11):
         replacements['$eventlist%s$' % i] = ''
 
     replacements['$time$'] = datetime.datetime.now().strftime("%H:%M:%S")
