@@ -8,6 +8,7 @@ import game_config
 
 import json
 import time
+import random
 import re
 import pprint
 from threading import Timer
@@ -73,6 +74,8 @@ class Action:
         if Team.addPlayer(playerId, teamId):
             Code.generateNewCodes(playerId)
             Event.addPlayerToTeam(playerId)
+        else:
+            print("Error when adding player to team")
         Stats.updateStats()
 
     def addTeamsToAllRounds():
@@ -218,22 +221,42 @@ class Action:
     def fleePlayerWithCode(fleeingCode):
         code = Action._codeValidate(fleeingCode)
         if not code:
+            print("Fleeing: Tried wrong code:", code)
             return
         if not Round.getActiveId():
-            print("Warning. No active team. No fleeing for" ,fleeingCode)
+            print("Warning. No active round. Fleeing not possible. Code:" ,fleeingCode)
             return
         playerId = Player.checkFleeingCode(code)
         if playerId:
             if not Team.getPlayerTeamId(playerId, Round.getActiveId()):
-                print("Warning. You are not in a team. No fleeing." ,fleeingCode)
-                return
+                team_name = Action.suggestedTeam()
+                player_name = Player.getNameById(playerId)
+                Action.addPlayerToTeam(player_name, team_name)
+                print("Player %s automatically assigned to team %s" % (playerId, team_name))
             Action._flee(playerId)
             Stats.updateStats()
-            # Print
+            # Print label
             Action.printer_queue.put(Action.prepareDataForPrinter(playerId))
-            #sms_outgoing.put('tore')
         else:
+            print("Fleeing code not matched to a player ID. Code:", code)
             BaseMsg.fleeingCodeMismatch()
+
+    def suggestedTeam():
+        """Assign to either smaller or to a random team."""
+        round_id = Round.getActiveId()
+        team_ids = Team.getTeamsIdList(round_id)
+        team_members = []
+        for team_id in team_ids:
+            player_list = Team.getTeamPlayerIdList(team_id)
+            team_members.append(len(player_list))
+        if team_members[0] == team_members[1]:
+            # Random team
+            team_id = random.choice(team_ids)
+        elif team_members[0] > team_members[1]:
+            team_id = team_ids[1]
+        else:
+            team_id = team_ids[0]
+        return Team.getNameById(team_id)
 
     def prepareDataForPrinter(playerId):
         teamId = Team.getPlayerTeamId(playerId, Round.getActiveId())

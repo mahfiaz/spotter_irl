@@ -8,7 +8,7 @@ from engine.round import *
 from engine.team import *
 
 import configparser
-from flask import Flask, render_template, request, json, session, jsonify
+from flask import Flask, json, jsonify, make_response, session, render_template, request, send_file
 import json
 import os
 import psycopg2
@@ -63,6 +63,18 @@ class App:
         else:
             return App.registration_template(" ")
 
+    # Set HTTP headers so those files would not be cached
+    @app.route("/events.json")
+    def events():
+        response = make_response(send_file("www/events.json"))
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
+        return response
+
+    @app.route("/stats.json")
+    def stats():
+        response = make_response(send_file("www/stats.json"))
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
+        return response
 
     @app.route("/register", methods=["GET"])
     def new_player():
@@ -385,8 +397,11 @@ if __name__ == "__main__":
     if debug:
         App.app.run(debug=True)
     else:
+        import logging
         from threading import Thread
         from engine.cli import processInput
+
+        logging.basicConfig(filename='flask.log', level=logging.DEBUG)
 
         appthread = Thread(target=App.app.run, args=())
         appthread.setDaemon(True)
