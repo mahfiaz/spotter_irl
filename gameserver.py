@@ -397,8 +397,11 @@ if __name__ == "__main__":
     if debug:
         App.app.run(debug=True)
     else:
+        import logging
         from threading import Thread
         from engine.cli import processInput
+
+        logging.basicConfig(filename='flask.log', level=logging.DEBUG)
 
         appthread = Thread(target=App.app.run, args=())
         appthread.setDaemon(True)

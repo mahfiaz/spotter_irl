@@ -1,4 +1,5 @@
 *.pyc
+*.log
 *.json
 *.kate-swp
 __pycache__/
