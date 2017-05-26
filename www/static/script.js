@@ -202,7 +202,9 @@ function getMessage() {
     $.ajax({
         url: "data"
     }).done(function(message) {
-        $("#messages").html(message)
+        if (!null) {
+            $("#messages").html(message)
+        }
     });
 }
 
