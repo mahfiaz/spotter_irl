@@ -135,8 +135,8 @@ class App:
             return "403 Connection Forbidden"
 
 
-    @app.route("/message", methods=["GET"])
-    def message():
+    @app.route("/messageTeam", methods=["GET"])
+    def messageTeam():
         if App.logged_in():
             team_message = request.args.get("message")
             player_id = Player.getIdByHash(session["web_hash"])
