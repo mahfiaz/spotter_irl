@@ -88,7 +88,7 @@ class App:
                 session["web_hash"] = Player.getHashById(Player._getIdByName(user))
                 return App.index()
             else:
-                return App.registration_template("Nimi või mobiil juba kasutusel.")
+                return App.registration_template("Probleem registreerimisel, kontrolli sisestatud andmeid.")
         else:
             return App.registration_template("Mõlemad väljad on kohustuslikud.")
 
