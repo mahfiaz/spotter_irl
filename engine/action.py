@@ -188,11 +188,13 @@ class Action:
                 Sms.touched(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
 
 # message spool
+    # player's browser requests for user messages. if these requests come frequently (<4s), any Sms-message is queued and served one-by-one on by this function.
     def browserRequestsMessages(hash):
         pollerId = Player.getIdByHash(hash)
         if pollerId:
-            MessageChannel.message_request(pollerId)
+            return MessageChannel.message_request(pollerId)
 
+    # if there is no browserRequestsMessages() in 15s, messages_timeout_check() send the queued message as sms.
     def messages_timeout_check():
         if time.time() - Action.checked_last > 1.0:
             MessageChannel.check_all()

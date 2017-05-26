@@ -37,8 +37,8 @@ class MessageChannel:
         MessageChannel.player_polled(playerId)
         msg = MessageChannel._pop_message(playerId)
         if msg:
-            print("     !! Served MSG:", msg['text'])
-            # serve msg
+            print("Message:", msg['text'])
+            return msg['text']
 
     def check_all():
         print("xx checkAll", MessageChannel.message_list)
