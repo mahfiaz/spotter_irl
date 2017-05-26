@@ -53,19 +53,16 @@
 <body>
     <div class="col-sm-12">
         <div class="col-sm-10 col-sm-offset-1">
-            <div id="roundInfo" class="textarea"></div>
+            <div id="round-info" class="textarea"></div>
             <div id="stats" class="textarea scroll player">
                 <div class='bottom' id='toEnd'></div>
             </div>
             <div id="events" class="textarea scroll player"></div>
-            <p style="text-align:center;">
-                <input class="form-control" id="tagCode" placeholder="Silmasin koodi" type="text">
-                <button class="btn-sm btn-danger btn-block" type="button" value="Taba" onclick="tag()">Taba</button>
-            </p>
-            <p style="text-align:center;width: 100%">
-                <input class="form-control" id="message" placeholder="Teade" type="text">
-                <button class="btn-sm btn-danger btn-block" type="button" value="Saada" onclick="message()">Teade meeskonnale</button>
-            </p>
+
+            <input id="tagCode" placeholder="Silmasin koodi" type="text">
+            <button class="button red fullwidth" type="button" value="Taba" onclick="tag()">Taba</button>
+            <input id="message" placeholder="Teade" type="text">
+            <button class="button green fullwidth" type="button" value="Saada" onclick="message()">Teade meeskonnale</button>
         </div>
     </div>
     <div id="isJailed" hidden></div>
