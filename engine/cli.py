@@ -38,3 +38,6 @@ def processInput():
     elif 'q' in userText:
         id = input("enter id: ")
         Action.browserRequestsMessages(id)
+    elif 'b' in userText:
+        msg = Action.base_msg_get()
+        print("BASE:", msg)

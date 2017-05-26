@@ -200,6 +200,10 @@ class Action:
             MessageChannel.check_all()
             Action.checked_last = time.time()
 
+    # base.html should poll this to get messages for jail fleeing players. returns same message until it expires (15 sec) or it is overwritten by new one.
+    def base_msg_get():
+        return BaseMsg.get()
+
 # teamchat
     def sayToMyTeam(playerId, message):
         if not playerId:

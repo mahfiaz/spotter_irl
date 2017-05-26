@@ -170,11 +170,18 @@ class Sms:
 
 
 class BaseMsg:
+    last_message = {}
+
+    def get():
+        if BaseMsg.last_message:
+            if time.time() - BaseMsg.last_message['time'] > 15:
+                BaseMsg.last_message = {}
+        return BaseMsg.last_message
 
     def send(msg):
-# TODO placeholder to true base message send function
-        print("        Base Msg:", msg)
-        #Sms.queue.put(['', msg])
+        print("  Base Msg:", msg)
+        BaseMsg.last_message['text'] = msg
+        BaseMsg.last_message['time'] = time.time()
 
     def fleeingCodeMismatch():
         BaseMsg.send(msgBase['fleeingCodeMismatch'])
