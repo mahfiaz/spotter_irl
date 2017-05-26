@@ -36,7 +36,6 @@
             var code = document.getElementById("tagCode").value;
             xhrTag.open("GET", "/tag?tagCode="+code, true);
             xhrTag.send();
-            window.location.assign("/");
             console.log("Tagged someone");
         }
 
@@ -45,7 +44,6 @@
             var message = document.getElementById("message").value;
             xhrMessage.open("GET", "/message?message="+message);
             xhrMessage.send();
-            window.location.assign("/");
             console.log("Messaged team");
         }
     </script>

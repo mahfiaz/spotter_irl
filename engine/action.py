@@ -212,7 +212,7 @@ class Action:
             teamId = 0
         message = re.sub('[^A-Za-z0-9 \.,:;\-\?!#/ÕõÄäÖöÜü]', '', message)
         message = message[:60]
-        print(Player.getNameById(playerId), "said ", message)
+        print("Teamchat: ", Player.getNameById(playerId), "said ", message)
         Event.addChatMessage(playerId, teamId, message)
         Stats.updateEvents()
 
@@ -394,7 +394,6 @@ class Stats:
     def _getTeamplessPlayerStats(roundId):
         teamless = []
         for player in Team.getTeamlessPlayerIdList(roundId):
-            print(player, Player.getMasterId())
             if not (player == Player.getMasterId()):
                 teamless.append(Stats._getPlayerStats(player, roundId))
         return teamless
