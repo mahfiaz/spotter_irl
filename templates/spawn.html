@@ -48,13 +48,11 @@
         function to2(playerId) {
             xhr.open("GET", "/addToTeam?teamName=Punased&playerId="+playerId, true);
             xhr.send();
-            window.location.assign("/spawn")
         }
 
         function to1(playerId) {
             xhr.open("GET", "/addToTeam?teamName=Sinised&playerId="+playerId, true);
             xhr.send();
-            window.location.assign("/spawn")
         }
     </script>
 </head>
