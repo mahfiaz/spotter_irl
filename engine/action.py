@@ -3,7 +3,7 @@ from .event import Event, EventType
 from .player import Player
 from .round import Round
 from .team import Team
-from .message import Sms, BaseMsg
+from .message import Sms, BaseMsg, MessageChannel
 import game_config
 
 import json
@@ -34,9 +34,10 @@ class Action:
         Event.initConnect(cursor)
         Round.setCallbacks(roundStarted = Action._roundStartedCall, roundEnding = Action._roundEndingCall, roundEnded = Action._roundEndedCall)
         Stats.updateStats()
-        Sms.queue = sms_queue
+        MessageChannel.queue = sms_queue
         Sms.setCallback(Stats.getTeamPlayerStatsStringByMobile)
         Action.printer_queue = printer_queue
+        Action.checked_last = 0
 
     def addPlayer(name, mobile, email):
         if not mobile.isdigit():
@@ -106,7 +107,6 @@ class Action:
             return
         assert isinstance(hash, str)
         return re.sub('[^a-z0-9]+', '', hash)
-
 
     def handleSms(mobile, message):
         mobile = Action._mobileValidate(mobile)
@@ -184,6 +184,18 @@ class Action:
                 Stats.updateStats()
                 Sms.touched(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
 
+# message spool
+    def browserRequestsMessages(hash):
+        pollerId = Player.getIdByHash(hash)
+        if pollerId:
+            MessageChannel.message_request(pollerId)
+
+    def messages_timeout_check():
+        if time.time() - Action.checked_last > 1.0:
+            MessageChannel.check_all()
+            Action.checked_last = time.time()
+
+# teamchat
     def sayToMyTeam(playerId, message):
         if not playerId:
             return
@@ -373,7 +385,7 @@ class Stats:
             'roundName'         : Round.getName(roundId),
             'roundStart'        : Round.getStartTime(roundId).strftime(game_config.database_dateformat),
             'roundEnd'          : Round.getEndTime(roundId).strftime(game_config.database_dateformat),
-            'smsCount'          : Sms._count,
+            'smsCount'          : MessageChannel.sms_count,
             'teams'             : allTeams,
             'teamlessPlayers'   : Stats._getTeamplessPlayerStats(roundId) }
         return roundStats

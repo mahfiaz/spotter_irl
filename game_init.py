@@ -59,7 +59,7 @@ def initGame():
     Round.print()
 
     Action.addTeamsToAllRounds()
-
+    Stats.updateStats()
 # remove these
 #    Action.addTestPlayers()
 #    Stats.printPlayersDetailed()

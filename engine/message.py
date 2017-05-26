@@ -1,15 +1,102 @@
 from game_config import msgCellular, msgBase
 from .round import Round
+from .player import Player
 import game_config
+import time
+
+class MessageChannel:
+    message_list = []
+    queue = None
+    sms_count = 0
+
+    def player_polled(playerId):
+        playerId = str(playerId)
+        for player in MessageChannel.message_list:
+            if player['id'] == playerId:
+                player['poll_time'] = time.time()
+                return
+        MessageChannel._add_player(playerId)
+
+    def send_message(playerId, message):
+        playerId = str(playerId)
+        if MessageChannel._if_send_web(playerId):
+            # last poll not so long ago, put message to queue to wait web request
+            MessageChannel._add_message(playerId, message)
+        else:
+            smsdata = {
+                'number': Player.getMobileById(playerId),
+                'contents': message
+                }
+            if MessageChannel.queue:
+                MessageChannel.queue.put(smsdata)
+                MessageChannel.sms_count += 1
+            print("SMS:", smsdata['number'], smsdata['contents'])
+
+    def message_request(playerId):
+        playerId = str(playerId)
+        MessageChannel.player_polled(playerId)
+        msg = MessageChannel._pop_message(playerId)
+        if msg:
+            print("     !! Served MSG:", msg['text'])
+            # serve msg
+
+    def check_all():
+        print("xx checkAll", MessageChannel.message_list)
+        for player in MessageChannel.message_list:
+            if time.time() - player['poll_time'] > 15:
+                print("xx checkAll time passed")
+                msg = MessageChannel._pop_message(player['id'])
+                if not msg:
+                    return
+                player['last_sent'] = time.time()
+                if MessageChannel.queue:
+                    MessageChannel.queue.put(smsdata)
+                    MessageChannel.sms_count += 1
+                print("SMS:", smsdata['number'], smsdata['contents'])
+                return
+
+
+    def _if_send_web(playerId):
+        for player in MessageChannel.message_list:
+            if player['id'] == playerId:
+                if time.time() - player['poll_time'] < 8: # 4:
+                    return True
+                return
+        MessageChannel._add_player(playerId)
+
+
+    def _add_message(playerId, message):
+        for player in MessageChannel.message_list:
+            if player['id'] == playerId:
+                data = {}
+                data['time'] = time.time()
+                data['text'] = message
+                player['messages'].append(data)
+                return
+        MessageChannel._add_player(playerId)
+        MessageChannel._add_message(playerId, message)
+
+
+    def _pop_message(playerId):
+        for player in MessageChannel.message_list:
+            if player['id'] == playerId:
+                if player['messages']:
+                    msg = player['messages'].pop(0)
+                    if msg:
+                        player['last_sent'] = time.time()
+                        return msg
+
+    def _add_player(playerId):
+        data = {}
+        data['id'] = playerId
+        data['poll_time'] = time.time()
+        data['last_sent'] = time.time() - 60.0
+        data['messages'] = []
+        MessageChannel.message_list.append(data)
 
 
 class Sms:
-    _count = 0
     _statsCallback = None
-    queue = None
-
-    def setQueue(queue):
-        Sms.queue = queue
 
     def setCallback(call):
         Sms._statsCallback = call
@@ -24,17 +111,8 @@ class Sms:
                     data += " " + Sms._statsCallback(mobile)
 #                    data += " " + Stats.getTeamPlayerStatsString(Player.getMobileOwnerId(mobile))
                 if sendLink:
-                    data += " # " + Sms.addUrl()
-                print("     SMS:", mobile, data)
-
-# TODO placeholder to true SMS send function
-                smsdata = {
-                    'number': mobile,
-                    'contents': data
-                    }
-                if Sms.queue:
-                    Sms.queue.put(smsdata)
-                    Sms._count += 1
+                    data += " " + Sms.addUrl()
+                MessageChannel.send_message(Player.getMobileOwnerId(mobile), data)
         else:
             print(" Errror! send sms", mobile, data)
 

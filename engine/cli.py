@@ -35,3 +35,6 @@ def processInput():
         message = input("enter text: ")
         playerId = Player._getIdByName(name)
         Action.sayToMyTeam(playerId, message)
+    elif 'q' in userText:
+        id = input("enter id: ")
+        Action.browserRequestsMessages(id)
