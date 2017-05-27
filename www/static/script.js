@@ -159,7 +159,7 @@ function timeToEnd() {
             if(stats["roundName"] != null) {
                 var ending = stats["roundEnd"];
                 endTime = new Date(ending.substring(0,4),ending.substring(5,7),ending.substring(8,10),ending.substring(11,13),ending.substring(14,16),ending.substring(17,19));
-                var toEnd = new Date(endTime.getTime() - currentDate.getTime());
+                var toEnd = new Date(endTime.getTime() - new Date(currentDate.getTime() * 3 * 60 *60 *1000);
                 $("#toEnd").html("Aega vooru lõpuni " + addZerobefore(toEnd.getUTCHours()) + ":" + addZerobefore(toEnd.getUTCMinutes()) + ":" + addZerobefore(toEnd.getUTCSeconds()));
             } else {
                 $("#toEnd").html("");
