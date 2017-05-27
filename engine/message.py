@@ -17,9 +17,9 @@ class MessageChannel:
                 return
         MessageChannel._add_player(playerId)
 
-    def send_message(playerId, message):
+    def send_message(playerId, message, forceSms):
         playerId = str(playerId)
-        if MessageChannel._if_send_web(playerId):
+        if MessageChannel._if_send_web(playerId) and not forceSms:
             # last poll not so long ago, put message to queue to wait web request
             MessageChannel._add_message(playerId, message)
         else:
@@ -104,7 +104,7 @@ class Sms:
     def addUrl():
         return game_config.game_link_sms
 
-    def send(mobile, data, sendStats = False, sendLink = False):
+    def send(mobile, data, sendStats = False, sendLink = False, forceSms = False):
         if isinstance(mobile, str):
             if mobile.isdigit():
                 if sendStats and Sms._statsCallback:
@@ -112,18 +112,18 @@ class Sms:
 #                    data += " " + Stats.getTeamPlayerStatsString(Player.getMobileOwnerId(mobile))
                 if sendLink:
                     data += " " + Sms.addUrl()
-                MessageChannel.send_message(Player.getMobileOwnerId(mobile), data)
+                MessageChannel.send_message(Player.getMobileOwnerId(mobile), data, forceSms)
         else:
             print(" Errror! send sms", mobile, data)
 
-    def notSignedUp(mobile):
+    def notSignedUp(mobile, forceSms = True):
         Sms.send(mobile, msgCellular['notSignedUp'].format(mobile), sendLink = True)
 
     def senderJailed(mobile, name, jailCode):
         Sms.send(mobile, msgCellular['senderJailed'].format(name, jailCode), sendStats = True, sendLink = True)
 
     def victimJailed(senderMobile, senderName, victimMobile, victimName, jailCode):
-        Sms.send(victimMobile, msgCellular['victimJailedVictim'].format(victimName, senderName, jailCode), sendStats = True, sendLink = True)
+        Sms.send(victimMobile, msgCellular['victimJailedVictim'].format(victimName, senderName, jailCode), sendStats = True, sendLink = True, forceSms = True)
         Sms.send(senderMobile, msgCellular['victimJailedSender'].format(senderName, victimName, victimName), sendStats = True, sendLink = True)
 
     def missed(mobile, name):
@@ -148,7 +148,7 @@ class Sms:
         Sms.send(victimMobile, msgCellular['touchedVictim'].format(victimName, jailCode), sendStats = True, sendLink = True)
 
     def fleeingProtectionOver(mobile, name):
-        Sms.send(mobile, msgCellular['fleeingProtectionOver'].format(name), sendLink = True)
+        Sms.send(mobile, msgCellular['fleeingProtectionOver'].format(name), sendLink = True, forceSms = True)
 
     def noActiveRound(mobile, nextIn):
         Sms.send(mobile, msgCellular['noActiveRound'].format(nextIn))
