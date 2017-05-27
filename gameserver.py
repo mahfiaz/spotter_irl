@@ -39,7 +39,7 @@ class App:
             return "403 Connection Forbidden"
 
     @app.route("/isJailed")
-    def playing_templateasd():
+    def jailed():
         if App.logged_in():
             return str(Event.isPlayerJailed(Player._getIdByName(session["user"])))
         else:
@@ -360,6 +360,8 @@ class App:
             #  'sent': sent, 'received': received}
             #print(message)
             Action.handleSms(message['number'], message['contents'])
+        # Mark all the old enough messages ready for SMSing
+        Action.messages_timeout_check()
         out = []
         try:
             while True:
