@@ -40,7 +40,10 @@ def generate(data):
     replacements['$time$'] = datetime.datetime.now().strftime("%H:%M:%S")
 
     # Read SVG template to memory
-    f = codecs.open('spotter_printer/template.svg', 'rb', encoding='utf8')
+    openpath = 'spotter_printer/template_portrait.svg'
+    if data['player']['team']['name'].lower() == 'sinised':
+        openpath = 'spotter_printer/template_landscape.svg'
+    f = codecs.open(openpath, 'rb', encoding='utf8')
     svg = f.read()
     f.close()
 

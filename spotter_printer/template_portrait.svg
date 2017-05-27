@@ -24,9 +24,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.99"
-     inkscape:cx="466.38124"
-     inkscape:cy="745.18946"
+     inkscape:zoom="0.70003571"
+     inkscape:cx="77.714394"
+     inkscape:cy="410.66531"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -43,8 +43,8 @@
      inkscape:snap-object-midpoints="true"
      inkscape:snap-center="true"
      inkscape:snap-text-baseline="true"
-     inkscape:window-width="1599"
-     inkscape:window-height="986"
+     inkscape:window-width="1592"
+     inkscape:window-height="871"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0" />
@@ -58,7 +58,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -70,16 +70,16 @@
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="697.34521"
-       y="387.20819"
+       y="427.20819"
        id="text4204"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4206"
          x="697.34521"
-         y="387.20819"
+         y="427.20819"
          style="font-size:17.59811783px">$eventlist1$</tspan></text>
     <image
-       sodipodi:absref="/Users/Leevi/Documents/GitSoft/PyEnv/fusiongame/spotter_irl/spotter_printer/test.png"
+       sodipodi:absref="/home/mattias/arendus/fusiongame/spotter_irl/spotter_printer/test.png"
        xlink:href="test.png"
        width="294.19901"
        height="294.19901"
@@ -162,14 +162,14 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:48.93424988px;line-height:125%;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="395.44788"
+       x="375.44788"
        y="1000.8072"
        id="text3340"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3342"
-         x="395.44788"
-         y="1000.8072">#fusionkeila</tspan></text>
+         x="375.44788"
+         y="1000.8072">fusiongame.tk</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text3344"
@@ -242,12 +242,12 @@
     <text
        sodipodi:linespacing="125%"
        id="text4195"
-       y="139.92242"
+       y="179.92242"
        x="708.35944"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:74.38546753px;line-height:125%;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          id="tspan4201"
-         y="139.92242"
+         y="179.92242"
          x="708.35944"
          sodipodi:role="line"
          style="font-size:74.38546753px">$team$</tspan></text>
@@ -255,24 +255,24 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:48.93424988px;line-height:125%;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="701.14856"
-       y="256.09204"
+       y="296.09204"
        id="text4203"
        sodipodi:linespacing="125%"><tspan
          style="font-size:31.25px"
          id="tspan4216"
          sodipodi:role="line"
          x="701.14856"
-         y="256.09204">seis kell $time$</tspan><tspan
+         y="296.09204">seis kell $time$</tspan><tspan
          id="tspan4322"
          style="font-size:31.25px"
          sodipodi:role="line"
          x="701.14856"
-         y="295.15454">$team1$</tspan><tspan
+         y="335.15454">$team1$</tspan><tspan
          id="tspan4324"
          style="font-size:31.25px"
          sodipodi:role="line"
          x="701.14856"
-         y="334.21704">$team2$</tspan></text>
+         y="374.21704">$team2$</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4220"
@@ -436,51 +436,51 @@
     <text
        sodipodi:linespacing="125%"
        id="text4232"
-       y="407.20819"
+       y="447.20819"
        x="697.34521"
-       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;opacity:0.95;"
+       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;opacity:0.95;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
-         style="font-size:17.59811783px;"
-         y="407.20819"
+         style="font-size:17.59811783px"
+         y="447.20819"
          x="697.34521"
          id="tspan4234"
          sodipodi:role="line">$eventlist2$</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;opacity:0.9;"
+       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;opacity:0.9;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="697.34521"
-       y="427.20819"
+       y="467.20819"
        id="text4236"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4238"
          x="697.34521"
-         y="427.20819"
-         style="font-size:17.59811783px;">$eventlist3$</tspan></text>
+         y="467.20819"
+         style="font-size:17.59811783px">$eventlist3$</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4240"
-       y="447.20819"
+       y="487.20819"
        x="697.34521"
-       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;opacity:0.85;"
+       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;opacity:0.85;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
-         style="font-size:17.59811783px;"
-         y="447.20819"
+         style="font-size:17.59811783px"
+         y="487.20819"
          x="697.34521"
          id="tspan4242"
          sodipodi:role="line">$eventlist4$</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;opacity:0.8;"
+       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;opacity:0.8;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="697.34521"
-       y="467.20822"
+       y="507.20822"
        id="text4244"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4246"
          x="697.34521"
-         y="467.20822"
-         style="font-size:17.59811783px;">$eventlist5$</tspan></text>
+         y="507.20822"
+         style="font-size:17.59811783px">$eventlist5$</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4248"
@@ -498,83 +498,83 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:57.01415634px;line-height:125%;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="699.2641"
-       y="65.849411"
+       y="105.84941"
        id="text4208"
        sodipodi:linespacing="125%"><tspan
          style="font-size:45px"
          sodipodi:role="line"
          x="699.2641"
-         y="65.849411"
+         y="105.84941"
          id="tspan4217">aita meeskonnal</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:57.01415634px;line-height:125%;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="700.80737"
-       y="199.81355"
+       y="239.81355"
        id="text4219"
        sodipodi:linespacing="125%"><tspan
          style="font-size:45px"
          sodipodi:role="line"
          x="700.80737"
-         y="199.81355"
+         y="239.81355"
          id="tspan4227">lahing võita</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4249"
-       y="487.20822"
+       y="527.20825"
        x="697.34521"
-       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;opacity:0.75;"
+       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;opacity:0.75;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
-         style="font-size:17.59811783px;"
-         y="487.20822"
+         style="font-size:17.59811783px"
+         y="527.20825"
          x="697.34521"
          id="tspan4251"
          sodipodi:role="line">$eventlist6$</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;opacity:0.7;"
+       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;opacity:0.7;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="697.34521"
-       y="507.20822"
+       y="547.20825"
        id="text4253"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4255"
          x="697.34521"
-         y="507.20822"
-         style="font-size:17.59811783px;">$eventlist7$</tspan></text>
+         y="547.20825"
+         style="font-size:17.59811783px">$eventlist7$</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4257"
-       y="527.20825"
+       y="567.20825"
        x="697.34521"
-       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;opacity:0.65;"
+       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;opacity:0.65;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
-         style="font-size:17.59811783px;"
-         y="527.20825"
+         style="font-size:17.59811783px"
+         y="567.20825"
          x="697.34521"
          id="tspan4259"
          sodipodi:role="line">$eventlist8$</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;opacity:0.6;"
+       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;opacity:0.6;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="697.34521"
-       y="547.20825"
+       y="587.20825"
        id="text4261"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4263"
          x="697.34521"
-         y="547.20825"
-         style="font-size:17.59811783px;">$eventlist9$</tspan></text>
+         y="587.20825"
+         style="font-size:17.59811783px">$eventlist9$</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4265"
-       y="567.20825"
+       y="607.20825"
        x="697.34521"
-       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;opacity:0.55;"
+       style="font-style:normal;font-weight:normal;font-size:17.59811783px;line-height:125%;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;opacity:0.55;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
-         style="font-size:17.59811783px;"
-         y="567.20825"
+         style="font-size:17.59811783px"
+         y="607.20825"
          x="697.34521"
          id="tspan4267"
          sodipodi:role="line">$eventlist10$</tspan></text>
