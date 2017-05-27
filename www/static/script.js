@@ -200,10 +200,21 @@ function getUserTeam() {
 
 function getMessage() {
     $.ajax({
-        url: "data"
+        url: "message"
     }).done(function(message) {
+        if (message["message"] != null) {
+            $("#messages").html(message["message"]);
+        }
+    });
+}
+
+
+function getBaseMessage() {
+    $.ajax({
+        url: "baseMessage"
+    }).done(function(baseMessage) {
         if (!null) {
-            $("#messages").html(message)
+            $("#messages").html(baseMessage);
         }
     });
 }

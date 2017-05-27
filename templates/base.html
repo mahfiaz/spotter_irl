@@ -36,6 +36,7 @@
             getAllEvents();
             getAllStats();
             timeToEnd();
+            getBaseMessage();
             window.setInterval(function() {
                 getRoundInfoBase("Baas");
                 getAllStats();
@@ -44,6 +45,7 @@
             }, 4000);
             window.setInterval(function() {
                 timeToEnd();
+                getBaseMessage();
             }, 1000);
         }
     </script>
@@ -56,6 +58,7 @@
         <div class="col-sm-10 col-sm-offset-1" style="top:20px; padding:0;">
             <div class="col-sm-7 col-sm-offset">
                 <div id="stats" class="textarea base"></div>
+                <div id="messages" class="textarea"></div>
             </div>
             <div class="col-sm-4 col-sm-offset-1">
                 <div id="events" class="textarea base"></div>

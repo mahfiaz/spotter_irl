@@ -175,6 +175,24 @@ class App:
         else:
             return "403 Connection Forbidden"
 
+    @app.route("/baseMessage")
+    def base_message():
+        try:
+            return Action.base_msg_get()["text"]
+        except KeyError:
+            return ""
+
+    @app.route("/message")
+    def personal_message():
+        if App.logged_in():
+            data = {}
+            data['jailed'] = str(Event.isPlayerJailed(Player._getIdByName(session["user"])))
+            message = Action.browserRequestsMessages(session["web_hash"])
+            data['message'] = message
+            return jsonify(data)
+        else:
+            return "403 Connection Forbidden"
+
     # Getting data
     # END BLOCK
 
