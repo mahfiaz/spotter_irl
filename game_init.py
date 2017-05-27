@@ -53,12 +53,12 @@ def initGame():
         exit()
     Action.initAllDB(cursor)
 #    Round.addRealRounds()
-    addTestRoundsNormal()
+#    addTestRoundsNormal()
     addMasterPlayer()
 
     Round.print()
 
-    Action.addTeamsToAllRounds()
+#    Action.addTeamsToAllRounds()
     Stats.updateStats()
 # remove these
 #    Action.addTestPlayers()
