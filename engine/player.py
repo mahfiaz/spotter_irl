@@ -6,6 +6,118 @@ import psycopg2
 
 from .helper import iterateZero
 
+a =
+
+class PlayerNew:
+
+    def __init__(self, cursor, id):
+        self.cur = cursor
+        self.id = id
+
+    def __del__(self):
+        pass
+
+    def update(self):
+        self.cur.execute("SELECT * FROM player_data WHERE player_id = %s", (self.id,))
+        data = Player.cur.fetchone()
+        self.id, self.name, self.mobile, self.email, self.code_id, self.chat_banned, self.fleeing_code, self.web_hash, self.created = data
+
+    def _generate_fleeing_code(self):
+        unique = True
+        while unique:
+            code_max = math.pow(10, game_config.player_fleeingCodeDigits)
+            fleeing_code = random.randint(codeMax / 10, codeMax - 1)
+            cursor.execute("""SELECT * FROM player_data
+                WHERE player_fleeing_code = %s""",(fleeing_code,))
+            if not cursor.fetchone():
+                Player.cur.execute("""UPDATE player_data
+                    SET player_fleeing_code = %s
+                    WHERE player_id = %s""", fleeing_code, self.id))
+                self.update()
+                return
+
+    def ban_chat(self):
+        self.cur.execute("""UPDATE player_data SET player_chat_banned = %s
+            WHERE player_id = %s""", ('true', self.id))
+        self.update()
+
+    def unban_chat(self):
+        self.cur.execute("""UPDATE player_data SET player_chat_banned = %s
+            WHERE player_id = %s""", ('false', self.id))
+
+
+class Players:
+
+    def __init__(self, cursor):
+        self.cur = cursor
+        self.cur.execute("SELECT player_id ORDER BY player_id")
+        data = Player.cur.fetchall()
+        if len(data) == 0:
+
+        self.all = []
+        for id in data:
+            someone = PlayerNew(self.cur, id)
+            someone.update()
+            self.all.append(someone)
+
+    def add(name, mobile, email):
+        self.cur.execute("""SELECT player_name, player_mobile, player_email
+            FROM player_data
+            WHERE player_name = %s OR player_mobile = %s""",
+            (name, mobile))
+        if not self.cur.fetchone():
+            hash = self._generate_hash(name)
+            self.cur.execute("""INSERT INTO player_data (player_name, player_mobile, player_email, player_web_hash)
+                VALUES (%s, %s, %s, %s)""", (name, mobile, email, hash))
+
+            self.cur.execute("""SELECT player_id FROM player_data
+                WHERE player_name = %s""", [name])
+            id = iterateZero(self.cur.fetchone())
+            newby = PlayerNew(cursor, id)
+            newby._generate_fleeing_code()
+            self.all.append(newby)
+            return newby
+
+    def delete(somebody):
+        for someone in self.all:
+            if someone == somebody:
+                self.all.remove(somebody)
+                self.cur.execute("DELETE FROM player_data WHERE player_id = %s",(somebody.id,))
+                somebody.__del__()
+
+    def by_name(self, name):
+        for someone in self.all:
+            if someone.name == name:
+                return someone
+
+    def by_mobile(self, mobile):
+        for someone in self.all:
+            if someone.mobile == mobile:
+                return someone
+
+    def by_hash(self, hash):
+        for someone in self.all:
+            if someone.hash == hash:
+                return someone
+
+    def by_fleeing_code(self, code):
+        for someone in self.all:
+            if someone.fleeing_code == code:
+                return someone
+
+    def _generate_hash(self, name):
+        unique = True
+        while unique:
+            hash = hashlib.sha224(name.encode('utf-8')).hexdigest()[-6:]
+            self.cur.execute("""SELECT * FROM player_data
+                WHERE player_web_hash = %s""",(hash,))
+            if not self.cur.fetchone():
+                return hash
+
+
+
+
+
 class Player:
 
 # init
@@ -55,7 +167,7 @@ class Player:
         while unique:
             hash = hashlib.sha224(name.encode('utf-8')).hexdigest()[-6:]
             Player.cur.execute("""SELECT * FROM player_data
-                WHERE player_name = %s""",(hash,))
+                WHERE player_web_hash = %s""",(hash,))
             if not Player.cur.fetchone():
                 return hash
 
