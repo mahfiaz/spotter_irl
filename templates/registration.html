@@ -21,6 +21,7 @@
     <div class="container">
         <h1>Mänguks valmis?</h1>
         <p class="large">Liitumine on lihtne: sisesta nimi ja mobiil.</p>
+        <p style="color: red;">{{ error }}</p>
         <div id="messages"></div>
         <form action="/register" method="GET">
             <input name="user" type="text" placeholder="Mängija nimi" size="20">
