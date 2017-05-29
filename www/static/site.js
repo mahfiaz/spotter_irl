@@ -356,7 +356,7 @@ function initSounds(bombsite) {
     var folder = 'static/bombsite/'
     var suffix = bombsite + '.mp3'
     var s = sounds
-    s['background'] = new Audio(folder + 'background1.mp3');
+    s['background'] = new Audio(folder + 'background.mp3');
     s['beep'] = new Audio(folder + 'beep.mp3');
     s['beep'].volume = 0.15;
     s['defused'] = new Audio(folder + 'defused.mp3');
