@@ -13,6 +13,7 @@ var armed, disarmed;
 var armingProgress, disarmingProgress;
 var locked = true;
 var winner = NaN;
+var gameOver = false;
 
 // Start round
 function initGame(site) {
@@ -30,7 +31,8 @@ function initGame(site) {
 }
 
 function startGame() {
-    winner = NaN
+    winner = NaN;
+    gameOver = false;
     clearOverlay();
     bombProgress(0, 'neutral');
     $('#timer-text').text('ROUND TIMER');
@@ -126,6 +128,7 @@ function endGame() {
     showOverlay(winner + ' won', '');
     stop('wind');
     play('background');
+    gameOver = true;
 }
 
 // Timer
@@ -331,7 +334,7 @@ function unlock() {
     initCodepad(codeLength);
     $('#lock').addClass('notvisible');
 
-    if (armed) bombProgress(0, 'disarming');
+    if (armed && !disarmingProgress) bombProgress(0, 'disarming');
 }
 
 function flashLock() {
@@ -382,7 +385,8 @@ function keypress(e) {
     var key = e.which || e.keyCode;
     // Enter was pressed
     if (debug && key == 13) {
-        unlock();
+        if (gameOver) startGame();
+        else if (locked) unlock();
         return;
     }
 
