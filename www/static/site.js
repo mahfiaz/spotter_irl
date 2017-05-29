@@ -146,7 +146,6 @@ function stopTimer() {
 
 function timer() {
     odd = !odd;
-    console.log(odd);
 
     if (odd) {
         // Every second time do not run full timer.
@@ -331,6 +330,8 @@ function unlock() {
     locked = false;
     initCodepad(codeLength);
     $('#lock').addClass('notvisible');
+
+    if (armed) bombProgress(0, 'disarming');
 }
 
 function flashLock() {
