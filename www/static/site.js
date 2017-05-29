@@ -278,10 +278,10 @@ function numberPressed(number) {
         progress = disarmingProgress / disarmingSteps;
         bombProgress(progress, 'disarming');
     }
-    
+
     if (number == next) {
         guessed += number;
-        
+
         // Set display
         var d = guessed;
         for (var i = d.length; i < code.length; i++) d += '-';
@@ -307,14 +307,19 @@ function numberPressed(number) {
         // Wrong keypress
         play('beep');
 
-        // Lock it again
-        lock();
+        // Display ERROR
+        $('#display').addClass('wrong');
+        $('#display').text('YOLO');
 
-        // Flash display
-        //$('#display').addClass('wrong');
-        //window.setTimeout(function () {
-        //    $('#display').removeClass('wrong');
-        //}, 200);
+        // Shake wrong key
+        locked = true;
+        $('#code' + number).addClass('shake');
+        window.setTimeout(function () {
+            $('#code' + number).removeClass('shake');
+            $('#display').removeClass('wrong');
+            // Make lock visible
+            lock();
+        }, 900);
     }
 }
 
