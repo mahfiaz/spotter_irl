@@ -305,11 +305,14 @@ function numberPressed(number) {
         // Wrong keypress
         play('beep');
 
+        // Lock it again
+        lock();
+
         // Flash display
-        $('#display').addClass('wrong');
-        window.setTimeout(function () {
-            $('#display').removeClass('wrong'); 
-        }, 200);
+        //$('#display').addClass('wrong');
+        //window.setTimeout(function () {
+        //    $('#display').removeClass('wrong');
+        //}, 200);
     }
 }
 
@@ -346,7 +349,7 @@ function initSounds(bombsite) {
     var s = sounds
     s['background'] = new Audio(folder + 'background1.mp3');
     s['beep'] = new Audio(folder + 'beep.mp3');
-    s['beep'].volume = 0.25;
+    s['beep'].volume = 0.15;
     s['defused'] = new Audio(folder + 'defused.mp3');
     s['done'] = new Audio(folder + 'done.mp3');
     s['done'].volume = 0.5;
