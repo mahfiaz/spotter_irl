@@ -1,0 +1,11 @@
+*.pyc
+*.log
+*.mp3
+*.json
+*.kate-swp
+.directory
+__pycache__/
+project/
+help.py
+config.ini
+www/static/bombsite/*

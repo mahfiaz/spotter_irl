@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+<html lang="en">
+<head>
+    <title>Bombsite</title>
+    <link href="static/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet"> 
+    <link href="static/site.css" rel="stylesheet">
+    <script src="static/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="static/site.js" charset="utf-8"></script>
+    <script type="text/javascript">
+    </script>
+</head>
+<body class="bombsite site-a">
+    <div class="container">
+        <div class="header">
+            <div class="progressbar-cont">
+                <div id="progressbar"></div>
+            </div>
+            <div class="sitename left">A</div>
+            <div class="sitename right">A</div>
+            <div class="timer"><span id="timer-text">ROUND TIMER</span> <span id="timer-value"><span id="timer-minutes"></span>:<span id="timer-seconds"></span></span></div>
+            <div class="fix"></div>
+        </div>
+        <div class="defusing">
+            <div id="bomb-progress-container" class="bomb-progress-cont neutral">
+                <div id="bomb-progress" style="width:0%"></div>
+                <div id="message">Not armed</div>
+            </div>
+            <div class="bomb">
+                <img id="led" class="hidden" src="static/bombsite/led.png" />
+            </div>
+            <div class="right-container">
+              <div id="lock" class="notvisible">
+                <div class="text">
+                    <img id="lock-image" src="static/bombsite/lock-small.png" /><h1>Locked</h1>
+                    <p>Unlock using QR code or send code <span id="unlock-code">13245678</span> (or press Enter)
+                    <div class="fix"></div>
+                </div>
+                <img id="qrcode" src="qr.png" />
+              </div>
+              <div id="module">
+                <div id="display" class="display">--------</div>
+                <div id="codepad">
+                  <div class="cp-row">
+                    <div id="code7" class="cp">7</div>
+                    <div id="code8" class="cp">8</div>
+                    <div id="code9" class="cp">9</div>
+                  </div>
+                  <div class="cp-row">
+                    <div id="code4" class="cp">4</div>
+                    <div id="code5" class="cp">5</div>
+                    <div id="code6" class="cp">6</div>
+                  </div>
+                  <div class="cp-row">
+                    <div id="code1" class="cp">1</div>
+                    <div id="code2" class="cp">2</div>
+                    <div id="code3" class="cp">3</div>
+                  </div>
+                  <div class="cp-row">
+                    <div id="code0" class="cp">0</div>
+                    <div id="coded" class="cp">&lt;</div>
+                  </div>
+                  <div class="fix"></div>
+                </div>
+                <div class="fix"></div>
+              </div>  
+            </div>
+            <div class="fix"></div>
+        </div>
+    </div>
+    <div id="overlay" class="overlay notvisible">
+        <div id="overlay-message" class="overlay-message">CT won</div>
+    </div>
+</body>
+</html>

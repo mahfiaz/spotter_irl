@@ -1,0 +1,314 @@
+@font-face {
+    font-family: 'Segment';
+    src: url('dseg.ttf');
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    background-size: cover;
+}
+
+.site-a {
+    background: url("bombsite/siteA.jpg") no-repeat center center fixed;
+}
+
+.site-b {
+    background: url("bombsite/siteB.jpg") no-repeat center center fixed;
+}
+
+.header {
+    background: rgba(0, 0, 0, 0.3);
+    text-align: center;
+    border-radius: 0 0 20px 20px;
+}
+
+.timer {
+    padding-top: 0.75em;
+    font-family: Orbitron, Arial;
+    font-weight: bold;
+    font-size: 3em;
+    color: white;
+}
+
+#timer-value {
+    color: red;
+    font-size: 1.1em;
+}
+
+#timer-minutes {
+    display: inline-block;
+    width: 1.5em;
+    text-align: right;
+}
+
+#timer-seconds {
+    display: inline-block;
+    width: 3em;
+    text-align: left;
+}
+
+.sitename {
+    color: white;
+    font-weight: bold;
+    font-size: 4em;
+    padding: 0.3em;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.fix {
+    clear: both;
+}
+
+#lock {
+    z-index: 100;
+    position: absolute;
+    height: 584px;
+    width: 420px;
+    margin: 0 auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    text-align: center;
+    
+    transition-property: transform, opacity;
+    transition-duration: 1s;
+}
+
+#lock.notvisible {
+    transform: scale(1.1);
+    opacity: 0;
+}
+
+#lock h1 {
+    font-family: Orbitron, Arial;
+    font-weight: bold;
+}
+
+#lock .text {
+    text-align: left;
+    color: white;
+    font-size: 1.5em;
+    padding: 10px;
+}
+
+#lock .text img {
+    float: left;
+    margin-top: 35px;
+    margin-right: 15px;
+    margin-bottom: 30px;
+    margin-left: 10px;
+}
+
+#lock-image.shake {
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+@keyframes shake {
+  10%, 90% {transform: translate3d(-1px, 0, 0);}
+  20%, 80% {transform: translate3d(2px, 0, 0);}
+  30%, 50%, 70% {transform: translate3d(-4px, 0, 0);}
+  40%, 60% {transform: translate3d(4px, 0, 0);}
+}
+
+.progressbar-cont {
+    height: 15px;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+#progressbar {
+    height: 15px;
+    background-color: red;
+    width: 0%;
+    transition-property: width;
+    transition-duration: 1s;
+    transition-timing-function: ease-out;
+}
+
+.bomb {
+    width: 484px;
+    height: 297px;
+    background: url('bombsite/bomb.png');
+    margin-left: -20px;
+    float: left;
+    margin-right: 2em;
+    margin-top: 150px;
+}
+
+#led {
+    margin-top: 56px;
+    margin-left: 209px;
+}
+
+.right-container {
+    width: 30em;
+    float: right;
+}
+
+.defusing {
+    margin-top: 2em;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px 20px 0 0;
+}
+
+#module {
+    width: 416px;
+    background-color: #211;
+    padding: 8px;
+}
+
+.display {
+    background-color: #e6e900;
+    width: 400px;
+    height: 74px;
+    font-family: Segment, Arial;
+    font-size: 3em;
+    color: #494a06;
+    padding: 8px;
+    
+    transition-property: background-color;
+    transition-duration: 0.2s;
+}
+
+.wrong {
+    background-color: #f66;
+}
+
+.correct {
+    background-color: #6f6;
+}
+
+#codepad {
+    width: 400px;
+}
+
+.cp {
+    float: left;
+    width: 113px;
+    padding: 5px 10px;
+    text-align: center;
+    font-family: Arial;
+    font-weight: bold;
+    font-size: 60px;
+    color: #533;
+    background: #eec;
+    margin: 10px;
+    border-radius: 8px;
+    border: 4px solid #444;
+}
+
+#code0 {
+    width: 246px;
+}
+
+.highlight {
+    background: #e99;
+    box-shadow: 0 0 8px red, 0 0 30px gray inset;
+    text-shadow: 0 0 3px black, 0 0 10px white;
+    color: #300;
+}
+
+/* Bomb bar */
+.bomb-progress-cont {
+    height: 140px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3) inset;
+}
+
+#bomb-progress {
+    height: 140px;
+    width: 0%;
+    border-radius: 20px 20px 0 0;
+    transition-property: width;
+    transition-duration: 2s;
+}
+
+#message {
+    margin-top: -140px;
+    font-family: Orbitron, Arial;
+    font-weight: bold;
+    font-size: 60px;
+    text-shadow: 0 0 5px black;
+    padding: 36px;
+    background-color: transparent;
+}
+
+.neutral div {
+    color: #eee;
+    background-color: rgba(0, 255, 0, 0.5);
+}
+
+.arming div {
+    color: #fb4;
+    background-color: rgba(255, 100, 0, 0.5);
+}
+
+.armed div {
+    color: #f00;
+    background-color: rgba(255, 100, 100, 0.5);
+}
+
+.disarming div {
+    color: #cef;
+    background-color: rgba(100, 200, 255, 0.5);
+}
+
+.disarmed div {
+    color: #cef;
+    background-color: rgba(100, 200, 255, 0.5);
+}
+
+.exploded div {
+    color: #fff;
+    background-color: #000;
+}
+
+/* Overlay */
+.overlay {
+    z-index: 200;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background: rgba(255, 255, 255, 0.6);
+    
+    transition-property: opacity;
+    transition-duration: 2s;
+}
+
+.overlay.notvisible {
+    opacity: 0;
+}
+
+.overlay-message {
+    background: rgba(0, 0, 0, 1);
+    margin-top: 30vh;
+    padding-top: 10vh;
+    padding-bottom: 10vh;
+    
+    text-align: center;
+    font-family: Orbitron, Arial;
+    font-weight: bold;
+    font-size: 60px;
+    color: white;
+    
+}
