@@ -49,8 +49,9 @@ function startGame() {
 
     // Lock keypad
     lock();
-    
+
     // Start music
+    stop('background');
     play('wind');
 }
 
@@ -97,17 +98,14 @@ function armingComplete() {
 function disarmingComplete() {
     console.log('Disarming complete');
     play('defused');
-
     winner = 'CT';
     endGame();
 }
 
 function kaboom() {
     console.log('Kaboom');
-
     bombProgress(1, 'exploded');
     play('explosion');
-
     play('win-ct');
     winner = 'TR';
     endGame();
@@ -117,14 +115,12 @@ function timerReached() {
     console.log('Timer reached');
     winner = 'CT';
     play('win-ct');
-
     endGame();
 }
 
 function endGame() {
     stopTimer();
     locked = true;
-
     showOverlay(winner + ' won', '');
     stop('wind');
     play('background');
@@ -149,7 +145,6 @@ function stopTimer() {
 
 function timer() {
     odd = !odd;
-
     if (odd) {
         // Every second time do not run full timer.
         if (armed && timerValue <= 10)
@@ -163,6 +158,7 @@ function timer() {
     // Change time
     timerValue -= 1;
     advanceClock();
+    if (armed) blinkLed();
 
     // Kaboom
     if (timerValue == 0) {
@@ -171,16 +167,6 @@ function timer() {
         else
             timerReached();
         clearInterval(beepTimer);
-    }
-
-    // Blinking LED
-    if (armed) {
-        // Show LED
-        $('#led').removeClass('hidden');
-        // Hide LED
-        window.setTimeout(function() {
-            $('#led').addClass('hidden');
-        }, 200);
     }
 }
 
@@ -194,6 +180,15 @@ function advanceClock() {
     // Set progress bar
     var width = 100 * ((maxTime - timerValue) / maxTime);
     $('#progressbar').css('width', width + '%');
+}
+
+function blinkLed() {
+    // Show LED
+    $('#led').removeClass('hidden');
+    // Hide LED
+    window.setTimeout(function() {
+        $('#led').addClass('hidden');
+    }, 200);
 }
 
 var bombTexts = {

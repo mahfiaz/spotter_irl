@@ -185,6 +185,7 @@ body {
     
     transition-property: background-color;
     transition-duration: 0.2s;
+    box-shadow: 2px 2px 7px black inset;
 }
 
 .wrong {
