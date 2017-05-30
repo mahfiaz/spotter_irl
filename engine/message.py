@@ -41,7 +41,7 @@ class MessageChannel:
             return msg['text']
 
     def check_all():
-        print("xx checkAll", MessageChannel.message_list)
+        #print("xx checkAll", MessageChannel.message_list)
         for player in MessageChannel.message_list:
             if time.time() - player['poll_time'] > 15:
                 print("xx checkAll time passed")
