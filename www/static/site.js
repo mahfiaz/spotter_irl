@@ -43,6 +43,20 @@ function initGame(site) {
 
     // Load sounds
     initSounds(site);
+
+    // Unhide debug if necessary
+    if (debug) {
+        $('#lock-debug').removeClass('hidden');
+    }
+
+    if (!debug) {
+        locked = true;
+        gameOver = true;
+        showOverlay('Game not yet started', '');
+    }
+
+    // Polling
+    poll();
 }
 
 function startGame() {
@@ -140,6 +154,31 @@ function endGame() {
     stop('wind');
     play('background');
     gameOver = true;
+}
+
+// Polling
+function poll() {
+    setTimeout(function () {
+        $.ajax({
+            url: "/pollsite?site=" + bombsite,
+            type: "GET",
+            success: pollData,
+            dataType: "json",
+            complete: poll,
+            timeout: 100
+        });
+    }, 500);
+}
+
+function pollData(data) {
+    console.log(data);
+    if (locked && !data['lock']) {
+        unlock();
+    }
+    if (data['startround']) {
+        startGame();
+        return;
+    }
 }
 
 // Timer
@@ -335,11 +374,18 @@ function numberPressed(number) {
 
 function lock() {
     // TODO get right QR code and regular code
-    var code = unlockCode;
-    var link = qrLink(code);
-    qrcode.makeCode(link);
+    qrcode.clear();
+    $.ajax('/getcode?site='+bombsite).done(lockCallback);
     locked = true;
     $('#lock').removeClass('notvisible');
+}
+
+function lockCallback(data) {
+    unlockCode = data['code'];
+    shortCode = data['shortcode'];
+    var link = qrLink();
+    qrcode.makeCode(link);
+    $('#unlock-code').text(shortCode);
 }
 
 function delayLock() {

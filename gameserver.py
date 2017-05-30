@@ -237,6 +237,42 @@ class App:
         else:
             return "403 Connection Forbidden"
 
+    @app.route("/getcode", methods=["GET"])
+    def getcode():
+        # expects request /getcode?site=A
+        site = request.args.get("site")
+        if site not in ['A', 'B']:
+            return "403 Connection Forbidden"
+        code, shortcode = game.sites[site].lock()
+        data = {'code': code, 'shortcode': shortcode}
+        return jsonify(data)
+
+    @app.route("/unlock", methods=["GET"])
+    def unlock():
+        # expects request /getcode?site=A
+        site = request.args.get("s")
+        code = request.args.get("c")
+        if site not in ['A', 'B']:
+            return "403 Connection Forbidden"
+        print(site, code)
+        data = {}
+        data['response'] = game.sites[site].unlock(code)
+        return jsonify(data)
+
+    @app.route("/pollsite", methods=["GET"])
+    def pollsite():
+        site = request.args.get("site")
+        if site not in ['A', 'B']:
+            return "403 Connection Forbidden"
+        data = {}
+        s = game.sites[site]
+        # Check if keypad was unlocked
+        data['lock'] = s.locked
+        if s.starting:
+            data['startround'] = True
+            s.starting = False
+        return jsonify(data)
+
     @app.route("/masterout")
     def master_logout():
         if App.is_master():
@@ -407,6 +443,8 @@ if __name__ == "__main__":
     # Queues
     sms_queue = queue.Queue()
     printer_queue = queue.Queue()
+
+    game = Game(config, cursor)
 
     Action.initAllConnect(cursor, sms_queue, printer_queue)
     Round.updateActiveId()

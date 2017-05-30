@@ -1,6 +1,8 @@
 *.pyc
 *.log
 *.json
+*.mp3
+*.ttf
 *.kate-swp
 __pycache__/
 project/

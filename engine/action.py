@@ -14,6 +14,55 @@ import pprint
 from threading import Timer
 
 
+class Game:
+    def __init__(self, config, cursor):
+        self.config = config
+        self.cursor = cursor
+        self.A = Site('A')
+        self.B = Site('B')
+        self.sites = {'A': self.A, 'B': self.B}
+
+
+class Site:
+    locked = True
+    code = None
+    shortcode = None
+
+    starting = False
+
+    def __init__(self, name):
+        self.name = name
+        self.lock()
+
+    def lock(self):
+        self.locked = True
+        self.code = self.generate_code(7)
+        self.shortcode = self.generate_code(4)
+        return (self.code, self.shortcode)
+
+    def unlock(self, code):
+        if str(code) == str(self.code) \
+            or str(code) == str(self.shortcode):
+            self.locked = False
+            return 'Site %s unlocked' % self.name
+        else:
+            return 'Code not correct'
+
+    def generate_code(self, length):
+        min_num = 10 ** (length - 1) + 1
+        max_num = 10 ** length - 1
+        # Ensure it's odd for A and even for B
+        while True:
+            code = random.randint(min_num, max_num)
+            if self.name == 'A' and (code % 2) == 1:
+                break
+            elif self.name == 'B' and (code % 2) == 0:
+                break
+            elif self.name not in ['A', 'B']:
+                # Don't care
+                break
+        return code
+
 
 class Action:
     compactPrint = pprint.PrettyPrinter(width=41, compact=True)
