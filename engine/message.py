@@ -44,7 +44,7 @@ class MessageChannel:
         #print("xx checkAll", MessageChannel.message_list)
         for player in MessageChannel.message_list:
             if time.time() - player['poll_time'] > 15:
-                print("xx checkAll time passed")
+                #print("xx checkAll time passed")
                 msg = MessageChannel._pop_message(player['id'])
                 if not msg:
                     return
