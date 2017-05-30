@@ -8,12 +8,16 @@ var codeLength = 4; // chars
 var armingSteps = 3;
 var disarmingSteps = 2;
 
+var gameLink = 'http://pll.ee/game/';
+var unlockCode = 123456;
+
 // Game variables
 var armed, disarmed;
 var armingProgress, disarmingProgress;
 var locked = true;
 var winner = NaN;
 var gameOver = false;
+var qrcode = NaN;
 
 // Start round
 function initGame(site) {
@@ -25,6 +29,17 @@ function initGame(site) {
     // Set main image
     $('body').removeClass('site-a site-b');
     $('body').addClass('site-' + site.toLowerCase());
+
+    // Setup QR code
+    var qrElement = document.getElementById("qrcode");
+    qrcode = new QRCode(qrElement, {
+        text: gameLink,
+        width: 256,
+        height: 256,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
 
     // Load sounds
     initSounds(site);
@@ -320,7 +335,9 @@ function numberPressed(number) {
 
 function lock() {
     // TODO get right QR code and regular code
-    //
+    var code = unlockCode;
+    var link = qrLink(code);
+    qrcode.makeCode(link);
     locked = true;
     $('#lock').removeClass('notvisible');
 }
@@ -335,6 +352,10 @@ function unlock() {
     $('#lock').addClass('notvisible');
 
     if (armed && !disarmingProgress) bombProgress(0, 'disarming');
+}
+
+function qrLink() {
+    return link = gameLink + 'unlock?s=' + bombsite + '&c=' + unlockCode;
 }
 
 function flashLock() {

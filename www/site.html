@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet"> 
     <link href="static/site.css" rel="stylesheet">
     <script src="static/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="static/qrcode.js" charset="utf-8"></script>
     <script src="static/site.js" charset="utf-8"></script>
     <script type="text/javascript">
     </script>
@@ -37,7 +38,9 @@
                     <p>Unlock using QR code or send code <span id="unlock-code">13245678</span> (or press Enter)
                     <div class="fix"></div>
                 </div>
-                <img id="qrcode" src="qr.png" />
+                <div class="qrcode-container">
+                    <div id="qrcode"></div>
+                </div>
               </div>
               <div id="module">
                 <div id="display" class="display">--------</div>
