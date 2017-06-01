@@ -47,12 +47,18 @@ class App:
 
     def logged_in():
         try:
-            if session["user"] == None or session["web_hash"] == None:
+            if request.cookies.get("user") == None or request.cookies.get("web_hash") == None:
                 return False
             else:
                 return True
         except KeyError:
             return False
+
+    @app.route("login", methods=["GET"])
+    def login():
+        user = request.args.get("user")
+        web_hash = Player.getHashById(Player._getIdByName(user))
+        return App.add_cookies(user, web_hash)
 
     @app.route("/")
     def index():
@@ -83,15 +89,22 @@ class App:
 
         if user and phone:
             if Action.addPlayer(user, phone, ''):
-                session["user"] = user
-                session["phone"] = phone
-                session["web_hash"] = Player.getHashById(Player._getIdByName(user))
+                App.add_cookies(user, Player.getHashById(Player._getIdByName(user)))
+
                 return App.index()
             else:
                 return App.registration_template("Probleem registreerimisel, kontrolli sisestatud andmeid.")
         else:
             return App.registration_template("Mõlemad väljad on kohustuslikud.")
 
+    def add_cookies(user, web_hash):
+        try:
+            cookies = make_response("Cookies added")
+            cookies.set_cookie("user", user)
+            cookies.set_cookie("web_hash", web_hash)
+            return cookies
+        except:
+            return "Problem adding cookies"
 
     @app.route("/wrongInfo")
     def wrong_info():
