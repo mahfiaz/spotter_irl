@@ -28,7 +28,7 @@ class App:
 
     def pending_template():
         if App.logged_in():
-            return render_template("pending.html", user=session["user"], phone=session["phone"])
+            return render_template("pending.html", user=request.cookies.get("user"), phone=request.cookies.get("phone"))
         else:
             return "403 Connection Forbidden"
 
@@ -41,7 +41,7 @@ class App:
     @app.route("/isJailed")
     def jailed():
         if App.logged_in():
-            return str(Event.isPlayerJailed(Player._getIdByName(session["user"])))
+            return str(Event.isPlayerJailed(Player._getIdByName(request.cookies.get("user"))))
         else:
             return "403 Connection Forbidden"
 
@@ -56,14 +56,16 @@ class App:
 
     @app.route("/login", methods=["GET"])
     def login():
-        user = request.args.get("user")
-        web_hash = Player.getHashById(Player._getIdByName(user))
-        return App.add_cookies(user, web_hash)
+        web_hash = request.args.get("hash")
+        phone = Player.getMobileById(Player.getIdByHash(web_hash))
+        user = Player.getNameById(Player.getIdByHash(web_hash))
+        return App.add_cookies(user, phone, web_hash)
+        
 
     @app.route("/")
     def index():
         if App.logged_in():
-            if not Event.isPlayerJailed(Player._getIdByName(session["user"])):
+            if not Event.isPlayerJailed(Player._getIdByName(request.cookies.get("user"))):
                 return App.playing_template()
             return App.pending_template()
         else:
@@ -89,19 +91,32 @@ class App:
 
         if user and phone:
             if Action.addPlayer(user, phone, ''):
-                App.add_cookies(user, Player.getHashById(Player._getIdByName(user)))
-
-                return App.index()
+                return App.add_cookies(user, phone, Player.getHashById(Player._getIdByName(user)))
             else:
                 return App.registration_template("Probleem registreerimisel, kontrolli sisestatud andmeid.")
         else:
             return App.registration_template("Mõlemad väljad on kohustuslikud.")
 
-    def add_cookies(user, web_hash):
+    @app.route("/cookie")
+    def add_cookies(user, phone, web_hash):
         try:
-            cookies = make_response("Cookies added")
-            cookies.set_cookie("user", user)
-            cookies.set_cookie("web_hash", web_hash)
+            expire_date = datetime.datetime.now()
+            expire_date = expire_date + datetime.timedelta(days=1)
+            cookies = make_response(render_template("to_game.html"))
+            cookies.set_cookie("user", user, expires=expire_date)
+            cookies.set_cookie("phone", phone, expires=expire_date)
+            cookies.set_cookie("web_hash", web_hash, expires=expire_date)
+            return cookies
+        except:
+            return "Problem adding cookies"
+
+    @app.route("/delCookies")
+    def delete_cookies():
+        try:
+            cookies = make_response(render_template("to_game.html"))
+            cookies.set_cookie("user", "", expires=0)
+            cookies.set_cookie("phone", "", expires=0)
+            cookies.set_cookie("web_hash", "", expires=0)
             return cookies
         except:
             return "Problem adding cookies"
@@ -110,10 +125,9 @@ class App:
     def wrong_info():
         if App.logged_in():
             phone = request.args.get("phone")
-            if phone == session["phone"]:
-                Player.delPlayer(session["user"])
-                session.clear()
-                return "User data removed"
+            if phone == request.cookies.get("phone"):
+                Player.delPlayer(request.cookies.get("user"))
+                return App.delete_cookies()
             else:
                 return "User data preserved"
         else:
@@ -140,7 +154,7 @@ class App:
     def tag():
         if App.logged_in():
             tag_code = request.args.get("tagCode")
-            if Action.handleWeb(session["web_hash"], tag_code):
+            if Action.handleWeb(request.cookies.get("web_hash"), tag_code):
                 return "Hit"
             else:
                 return "Your attempt to catch them failed"
@@ -152,7 +166,7 @@ class App:
     def messageTeam():
         if App.logged_in():
             team_message = request.args.get("message")
-            player_id = Player.getIdByHash(session["web_hash"])
+            player_id = Player.getIdByHash(request.cookies.get("web_hash"))
             if team_message and player_id:
                 if Action.sayToMyTeam(player_id, team_message):
                     return "Message sent"
@@ -174,15 +188,15 @@ class App:
     @app.route("/user")
     def username():
         if App.logged_in():
-            return session["user"]
+            return request.cookies.get("user")
         else:
             return "403 Connection Forbidden"
 
     @app.route("/userTeam")
     def user_team():
         if App.logged_in():
-            if Team.getPlayerTeamId(Player.getIdByHash(session["web_hash"]),Round.getActiveId()):
-                return str(Team.getPlayerTeamId(Player.getIdByHash(session["web_hash"]),Round.getActiveId()))
+            if Team.getPlayerTeamId(Player.getIdByHash(request.cookies.get("web_hash")),Round.getActiveId()):
+                return str(Team.getPlayerTeamId(Player.getIdByHash(request.cookies.get("web_hash")),Round.getActiveId()))
             else:
                 return "Player is not currently in a team"
         else:
@@ -199,8 +213,8 @@ class App:
     def personal_message():
         if App.logged_in():
             data = {}
-            data['jailed'] = str(Event.isPlayerJailed(Player._getIdByName(session["user"])))
-            message = Action.browserRequestsMessages(session["web_hash"])
+            data['jailed'] = str(Event.isPlayerJailed(Player._getIdByName(request.cookies.get("user"))))
+            message = Action.browserRequestsMessages(request.cookies.get("web_hash"))
             data['message'] = message
             return jsonify(data)
         else:
