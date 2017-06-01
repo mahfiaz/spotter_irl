@@ -54,7 +54,7 @@ class App:
         except KeyError:
             return False
 
-    @app.route("login", methods=["GET"])
+    @app.route("/login", methods=["GET"])
     def login():
         user = request.args.get("user")
         web_hash = Player.getHashById(Player._getIdByName(user))
