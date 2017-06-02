@@ -15,6 +15,10 @@
             if(window.location.href != gameServerAddress+"spawn") {
                 window.location.assign("/spawn");
             }
+            $.when(getAllTeams()).then(function() {
+                $(".addToTeam1").html(teams[0]);
+                $(".addToTeam2").html(teams[1]);
+            });
         }
 
         function newRound() {
@@ -39,24 +43,20 @@
             xhr.send();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4 && xhr.status == 200) {
-                    console.log(xhr.responseText)
-                    window.location.assign("/spawn")
+                    console.log(xhr.responseText);
+                    window.location.assign("/spawn");
                 }
             }
         }
 
         function to2(playerId) {
-            xhr.open("GET", "/addToTeam?teamName="teams[1]"&playerId="+playerId, true);
+            xhr.open("GET", "/addToTeam?teamName="+teams[1]+"&playerId="+playerId, true);
             xhr.send();
         }
 
         function to1(playerId) {
-            xhr.open("GET", "/addToTeam?teamName="teams[0]"&playerId="+playerId, true);
+            xhr.open("GET", "/addToTeam?teamName="+teams[0]+"&playerId="+playerId, true);
             xhr.send();
-        }
-
-        window.onload = function() {
-        	getAllTeams();
         }
     </script>
 </head>
@@ -92,8 +92,8 @@
                         <td>{{ player[6] }}</td>
                         <td>{{ player[7] }}</td>
                         <td>{{ player[8] }}</td>
-                        <td><button class="btn btn-primary" onclick="to1({{ player[0] }})">Sinised</button></td>
-                        <td><button class="btn btn-danger" onclick="to2({{ player[0] }})">Punased</button></td>
+                        <td><button class="btn btn-primary" onclick="to1({{ player[0] }})"><span class="addToTeam1"></span></button></td>
+                        <td><button class="btn btn-danger" onclick="to2({{ player[0] }})"><span class="addToTeam2"></span></button></td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -122,8 +122,8 @@
                         <td>{{ player[6] }}</td>
                         <td>{{ player[7] }}</td>
                         <td>{{ player[8] }}</td>
-                        <td><button class="btn btn-primary" onclick="to1({{ player[0] }})">Sinised</button></td>
-                        <td><button class="btn btn-danger" onclick="to2({{ player[0] }})">Punased</button></td>
+                        <td><button class="btn btn-primary" onclick="to1({{ player[0] }})"><span class="addToTeam1"></span></button></td>
+                        <td><button class="btn btn-danger" onclick="to2({{ player[0] }})"><span class="addToTeam2"></span></button></td>
                     </tr>
                     {% endfor %}
                 </table>
