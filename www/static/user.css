@@ -16,6 +16,7 @@ body {
     padding: 0;
     margin: 0;
     background-size: cover;
+    background-image: url('css_dust2.jpg');
 }
 
 .header {
@@ -108,7 +109,7 @@ body {
     
 }
 
-
+/* Login overlay */
 .overlay-login {
     z-index: 200;
     position: absolute;
@@ -116,8 +117,8 @@ body {
     left: 0;
     height: 100vh;
     width: 100vw;
-    background: rgba(255, 255, 255, 0.6);
-    
+    background-size: cover;
+    background-image: url('css_dust2.jpg');
     transition-property: opacity;
     transition-duration: 2s;
 }
@@ -127,17 +128,19 @@ body {
 }
 
 .login {
-    max-width: 480px;
+    max-width: 500px;
     margin: 0 auto;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.6);
     padding: 20px;
+    color: white;
+    text-align: center;
 }
 
 .login input {
     width: 100%;
-    margin: 5px;
-
+    margin: 10px 0;
 }
+
 input[type="text"] {
     display: block;
     width: 100%;
@@ -146,12 +149,8 @@ input[type="text"] {
     appearance: none;
     box-shadow: none;
     border-radius: none;
+    color: black;
 }
-
-input[type="radio"] {
-    width: auto;
-}
-
 
 
 .button {
@@ -166,12 +165,38 @@ input[type="radio"] {
     margin-top: 0.2em;
 }
 
+#ct, #tr {
+    width: 48%;
+}
+
+#ct.selected {
+    background-color: #33c;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 1), 0 0 5px rgba(0, 0, 0, 1) inset;
+}
+
+#ct {
+    background-color: #446;
+}
+
+#tr.selected {
+    background-color: #c33;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 1), 0 0 5px rgba(0, 0, 0, 1) inset;
+}
+
+#tr {
+    background-color: #644;
+}
+
 .green {
-    background-color: #4CAF50; /* Green */
+    background-color: #4CAF50;
 }
 
 .red {
-    background-color: #f44336; /* Red */
+    background-color: #f44336;
+}
+
+.gray {
+    background-color: #999;
 }
 
 .team {
@@ -186,3 +211,89 @@ input[type="radio"] {
     padding-left: 45px;
     background: blue;
 }
+
+/* Input line */
+.actions {
+    background: rgba(0, 0, 0, 0.3);
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 10px 10px 0 0;
+}
+
+#code {
+    width: 77%;
+    float: left;
+    padding: 7px 10px;
+    margin-top: 0.2em;
+    margin-left: 3px;
+    font-size: 20px;
+}
+
+#send {
+    width: 20%;
+    float: right;
+    margin-right: 3px;
+}
+
+#response {
+    color: white;
+    font-size: 24px;
+    padding: 5px;
+    padding-top: 10px;
+}
+
+/* Scoretable */
+
+.scoretable {
+    background: rgba(0, 0, 0, 1);
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 1.2em;
+}
+
+.scoretable table {
+    width: 100%;
+    color: white;
+}
+
+.scoretable thead {
+    font-weight: bold;
+}
+
+.scoretable .team-ct thead {
+    background: #339;
+}
+
+.scoretable .team-tr thead {
+    background: #933;
+}
+
+.scoretable td {
+    padding: 5px;
+}
+
+.scoretable .color, .scoretable.hits {
+    text-align: center;
+}
+
+.scoretable .down {
+    text-decoration: line-through;
+    color: gray;
+}
+
+.scoretable .team-ct .color {
+    background: #339;
+}
+
+.scoretable .team-tr .color {
+    background: #933;
+}
+
+.scoretable .down .color {
+    background: black;
+}
+
+.scoretable thead .color {
+    font-size: 1.5em;
+}
+

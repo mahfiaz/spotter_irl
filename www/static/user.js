@@ -1,7 +1,4 @@
 // GENERAL SETTINGS
-
-var debug = true;
-var bombsite = 'B';
 var roundLength = 1.5 * 60;
 var bombTimer = 30;
 var codeLength = 4; // chars
@@ -107,38 +104,6 @@ function showOverlay(message) {
 
 function clearOverlay() {
     $('#overlay').addClass('notvisible');
-}
-
-// Sound bank
-var sounds = {};
-
-function initSounds(bombsite) {
-    var folder = 'static/bombsite/'
-    var suffix = bombsite + '.mp3'
-    var s = sounds
-    s['beep'] = new Audio(folder + 'beep.mp3');
-    s['beep'].volume = 0.15;
-    s['defused'] = new Audio(folder + 'defused.mp3');
-    s['done'] = new Audio(folder + 'done.mp3');
-    s['done'].volume = 0.5;
-    s['planted'] = new Audio(folder + 'planted.mp3');
-    s['press'] = new Audio(folder + 'press.mp3');
-    s['press'].volume = 0.6;
-    s['win-ct'] = new Audio(folder + 'win-ct.mp3');
-    s['win-tr'] = new Audio(folder + 'win-tr.mp3');
-}
-
-function play(sound) {
-    // Pause and time reset is to make sure
-    // it restarts when still playing.
-    sounds[sound].pause();
-    sounds[sound].currentTime = 0;
-    sounds[sound].play();
-}
-
-function stop(sound) {
-    sounds[sound].pause();
-    sounds[sound].currentTime = 0;
 }
 
 // Finally start game
