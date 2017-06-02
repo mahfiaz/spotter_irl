@@ -42,8 +42,8 @@ def generate(data):
     team = data['player']['team']['name']
     code = data['player']['spotcode']
 
-    link = "http://pll.ee/game"
-    qr_url = "http://fusiongame.tk/s/%s" % data['player']['touchcode']
+    link = "game.pll.ee"
+    qr_url = "http://game.pll.ee/s/%s" % data['player']['touchcode']
 
     if team == 'CT':
         template = 'spotter_printer/template-CT.odt'

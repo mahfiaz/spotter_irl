@@ -23,7 +23,7 @@ def connector():
 
     while True:
         datestr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        r = requests.get('http://fusiongame.tk/print?pass=htpT2U8UMpApV852DGSncBP7')
+        r = requests.get('http://game.pll.ee/print?pass=htpT2U8UMpApV852DGSncBP7')
         try:
             response = json.loads(r.text)
             if not successful:
@@ -50,7 +50,7 @@ def test():
             'spotcode': 2374,
             'touchcode': 2440987,
             'team': {
-                'name': 'Sinised',
+                'name': 'CT',
                 'color': '3399FF'}
         },
         'printer': 'PDF',
@@ -60,12 +60,13 @@ def test():
             '13:33 Villu pages ',
             '13:30 Volloi värvati '],
         'teamScores': [
-            {'name': 'Sinised', 'score': 0},
-            {'name': 'Punased', 'score': 2}]
+            {'name': 'CT', 'score': 0},
+            {'name': 'TR', 'score': 2}]
         }
     pdf = generate(testdata)
     send_printer(pdf, "PDF")
 
+
 if __name__ == "__main__":
-    #test()
-    connector()
+    test()
+    #connector()

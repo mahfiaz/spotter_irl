@@ -296,7 +296,7 @@ class App:
     @app.route("/pollsite", methods=["GET"])
     def pollsite():
         site = request.args.get("site")
-        if site not in ['A', 'B']:
+        if site not in ['A', 'B', 'C']:
             return "403 Connection Forbidden"
         data = {}
         s = game.sites[site]

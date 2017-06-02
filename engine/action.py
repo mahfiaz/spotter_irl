@@ -18,9 +18,10 @@ class Game:
     def __init__(self, config, cursor):
         self.config = config
         self.cursor = cursor
-        self.A = Site('A')
-        self.B = Site('B')
-        self.sites = {'A': self.A, 'B': self.B}
+        self.A = Site(self, 'A')
+        self.B = Site(self, 'B')
+        self.C = Site(self, 'C')
+        self.sites = {'A': self.A, 'B': self.B, 'C': self.C}
 
 
 class Site:
@@ -30,7 +31,8 @@ class Site:
 
     starting = False
 
-    def __init__(self, name):
+    def __init__(self, parent, name):
+        self.parent = parent
         self.name = name
         self.lock()
 

@@ -1,6 +1,5 @@
 // GENERAL SETTINGS
-
-var debug = true;
+var debug = false;
 var bombsite = 'B';
 var roundLength = 1.5 * 60;
 var bombTimer = 30;
@@ -18,6 +17,10 @@ var locked = true;
 var winner = NaN;
 var gameOver = false;
 var qrcode = NaN;
+
+// Globals
+var GET;
+var round = 0;
 
 // Start round
 function initGame(site) {
@@ -154,6 +157,7 @@ function endGame() {
     stop('wind');
     play('background');
     gameOver = true;
+    round += 1;
 }
 
 // Polling
@@ -468,11 +472,31 @@ function keypress(e) {
     play('beep');
 }
 
+// Get query parameters
+function getQueryParams(qs) {
+    qs = qs.split("+").join(" ");
+    var params = {},
+        tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+
+    while (tokens = re.exec(qs)) {
+        params[decodeURIComponent(tokens[1])]
+            = decodeURIComponent(tokens[2]);
+    }
+
+    return params;
+}
+
 // Finally start game
 window.onload = function() {
+    GET = getQueryParams(document.location.search);
+    bombsite = GET['site'];
+
     // Setup game
     initGame(bombsite);
-    startGame();
+
+    // Otherwise server starts game
+    if (debug) startGame();
 
     // Register keypress listener
     window.addEventListener("keypress", keypress);

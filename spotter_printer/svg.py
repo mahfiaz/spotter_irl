@@ -19,8 +19,6 @@ def generate(data):
     svgpath = "spotter_printer/gen/%s.svg" % code
     pdfpath = "spotter_printer/gen/%s.pdf" % code
 
-
-
     replacements = {
         '$playername$': data['player']['name'],
         '$code$': data['player']['spotcode'],
