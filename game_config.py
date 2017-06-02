@@ -39,7 +39,7 @@ round_data = [
     {'name':'Viimane',      'starts':'18:05', 'ends':'18:55'}]
 
 
-teams = ({'name':'Sinised', 'color':'3399FF'}, {'name':'Punased', 'color':'FF6699'})
+teams = ({'name':'CT', 'color':'3399FF'}, {'name':'TR', 'color':'FF6699'})
 
 master_player = {'name':'Master', 'mobile': config['general']['phone_alert']}
 

@@ -120,41 +120,41 @@ class Sms:
         Sms.send(mobile, msgCellular['notSignedUp'].format(mobile), sendLink = True)
 
     def senderJailed(mobile, name, jailCode):
-        Sms.send(mobile, msgCellular['senderJailed'].format(name, jailCode), sendStats = True, sendLink = True)
+        Sms.send(mobile, msgCellular['senderJailed'].format(name), sendStats = True)
 
     def victimJailed(senderMobile, senderName, victimMobile, victimName, jailCode):
-        Sms.send(victimMobile, msgCellular['victimJailedVictim'].format(victimName, senderName, jailCode), sendStats = True, sendLink = True, forceSms = True)
-        Sms.send(senderMobile, msgCellular['victimJailedSender'].format(senderName, victimName, victimName), sendStats = True, sendLink = True)
+        Sms.send(victimMobile, msgCellular['victimJailedVictim'].format(victimName, senderName), forceSms = True, sendStats = True)
+        Sms.send(senderMobile, msgCellular['victimJailedSender'].format(senderName, victimName), sendStats = True)
 
     def missed(mobile, name):
-        Sms.send(mobile, msgCellular['missed'].format(name), sendStats = True, sendLink = True)
+        Sms.send(mobile, msgCellular['missed'].format(name), sendStats = True)
 
     def oldCode(mobile, nameSender, nameVictim):
-        Sms.send(mobile, msgCellular['oldCode'].format(nameSender, nameVictim), sendStats = True, sendLink = True)
+        Sms.send(mobile, msgCellular['oldCode'].format(nameSender, nameVictim), sendStats = True)
 
     def exposedSelf(mobile, name, jailCode):
-        Sms.send(mobile, msgCellular['exposedSelf'].format(name, jailCode), sendStats = True, sendLink = True)
+        Sms.send(mobile, msgCellular['exposedSelf'].format(name), sendStats = True)
 
     def spotMate(senderMobile, senderName, victimMobile, victimName, jailCode):
-        Sms.send(senderMobile, msgCellular['spotMateSender'].format(senderName, victimName), sendStats = True, sendLink = True)
-        Sms.send(victimMobile, msgCellular['spotMateVictim'].format(victimName, jailCode), sendStats = True, sendLink = True)
+        Sms.send(senderMobile, msgCellular['spotMateSender'].format(senderName, victimName), sendStats = True)
+        Sms.send(victimMobile, msgCellular['spotMateVictim'].format(victimName), sendStats = True)
 
     def spotted(senderMobile, senderName, victimMobile, victimName, jailCode):
-        Sms.send(senderMobile, msgCellular['spottedSender'].format(senderName, victimName), sendStats = True, sendLink = True)
-        Sms.send(victimMobile, msgCellular['spottedVictim'].format(victimName, jailCode), sendStats = True, sendLink = True)
+        Sms.send(senderMobile, msgCellular['spottedSender'].format(senderName, victimName), sendStats = True)
+        Sms.send(victimMobile, msgCellular['spottedVictim'].format(victimName), sendStats = True)
 
     def touched(senderMobile, senderName, victimMobile, victimName, jailCode):
-        Sms.send(senderMobile, msgCellular['touchedSender'].format(senderName, victimName), sendStats = True, sendLink = True)
-        Sms.send(victimMobile, msgCellular['touchedVictim'].format(victimName, jailCode), sendStats = True, sendLink = True)
+        Sms.send(senderMobile, msgCellular['touchedSender'].format(senderName, victimName), sendStats = True)
+        Sms.send(victimMobile, msgCellular['touchedVictim'].format(victimName, senderName), sendStats = True)
 
     def fleeingProtectionOver(mobile, name):
-        Sms.send(mobile, msgCellular['fleeingProtectionOver'].format(name), sendLink = True, forceSms = True)
+        Sms.send(mobile, msgCellular['fleeingProtectionOver'].format(name), forceSms = True)
 
     def noActiveRound(mobile, nextIn):
         Sms.send(mobile, msgCellular['noActiveRound'].format(nextIn))
 
     def roundStarted(mobile, roundName):
-        Sms.send(mobile, msgCellular['roundStarted'].format(roundName), sendLink = True)
+        Sms.send(mobile, msgCellular['roundStarted'].format(roundName))
 
     def roundEnding(mobile, roundName, timeLeft):
         Sms.send(mobile, msgCellular['roundEnding'].format(roundName, timeLeft), sendStats = True)
@@ -163,7 +163,7 @@ class Sms:
         Sms.send(mobile, msgCellular['roundEnded'].format(roundName), sendStats = True)
 
     def playerAdded(mobile, name, jailCode):
-        Sms.send(mobile, msgCellular['playerAdded'].format(name, jailCode), sendLink = True)
+        Sms.send(mobile, msgCellular['playerAdded'].format(name))
 
     def alertGameMaster(message):
         Sms.send(game_config.game_master_mobile_number, message)
