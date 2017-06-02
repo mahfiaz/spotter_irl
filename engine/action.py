@@ -101,12 +101,12 @@ class Action:
             BaseMsg.playerAdded(name)
             Sms.playerAdded(mobile, name, Player.getFleeingCode(newPlayerId))
             Stats.updateStats()
+            # Make fleeing temporarily obsolete
+            fleecode = Player.getFleeingCode(newPlayerId)
+            Action.fleePlayerWithCode(str(fleecode))
+            return newPlayerId
         else:
             BaseMsg.playerNotUnique(name, mobile, email)
-        # Make fleeing temporarily obsolete
-        fleecode = Player.getFleeingCode(newPlayerId)
-        Action.fleePlayerWithCode(str(fleecode))
-        return newPlayerId
 
     def addPlayerToTeam(name, teamName):
         if not Round.getActiveId():
@@ -191,7 +191,7 @@ class Action:
                 Sms.noActiveRound(mobile, Round._getStartTimeOfNext())
             return
         if not Team.getPlayerTeamId(senderId, Round.getActiveId()):
-            Sms.alertGameMaster(senderName + " not added to any team! Please add!")
+#            Sms.alertGameMaster(senderName + " not added to any team! Please add!")
             return
         code = int(code)
         if senderJailed:
