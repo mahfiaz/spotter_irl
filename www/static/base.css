@@ -123,54 +123,10 @@ body {
     
 }
 
-/* Login overlay */
-.overlay-login {
-    z-index: 200;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 100vw;
-    background-size: cover;
-    background-image: url('css_dust2.jpg');
-    transition-property: opacity;
-    transition-duration: 2s;
-}
-
-.overlay-login.notvisible {
-    opacity: 0;
-}
-
-.login {
-    max-width: 500px;
-    margin: 0 auto;
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 20px;
-    color: white;
-    text-align: center;
-}
-
-.login input {
-    width: 100%;
-    margin: 10px 0;
-}
-
-input[type="text"] {
-    display: block;
-    width: 100%;
-    font-family: sans-serif;
-    font-size: 18px;
-    appearance: none;
-    box-shadow: none;
-    border-radius: none;
-    color: black;
-}
-
-
 .button {
     border: none;
     color: white;
-    padding: 15px 32px;
+    padding: 10px 25px;
     font-weight: bold;
     text-align: center;
     text-decoration: none;
@@ -180,7 +136,6 @@ input[type="text"] {
 }
 
 #ct, #tr {
-    width: 48%;
 }
 
 #ct.selected {
@@ -251,7 +206,7 @@ input[type="text"] {
 
 #response {
     color: white;
-    font-size: 24px;
+    font-size: 18px;
     padding: 5px;
     padding-top: 10px;
 }
@@ -311,3 +266,15 @@ input[type="text"] {
     font-size: 1.5em;
 }
 
+#eventlist {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    padding-bottom: 10px;
+    margin-top: 20px;
+    color: white;
+}
+
+.ready {
+    float: right;
+    margin-top: 30px;
+}
