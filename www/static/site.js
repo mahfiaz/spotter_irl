@@ -8,7 +8,7 @@ var codeLength = 4; // chars
 var armingSteps = 3;
 var disarmingSteps = 2;
 
-var gameLink = 'http://pll.ee/game/';
+var gameLink = 'http://game.pll.ee/';
 var unlockCode = 123456;
 
 // Game variables

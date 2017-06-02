@@ -103,6 +103,9 @@ class Action:
             Stats.updateStats()
         else:
             BaseMsg.playerNotUnique(name, mobile, email)
+        # Make fleeing temporarily obsolete
+        fleecode = Player.getFleeingCode(newPlayerId)
+        Action.fleePlayerWithCode(str(fleecode))
         return newPlayerId
 
     def addPlayerToTeam(name, teamName):
