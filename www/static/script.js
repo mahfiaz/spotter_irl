@@ -2,6 +2,16 @@ user = "";
 userTeam = "";
 userJailed = "";
 gameServerAddress = window.location.origin + "/";
+var teams;
+
+function getAllTeams() {
+    $.ajax({
+        url:"teams"
+    }).done(function(data){
+        teams = data;
+    })
+}
+
 
 function getAllStats() {
     if (document.getElementById("stats")) {
@@ -118,7 +128,7 @@ function getEvents() {
             } else {
                 for(i in events) {
                     event = events[i];
-                    if (event["visible"] == "All" || (event["visible"] == "Sinised" && (userTeam % 2) == 1) || (event["visible"] == "Punased" && (userTeam % 2) == 0)) {
+                    if (event["visible"] == "All" || (event["visible"] == teams[0] && (userTeam % 2) == 1) || (event["visible"] == teams[1] && (userTeam % 2) == 0)) {
                         divContents += "<p>" + (parseInt(event["time"].substring(0,2)) + 3) + event["time"].substring(2,5);
                         divContents += " <span style='color:#"+event["text1"]["color"]+";'>"+event["text1"]["text"]+"</span>";
                         divContents += " <span style='color:#"+event["text2"]["color"]+";'>"+event["text2"]["text"]+"</span>";
