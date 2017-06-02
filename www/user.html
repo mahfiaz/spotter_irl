@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+<html lang="en">
+<head>
+    <title>Bombsite</title>
+    <link href="static/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet"> 
+    <link href="static/user.css" rel="stylesheet">
+    <script src="static/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="static/qrcode.js" charset="utf-8"></script>
+    <script src="static/user.js" charset="utf-8"></script>
+    <script type="text/javascript">
+    </script>
+</head>
+<body class="user team-unknown">
+    <div class="container">
+        <div class="header">
+            <div class="progressbar-cont">
+                <div id="progressbar"></div>
+            </div>
+            <div class="sitename left">A</div>
+            <div class="sitename right">A</div>
+            <div class="timer"><span id="timer-text">ROUND TIMER</span> <span id="timer-value"><span id="timer-minutes"></span>:<span id="timer-seconds"></span></span></div>
+            <div class="fix"></div>
+        </div>
+        <div class="defusing">
+            <div class="fix"></div>
+        </div>
+    </div>
+    <div id="overlay" class="overlay notvisible">
+        <div id="overlay-message" class="overlay-message">CT won</div>
+    </div>
+    <div id="overlay-login" class="overlay">
+        <div id="login" class="login">
+            <input name="username" type="text" placeholder="Player name" />
+            <input name="mobile" type="text" placeholder="Mobile phone" />
+            <div class="team">
+            Choose your preferred team<br />
+                <input id="ct" name="team" type="radio" value="CT"><label for="ct">CT</label>
+                <input id="tr" name="team" type="radio" value="TR"><label for="tr">TR</label>
+            </div>
+            <input name="send" type="button" value="Join game" class="button green" />
+        </div> 
+    </div>
+</body>
+</html>
