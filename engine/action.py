@@ -82,7 +82,7 @@ class Action:
         Code.initConnect(cursor)
         Team.initConnect(cursor)
         Event.initConnect(cursor)
-        Round.setCallbacks(roundStarted = Action._roundStartedCall, roundEnding = Action._roundEndingCall, roundEnded = Action._roundEndedCall)
+#        Round.setCallbacks(roundStarted = Action._roundStartedCall, roundEnding = Action._roundEndingCall, roundEnded = Action._roundEndedCall)
         Stats.updateStats()
         MessageChannel.queue = sms_queue
         Sms.setCallback(Stats.getTeamPlayerStatsStringByMobile)
@@ -101,9 +101,6 @@ class Action:
             BaseMsg.playerAdded(name)
             Sms.playerAdded(mobile, name, Player.getFleeingCode(newPlayerId))
             Stats.updateStats()
-            # Make fleeing temporarily obsolete
-            fleecode = Player.getFleeingCode(newPlayerId)
-            Action.fleePlayerWithCode(str(fleecode))
             return newPlayerId
         else:
             BaseMsg.playerNotUnique(name, mobile, email)
@@ -125,6 +122,9 @@ class Action:
         teamId = Team._getIdByName(teamName, Round.getActiveId())
         if Team.addPlayer(playerId, teamId):
             Code.generateNewCodes(playerId)
+            # auto flee
+            fleecode = Player.getFleeingCode(newPlayerId)
+            Action.fleePlayerWithCode(str(fleecode))
             Event.addPlayerToTeam(playerId)
         else:
             print("Error when adding player to team")
@@ -352,13 +352,13 @@ class Action:
                 Player._generateFleeingCode(playerId)
                 Event.addFlee(playerId)
                 Code.generateNewCodes(playerId)
-                timer = Timer(game_config.player_fleeingProtectionTime, Action._fleeTimerCall, (Player.getMobileById(playerId), Player.getNameById(playerId),))
-                timer.daemon=True
-                timer.start()
-                BaseMsg.fledSuccessful(Player.getNameById(playerId), round(game_config.player_fleeingProtectionTime / 60, 1))
+#                timer = Timer(game_config.player_fleeingProtectionTime, Action._fleeTimerCall, (Player.getMobileById(playerId), Player.getNameById(playerId),))
+#                timer.daemon=True
+#                timer.start()
+#                BaseMsg.fledSuccessful(Player.getNameById(playerId), round(game_config.player_fleeingProtectionTime / 60, 1))
                 return playerId
             else:
-                BaseMsg.cantFleeFromLiberty(Player.getNameById(playerId))
+#                BaseMsg.cantFleeFromLiberty(Player.getNameById(playerId))
                 return False
 
     def _unbanAllChats():
@@ -367,13 +367,27 @@ class Action:
 
 # round calls
     def _roundStartedCall(mobileNameList, roundName):
-        Action.masterAnnounces("Lahing " + roundName + " algas.")
-#        BaseMsg.roundStarted()
-        for (mobile, name) in mobileNameList:
-            Sms.roundStarted(mobile, roundName)
-        for id in Player.getAllPlayerIds():
-            Player.unbanChat(id)
+        Action.masterAnnounces("Lahing " + roundName + " algas. CT meeskond väljub.")
 
+        timer = Timer(30 - 5, Action._team_tr_starting_in_callback, 5)
+        timer.daemon=True
+        timer.start()
+
+        timer = Timer(30, Action._team_tr_ready_callback, 0)
+        timer.daemon=True
+        timer.start()
+
+#        BaseMsg.roundStarted()
+#        for (mobile, name) in mobileNameList:
+#            Sms.roundStarted(mobile, roundName)
+#        for id in Player.getAllPlayerIds():
+#            Player.unbanChat(id)
+
+    def _team_tr_starting_in_callback(timeleft):
+        Action.masterAnnounces("TR stardib " + str(timeleft) + " sek pärast.")
+
+    def _team_tr_ready_callback(timeleft):
+        Action.masterAnnounces("TR meeskond startis.")
 
     def _roundEndingCall(mobileNameList, roundName, left):
         Action.masterAnnounces("Lahing " + roundName + " lõpeb " + str(left) + " min pärast. Tule autasustamisele baasi.")
