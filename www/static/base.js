@@ -190,7 +190,6 @@ function getEvents() {
     });
 }
 
-<<<<<<< HEAD
 // Get data from json to fill table contents
 function getScoreTable() {
     var score = "";
@@ -214,7 +213,8 @@ function getScoreTable() {
         }
         $(".scoretable").html(score);
     });
-=======
+}
+
 // Get query parameters
 function getQueryParams(qs) {
     qs = qs.split("+").join(" ");
@@ -228,7 +228,6 @@ function getQueryParams(qs) {
     }
 
     return params;
->>>>>>> 10c1909c13662934aaeba41bd8a5756ce1a9d54f
 }
 
 // Finally start game
