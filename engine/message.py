@@ -148,25 +148,31 @@ class Sms:
         Sms.send(victimMobile, msgCellular['touchedVictim'].format(victimName, senderName), sendStats = True)
 
     def fleeingProtectionOver(mobile, name):
-        Sms.send(mobile, msgCellular['fleeingProtectionOver'].format(name), forceSms = True)
+        #Sms.send(mobile, msgCellular['fleeingProtectionOver'].format(name), forceSms = True)
+        pass
 
     def noActiveRound(mobile, nextIn):
-        Sms.send(mobile, msgCellular['noActiveRound'].format(nextIn))
+        #Sms.send(mobile, msgCellular['noActiveRound'].format(nextIn))
+        pass
 
     def roundStarted(mobile, roundName):
-        Sms.send(mobile, msgCellular['roundStarted'].format(roundName))
+        #Sms.send(mobile, msgCellular['roundStarted'].format(roundName))
+        pass
 
     def roundEnding(mobile, roundName, timeLeft):
-        Sms.send(mobile, msgCellular['roundEnding'].format(roundName, timeLeft), sendStats = True)
+        #Sms.send(mobile, msgCellular['roundEnding'].format(roundName, timeLeft), sendStats = True)
+        pass
 
     def roundEnded(mobile, roundName):
-        Sms.send(mobile, msgCellular['roundEnded'].format(roundName), sendStats = True)
+        #Sms.send(mobile, msgCellular['roundEnded'].format(roundName), sendStats = True)
+        pass
 
     def playerAdded(mobile, name, jailCode):
         Sms.send(mobile, msgCellular['playerAdded'].format(name))
 
     def alertGameMaster(message):
-        Sms.send(game_config.game_master_mobile_number, message)
+        #Sms.send(game_config.game_master_mobile_number, message)
+        pass
 
 
 class BaseMsg:
@@ -184,13 +190,16 @@ class BaseMsg:
         BaseMsg.last_message['time'] = time.time()
 
     def fleeingCodeMismatch():
-        BaseMsg.send(msgBase['fleeingCodeMismatch'])
+        #BaseMsg.send(msgBase['fleeingCodeMismatch'])
+        pass
 
     def fledSuccessful(name, minutes):
-        BaseMsg.send(msgBase['fledSuccessful'].format(name, minutes))
+        #BaseMsg.send(msgBase['fledSuccessful'].format(name, minutes))
+        pass
 
     def cantFleeFromLiberty(name):
-        BaseMsg.send(msgBase['cantFleeFromLiberty'].format(name))
+        #BaseMsg.send(msgBase['cantFleeFromLiberty'].format(name))
+        pass
 
     def playerAdded(name):
         BaseMsg.send(msgBase['playerAdded'].format(name))
