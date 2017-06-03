@@ -21,10 +21,13 @@ var qrcode = NaN;
 // Globals
 var GET;
 var round = 0;
+var polling = false;
 
 // Start round
 function initGame(site) {
-    bombsite = site;
+    if (site) {
+        bombsite = site;
+    }
 
     $.ajax('sitesettings').done(initEnd);
 }
@@ -69,7 +72,10 @@ function initEnd(data) {
     }
 
     // Polling
-    poll();
+    if (!polling) {
+        poll();
+        polling = true;
+    }
 }
 
 function startGame() {
@@ -179,18 +185,38 @@ function poll() {
             success: pollData,
             dataType: "json",
             complete: poll,
-            timeout: 100
+            timeout: 500
         });
-    }, 500);
+    }, 1000);
 }
 
 function pollData(data) {
     if (locked && !data['lock']) {
         unlock();
     }
-    if (data['startround']) {
-        startGame();
-        return;
+    if (data['events']) {
+        for (var i = 0; i < data['events'].length; i++) {
+            event = data['events'][i];
+            eventname = event[0];
+            eventdata = event[1];
+
+            console.log(eventname);
+            if (eventname == 'started') {
+                startGame();
+            }
+            if (eventname == 'reset') {
+                endGame();
+                initGame();
+                window.location = window.location;
+            }
+            if (eventname == 'planted' && eventdata['origin'] != bombsite) {
+                play('planted');
+            }
+            if (eventname == 'ended' && eventdata['origin'] != bombsite) {
+                winner = eventdata['winner'];
+                endGame();
+            }
+        }
     }
 }
 

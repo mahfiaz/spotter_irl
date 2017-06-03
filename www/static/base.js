@@ -17,12 +17,29 @@ var locked = true;
 var winner = NaN;
 var gameOver = false;
 var qrcode = NaN;
+var teamready = false;
+
+function initGame(site) {
+    if (site) {
+        bombsite = site;
+    }
+
+    $.ajax('sitesettings').done(initEnd);
+}
+
+function initEnd(data) {
+    roundLength = parseInt(data['roundlength']);
+    bombTimer = parseInt(data['bombtimer']);
+    armingSteps = parseInt(data['armingsteps']);
+    disarmingSteps = parseInt(data['disarmingsteps']);
+    gameLink = data['link'];
+}
 
 // Polling
 function poll() {
     setTimeout(function () {
         $.ajax({
-            url: "/pollbase?team=" + team,
+            url: "/pollsite?site=" + team,
             type: "GET",
             success: pollData,
             dataType: "json",
@@ -33,15 +50,42 @@ function poll() {
 }
 
 function pollData(data) {
-    console.log(data);
+    //console.log(data);
     if (locked && !data['lock']) {
         unlock();
     }
-    if (data['startround']) {
-        startGame();
-        return;
+    if (data['events']) {
+        for (var i = 0; i < data['events'].length; i++) {
+            event = data['events'][i];
+            eventname = event[0];
+            eventdata = event[1];
+
+            console.log(eventname);
+            if (eventname == 'started') {
+                maxTime = roundLength;
+                timerValue =  maxTime + 1;
+                startTimer();
+                $('#timer-text').text('ROUND TIMER');
+            }
+            if (eventname == 'reset') {
+                window.location = window.location;
+            }
+            if (eventname == 'planted' && eventdata['origin'] != bombsite) {
+                play('planted');
+                maxTime = bombTimer;
+                timerValue = maxTime + 1;
+                $('#timer-text').text('BOMB TIMER');
+            }
+            if (eventname == 'ended' && eventdata['origin'] != bombsite) {
+                winner = eventdata['winner'];
+                console.log(winner);
+                $('#timer-text').text(winner + 'WON');
+            }
+        }
     }
 }
+
+
 
 // Timer
 var maxTime = roundLength;
@@ -78,12 +122,17 @@ function timer() {
 
     // Kaboom
     if (timerValue == 0) {
-        if (armed)
-            kaboom();
-        else
+        if (armed) {
+            //kaboom();
+        } else {
             timerReached();
+        }
         clearInterval(beepTimer);
     }
+}
+
+function timerReached() {
+    stopTimer();
 }
 
 function advanceClock() {
@@ -141,6 +190,7 @@ function getEvents() {
     });
 }
 
+<<<<<<< HEAD
 // Get data from json to fill table contents
 function getScoreTable() {
     var score = "";
@@ -164,10 +214,30 @@ function getScoreTable() {
         }
         $(".scoretable").html(score);
     });
+=======
+// Get query parameters
+function getQueryParams(qs) {
+    qs = qs.split("+").join(" ");
+    var params = {},
+        tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+
+    while (tokens = re.exec(qs)) {
+        params[decodeURIComponent(tokens[1])]
+            = decodeURIComponent(tokens[2]);
+    }
+
+    return params;
+>>>>>>> 10c1909c13662934aaeba41bd8a5756ce1a9d54f
 }
 
 // Finally start game
 window.onload = function() {
+    GET = getQueryParams(document.location.search);
+    team = GET['team'];
+    
+    initGame();
+    
     // Setup game
     addUser();
     //getEvents();
@@ -175,5 +245,18 @@ window.onload = function() {
     var allEvents = setInterval(function() {
         getScoreTable();
     }, 2000);
+    $('#readybutton').click(function () {
+        teamready = !teamready;
+        $.ajax('teamready?team='+team+'&state='+teamready)
+            .done(function () {
+                console.log(teamready);
+                if (teamready) {
+                    $('#readybutton').addClass('green').removeClass('gray');
+                } else {
+                    $('#readybutton').removeClass('green').addClass('gray');
+                }
+            });
+    });
     
+    poll();
 }
