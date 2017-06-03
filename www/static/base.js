@@ -19,6 +19,22 @@ var gameOver = false;
 var qrcode = NaN;
 var teamready = false;
 
+function initGame(site) {
+    if (site) {
+        bombsite = site;
+    }
+
+    $.ajax('sitesettings').done(initEnd);
+}
+
+function initEnd(data) {
+    roundLength = parseInt(data['roundlength']);
+    bombTimer = parseInt(data['bombtimer']);
+    armingSteps = parseInt(data['armingsteps']);
+    disarmingSteps = parseInt(data['disarmingsteps']);
+    gameLink = data['link'];
+}
+
 // Polling
 function poll() {
     setTimeout(function () {
@@ -38,11 +54,32 @@ function pollData(data) {
     if (locked && !data['lock']) {
         unlock();
     }
-    if (data['startround']) {
-        startGame();
-        return;
+    if (data['events']) {
+        for (var i = 0; i < data['events'].length; i++) {
+            event = data['events'][i];
+            eventname = event[0];
+            eventdata = event[1];
+
+            console.log(eventname);
+            if (eventname == 'started') {
+                startTime();
+            }
+            if (eventname == 'reset') {
+                endGame();
+                initGame();
+            }
+            if (eventname == 'planted' && eventdata['origin'] != bombsite) {
+                play('planted');
+            }
+            if (eventname == 'ended' && eventdata['origin'] != bombsite) {
+                winner = eventdata['winner'];
+                endGame();
+            }
+        }
     }
 }
+
+
 
 // Timer
 var maxTime = roundLength;
@@ -162,6 +199,8 @@ function getQueryParams(qs) {
 window.onload = function() {
     GET = getQueryParams(document.location.search);
     team = GET['team'];
+    
+    initGame();
     
     // Setup game
     addUser();

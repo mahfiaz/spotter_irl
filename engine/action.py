@@ -23,7 +23,9 @@ class Game:
         self.A = Site(self, 'A')
         self.B = Site(self, 'B')
         self.C = Site(self, 'C')
-        self.sites = {'A': self.A, 'B': self.B, 'C': self.C}
+        self.CT = Site(self, 'CT')
+        self.TR = Site(self, 'TR')
+        self.sites = {'A': self.A, 'B': self.B, 'C': self.C, 'CT': self.CT, 'TR': self.TR}
 
         self.teams = {}
         self.teams['CT'] = TeamNew(self, 'CT')
@@ -32,16 +34,24 @@ class Game:
         self.reset()
 
     def reset(self):
-        for name in self.sites:
-            site = self.sites[name]
-            site.events.append('reset')
-            print('appended to', name, site.events)
+        self.sendall('reset')
 
     def start(self):
         self.started = True
+        self.sendall('started')
+
+    def planted(self, origin):
+        self.started = True
+        self.sendall('planted', {'origin': origin})
+
+    def ended(self, origin, winner):
+        self.started = True
+        self.sendall('ended', {'origin': origin, 'winner': winner})
+
+    def sendall(self, message, data = {}):
         for name in self.sites:
             site = self.sites[name]
-            site.events.append('started')
+            site.events.append([message, data])
 
 class TeamNew:
     ready = False

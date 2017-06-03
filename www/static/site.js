@@ -197,15 +197,23 @@ function pollData(data) {
     if (data['events']) {
         for (var i = 0; i < data['events'].length; i++) {
             event = data['events'][i];
-            console.log(event);
-            if (event == 'started') {
-                console.log('started');
+            eventname = event[0];
+            eventdata = event[1];
+
+            console.log(eventname);
+            if (eventname == 'started') {
                 startGame();
             }
-            if (event == 'reset') {
-                console.log('resetted');
+            if (eventname == 'reset') {
                 endGame();
                 initGame();
+            }
+            if (eventname == 'planted' && eventdata['origin'] != bombsite) {
+                play('planted');
+            }
+            if (eventname == 'ended' && eventdata['origin'] != bombsite) {
+                winner = eventdata['winner'];
+                endGame();
             }
         }
     }
