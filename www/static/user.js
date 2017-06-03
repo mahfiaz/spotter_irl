@@ -106,17 +106,11 @@ function clearOverlay() {
     $('#overlay').addClass('notvisible');
 }
 
-// Finally start game
-window.onload = function() {
-    // Setup game
-}
-
-
 // Hit somebody
 function hit() {
-    $("#send").addEventListener("click", function() {
+    $("#send").click(function() {
         $.ajax({
-            url: /*TODO*/+$("#code").val()
+            url: "tag?tagCode="+$("#code").val()
         }).done(function(response) {
             $("#response").html(response);
         });
@@ -127,23 +121,33 @@ function hit() {
 function getScoreTable() {
     var score = "";
     $.ajax({
-        url: //TODO
+        url: "stats.json"//TODO
     }).done(function(data) {
         for (var i in data["teams"]) {
             var team = data["teams"][i];
-            score += "<div id='score-"+team["tag"]+"'>";
-            score += "<table class='team-"+team["tag"]+"'>";
-            score += "<thead><td width='20%'>"+team["tag"].toUpperCase()+"</td><td width='40%'>Player</td><td width='40%'>Hits</td></thead>";
+            score += "<div id='score-"+team["name"].toLowerCase()+"'>";
+            score += "<table class='team-"+team["name"].toLowerCase()+"'>";
+            score += "<thead><td width='20%'>"+team["name"]+"</td><td width='40%'>Player</td><td width='40%'>Hits</td></thead>";
             for (var j in team["players"]) {
                 var player = team["players"][j];
-                if (player["is_down"]) {
-                    score += "<tr class='down'><td class='color'></td><td class='name'>"+player["name"]+"</td><td class='hits'>"+player["hits"]+"</td></tr>";
+                if (player["nowInLiberty"]) {
+                    score += "<tr><td class='color'></td><td class='name'>"+player["name"]+"</td><td class='hits'>"+player["spotCount"]+"</td></tr>";
                 } else {
-                    score += "<tr><td class='color'></td><td class='name'>"+player["name"]+"</td><td class='hits'>"+player["hits"]+"</td></tr>";
+                    score += "<tr class='down'><td class='color'></td><td class='name'>"+player["name"]+"</td><td class='hits'>"+player["spotCount"]+"</td></tr>";
                 }
             }
             score += "</table></div>";
         }
         $(".scoretable").html(score);
     });
+}
+
+// Finally start game
+window.onload = function() {
+    // Setup game
+    hit();
+    getScoreTable();
+    var allEvents = setInterval(function() {
+        getScoreTable();
+    }, 2000);
 }

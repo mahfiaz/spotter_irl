@@ -118,7 +118,6 @@ function addUser() {
         $.ajax({
             url: "ap?username="+$("input[name=username]").val()+"&phone="+$("input[name=mobile]").val()+"&team="+team
         }).done(function(response) {
-            console.log(response);
             $("#response").html(response);
         });
     })
@@ -142,13 +141,39 @@ function getEvents() {
     });
 }
 
+// Get data from json to fill table contents
+function getScoreTable() {
+    var score = "";
+    $.ajax({
+        url: "stats.json"//TODO
+    }).done(function(data) {
+        for (var i in data["teams"]) {
+            var team = data["teams"][i];
+            score += "<div id='score-"+team["name"].toLowerCase()+"'>";
+            score += "<table class='team-"+team["name"].toLowerCase()+"'>";
+            score += "<thead><td width='20%'>"+team["name"]+"</td><td width='40%'>Player</td><td width='40%'>Hits</td></thead>";
+            for (var j in team["players"]) {
+                var player = team["players"][j];
+                if (player["nowInLiberty"]) {
+                    score += "<tr><td class='color'></td><td class='name'>"+player["name"]+"</td><td class='hits'>"+player["spotCount"]+"</td></tr>";
+                } else {
+                    score += "<tr class='down'><td class='color'></td><td class='name'>"+player["name"]+"</td><td class='hits'>"+player["spotCount"]+"</td></tr>";
+                }
+            }
+            score += "</table></div>";
+        }
+        $(".scoretable").html(score);
+    });
+}
+
 // Finally start game
 window.onload = function() {
     // Setup game
     addUser();
-    getEvents();
+    //getEvents();
+    getScoreTable();
     var allEvents = setInterval(function() {
-        getEvents();
+        getScoreTable();
     }, 2000);
     
 }

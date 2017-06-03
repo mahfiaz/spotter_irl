@@ -150,9 +150,9 @@ class App:
     def tag():
         if App.logged_in():
             tag_code = request.args.get("tagCode")
-            if Action.handleWeb(request.cookies.get("web_hash"), tag_code):
-                return "Hit"
-            else:
+            try:
+                return Action.handleWeb(request.cookies.get("web_hash"), tag_code)
+            except:
                 return "Your attempt to catch them failed"
         else:
             return "403 Connection Forbidden"
@@ -243,6 +243,10 @@ class App:
     @app.route("/b1")
     def b1():
         return render_template("base1.html")
+
+    @app.route("/p1")
+    def p1():
+        return render_template("user.html")
 
 
 

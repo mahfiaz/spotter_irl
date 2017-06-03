@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<meta charset="utf-8"/>
+<html lang="en">
+<head>
+    <title>game.pll.ee</title>
+    <link href="static/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet"> 
+    <link href="static/user.css" rel="stylesheet">
+    <script src="static/jquery-3.2.1.min.js" charset="utf-8"></script>
+    <script src="static/user.js" charset="utf-8"></script>
+    <script type="text/javascript">
+    </script>
+</head>
+<body class="user team-unknown">
+    <div class="container">
+        <div class="header">
+            <div class="progressbar-cont">
+                <div id="progressbar"></div>
+            </div>
+            <div class="timer"><span id="timer-text">STARTING IN</span> <span id="timer-value"><span id="timer-minutes">0</span>:<span id="timer-seconds">00</span></span></div>
+            <div class="fix"></div>
+        </div>
+        <div class="actions">
+            <div class="inputbox">
+                <input id="code" type="text" placeholder="Type code" class="" />
+                <input id="send" type="button" value="Send" class="button green" />
+                <div class="fix"></div>
+            </div>
+            <div id="response">Response</div>
+            <div class="fix"></div>
+        </div>
+        <div class="scoretable">
+          <div id="score-ct">
+            <table class="team-ct">
+                <thead>
+                    <td class="color">CT</td>
+                    <td class="name">Player</td>
+                    <td class="hits">Hits</td>
+                </thead>
+                <tr id="player-0">
+                    <td class="color"></td>
+                    <td class="name">jyrka</td>
+                    <td class="hits">0</td>
+                </tr>
+                <tr id="player-1" class="down">
+                    <td class="color"></td>
+                    <td class="name">pessimist</td>
+                    <td class="hits">0</td>
+                </tr>
+            </table>
+          </div>
+          <div id="score-tr">
+            <table class="team-tr">
+                <thead>
+                    <td class="color">TR</td>
+                    <td class="name">Player</td>
+                    <td class="hits">Hits</td>
+                </thead>
+                <tr id="player-0">
+                    <td class="color"></td>
+                    <td class="name">jyrka</td>
+                    <td class="hits">0</td>
+                </tr>
+                <tr id="player-1" class="down">
+                    <td class="color"></td>
+                    <td class="name">pessimist</td>
+                    <td class="hits">0</td>
+                </tr>
+            </table>
+          </div>
+        </div>
+    </div>
+    <div id="overlay-login" class="overlay-login hidden">
+        <div id="login" class="login">
+            <h1>game.pll.ee</h1>
+            <input name="username" type="text" placeholder="Player name" />
+            <input name="mobile" type="text" placeholder="Mobile phone" />
+            <div class="team">
+            Choose your preferred team<br />
+                <input id="ct" name="team-ct" type="button" value="CT" class="button button-ct selected" />
+                <input id="tr" name="team-tr" type="button" value="TR" class="button button-tr" />
+            </div>
+            <input name="send" type="button" value="Ready?" class="button gray" />
+            <h1>Waiting for the game to begin...</h1>
+        </div>
+    </div>
+    <div id="overlay" class="overlay hidden">
+        <div id="overlay-message" class="overlay-message">CT won</div>
+    </div>
+</body>
+</html>

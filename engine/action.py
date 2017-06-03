@@ -178,7 +178,7 @@ class Action:
         hash = Action._hashValidate(hash)
         code = Action._codeValidate(code)
         senderId = Player.getIdByHash(hash)
-        Action._handleCode(senderId, code, byMobile = False)
+        return Action._handleCode(senderId, code, byMobile = False)
 
     def _handleCode(senderId, code, byMobile):
         mobile = Player.getMobileById(senderId)
@@ -188,60 +188,62 @@ class Action:
             Event.addObscureMessage(senderId, code)
             if byMobile and mobile:
                 Sms.notSignedUp(mobile)
-            return
+            return False
         if not Round.updateActiveId() or not code:
             Event.addObscureMessage(senderId, code)
             if byMobile:
                 Sms.noActiveRound(mobile, Round._getStartTimeOfNext())
-            return
+            return False
         if not Team.getPlayerTeamId(senderId, Round.getActiveId()):
 #            Sms.alertGameMaster(senderName + " not added to any team! Please add!")
-            return
+            return False
         code = int(code)
         if senderJailed:
             Sms.senderJailed(mobile, senderName, Player.getFleeingCode(senderId))
             # store event too
-            return
+            return "Sa ei saa teisi hittida, kui oled ise hititud, pöördu tagasi baasi"
         victimId, codeValid = Code.getVictimIdByCode(code)
         if not victimId:
             # first add event, then update stats and then send sms with updated stats
             Event.addFailedSpot(senderId, code)
             Stats.updateStats()
             Sms.missed(mobile, Player.getNameById(senderId))
-            return
+            return "Tundub, et sisestasid vale koodi"
         if not Team.getPlayerTeamId(victimId, Round.getActiveId()):
             Sms.alertGameMaster(Player.getNameById(victimId) + " not added to any team! Please add!")
-            return
+            return False
         victimJailed = Event.isPlayerJailed(victimId)
         victimName = Player.getNameById(victimId)
         victimMobile = Player.getMobileById(victimId)
         if not codeValid:
             Event.addWasAimedWithOldCode(victimId, code)
             Sms.oldCode(mobile, senderName, victimName)
-            return
+            return False
         if victimJailed:
             Sms.victimJailed(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
-            return
+            return "Oleksid muidu hittinud, aga ta oli juba pihta saanud"
         assert type(senderId) == type(victimId)
         if senderId == victimId:
             Event.addExposeSelf(victimId)
             Stats.updateStats()
             Sms.exposedSelf(mobile, senderName, Player.getFleeingCode(senderId))
-            return
+            return "Hittisid ennast, järgmine kord ole hoolikam, selleks korraks on mäng sinu jaoks läbi, pöördu tagasi baasi"
         if Team.getPlayerTeamId(senderId, Round.getActiveId()) == Team.getPlayerTeamId(victimId, Round.getActiveId()):
             Event.addSpotMate(senderId, victimId)
             Stats.updateStats()
             Sms.spotMate(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
-            return
+            return "Hittisid oma meeskonna kaaslast"
         else:
             if Code._isValidSpotCodeFormat(code):
                 Event.addSpot(senderId, victimId)
                 Stats.updateStats()
                 Sms.spotted(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
+                return "Hea töö, hittisid vastast"
             elif Code._isValidTouchCodeFormat(code):
                 Event.addTouch(senderId, victimId)
                 Stats.updateStats()
                 Sms.touched(mobile, senderName, victimMobile, victimName, Player.getFleeingCode(victimId))
+                return "Erakordne õnn või häkk, aga punkte selle hiti eest ei jagata"
 
 # message spool
     # player's browser requests for user messages. if these requests come frequently (<4s), any Sms-message is queued and served one-by-one on by this function.
