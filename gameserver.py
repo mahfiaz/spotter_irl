@@ -488,7 +488,16 @@ if __name__ == "__main__":
     game = Game(config, cursor)
 
     Action.initAllConnect(cursor, sms_queue, printer_queue)
+    time = datetime.datetime.now()
+    end = datetime.datetime.now()+datetime.timedelta(days=365)
+    timestr = format(time, "%Y-%m-%d %H:%M:%S")
+    print(timestr)
+    endstr = format(end, "%Y-%m-%d %H:%M:%S")
+    print(endstr)
+    Round.add('round', timestr, endstr)
     Round.updateActiveId()
+    Action.addTeamsToAllRounds()
+
     Stats.updateStats()
     Stats.printPlayersDetailed()
 
