@@ -126,7 +126,7 @@ class Action:
         if Team.addPlayer(playerId, teamId):
             Code.generateNewCodes(playerId)
             # auto flee
-            fleecode = Player.getFleeingCode(newPlayerId)
+            fleecode = Player.getFleeingCode(playerId)
             Action.fleePlayerWithCode(str(fleecode))
             Event.addPlayerToTeam(playerId)
             Event.addFlee(playerId)

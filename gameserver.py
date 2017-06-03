@@ -232,9 +232,11 @@ class App:
         phone = request.args.get("phone")
         team = request.args.get("team")
         if user and team and phone:
-            Action.addPlayer(user, phone, '')
-            Action.addPlayerToTeam(user, team)
-            return "Success"
+            if Action.addPlayer(user, phone, ''):
+                Action.addPlayerToTeam(user, team)
+                return "Success"
+            else:
+                return "Error"
         else:
             return "Error"
 

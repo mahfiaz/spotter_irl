@@ -113,12 +113,12 @@ function addUser() {
     $("#ct").click(function() {team = "CT";console.log("CTd");});
     $("#tr").click(function() {team = "TR";console.log("TRd");});
     $("input[name=send]").click(function() {
-        console.log("Registered");
         console.log($("input[name=username]").val());
         console.log($("input[name=mobile]").val());
         $.ajax({
             url: "ap?username="+$("input[name=username]").val()+"&phone="+$("input[name=mobile]").val()+"&team="+team
         }).done(function(response) {
+            console.log(response);
             $("#response").html(response);
         });
     })
