@@ -103,6 +103,7 @@ class Action:
             BaseMsg.playerAdded(name)
             Sms.playerAdded(mobile, name, Player.getFleeingCode(newPlayerId))
             Stats.updateStats()
+            Event.addFlee(newPlayerId)
             return newPlayerId
         else:
             BaseMsg.playerNotUnique(name, mobile, email)
@@ -128,6 +129,7 @@ class Action:
             fleecode = Player.getFleeingCode(newPlayerId)
             Action.fleePlayerWithCode(str(fleecode))
             Event.addPlayerToTeam(playerId)
+            Event.addFlee(playerId)
         else:
             print("Error when adding player to team")
         Stats.updateStats()
