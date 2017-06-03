@@ -233,7 +233,7 @@ function getQueryParams(qs) {
 // Finally start game
 window.onload = function() {
     GET = getQueryParams(document.location.search);
-    team = GET['team'];
+    team = GET['site'];
     
     initGame();
     
@@ -246,7 +246,7 @@ window.onload = function() {
     }, 2000);
     $('#readybutton').click(function () {
         teamready = !teamready;
-        $.ajax('teamready?team='+team+'&state='+teamready)
+        $.ajax('teamready?site='+team+'&state='+teamready)
             .done(function () {
                 console.log(teamready);
                 if (teamready) {

@@ -376,7 +376,7 @@ class App:
 
     @app.route("/teamready", methods=["GET"])
     def teamready():
-        team = request.args.get("team")
+        team = request.args.get("site")
         state = request.args.get("state")
         if team not in ['CT', 'TR']:
             return "403 Connection Forbidden"

@@ -13,7 +13,8 @@ from spotter_printer.odt import generate
 
 
 def send_printer(pdf, printer="PDF"):
-    subprocess.call('lp -d "%s" "%s"' % (printer, pdf), shell=True)
+    copies = 2
+    subprocess.call('lp -d "%s" -n %d "%s"' % (printer, copies, pdf), shell=True)
 
 
 def connector():
@@ -68,5 +69,5 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
-    #connector()
+    #test()
+    connector()
