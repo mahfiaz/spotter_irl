@@ -1,0 +1,14 @@
+[
+  {
+    "commiter": "Jyrka", 
+    "event": "spotted", 
+    "targer": "Magnus", 
+    "time": "21:03", 
+    "type": "personal"
+  }, 
+  {
+    "event": "Game started", 
+    "time": "21:05", 
+    "type": "impersonal"
+  }
+]

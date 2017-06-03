@@ -110,3 +110,35 @@ function clearOverlay() {
 window.onload = function() {
     // Setup game
 }
+
+// Add user
+function addUser() {
+    var team = "";
+    $("#ct").addEventListener("click", function() {team = "ct";}
+    $("#tr").addEventListener("click", function() {team = "tr";}
+    $("#send").addEventListener("click", function() {
+        $.ajax({
+            url: /*TODO*/"?username="+$("#username").val()+"&phone="+$("#phone").val()+"&team="+team;
+        }).done(function(response) {
+            $("#response").html(response);
+        });
+    })
+}
+
+// Eventlist
+function getEvents() {
+    var events = "";
+    $.ajax({
+        url: "/"//TODO
+    }).done(function(data) {
+        for (var i in data) {
+            var event = data[i];
+            if (event["type"] == "personal") {
+                events += "<p>"+event["time"]+" "+event["commiter"]+" "+event["event"]+" "+event["target"]+"</p>";
+            } else {
+                events += "<p>"+event["time"]+" "+event["event"]+"</p>";
+            }
+        }
+        $(".eventlist").html(events);
+    });
+}

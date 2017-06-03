@@ -124,7 +124,7 @@ function hit() {
 }
 
 // Get data from json to fill table contents
-function getDataTable() {
+function getScoreTable() {
     var score = "";
     $.ajax({
         url: //TODO
@@ -144,6 +144,6 @@ function getDataTable() {
             }
             score += "</table></div>";
         }
-        console.log(score)
+        $(".scoretable").html(score);
     });
 }
