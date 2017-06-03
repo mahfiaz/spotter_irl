@@ -66,7 +66,7 @@ class App:
     def index():
         if App.logged_in():
             if not Event.isPlayerJailed(Player._getIdByName(request.cookies.get("user"))):
-                return App.playing_template()
+                return render_template("user.html")
             return App.pending_template()
         else:
             return App.registration_template(" ")
