@@ -512,6 +512,7 @@ class App:
             code = re.sub('[^0-9]+', '', message['contents'])
             if len(code) == 3:
                 # This is site unlocking code
+                mobile = message['number']
                 senderId = Player.getMobileOwnerId(mobile)
                 # Check if player is alive
                 dead = Event.isPlayerJailed(senderId)
