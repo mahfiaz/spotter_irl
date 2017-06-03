@@ -39,7 +39,7 @@ function initEnd(data) {
 function poll() {
     setTimeout(function () {
         $.ajax({
-            url: "/pollbase?team=" + team,
+            url: "/pollsite?site=" + team,
             type: "GET",
             success: pollData,
             dataType: "json",
@@ -50,7 +50,7 @@ function poll() {
 }
 
 function pollData(data) {
-    console.log(data);
+    //console.log(data);
     if (locked && !data['lock']) {
         unlock();
     }
@@ -62,18 +62,24 @@ function pollData(data) {
 
             console.log(eventname);
             if (eventname == 'started') {
-                startTime();
+                maxTime = roundLength;
+                timerValue =  maxTime + 1;
+                startTimer();
+                $('#timer-text').text('ROUND TIMER');
             }
             if (eventname == 'reset') {
-                endGame();
-                initGame();
+                window.location = window.location;
             }
             if (eventname == 'planted' && eventdata['origin'] != bombsite) {
                 play('planted');
+                maxTime = bombTimer;
+                timerValue = maxTime + 1;
+                $('#timer-text').text('BOMB TIMER');
             }
             if (eventname == 'ended' && eventdata['origin'] != bombsite) {
                 winner = eventdata['winner'];
-                endGame();
+                console.log(winner);
+                $('#timer-text').text(winner + 'WON');
             }
         }
     }
@@ -116,12 +122,17 @@ function timer() {
 
     // Kaboom
     if (timerValue == 0) {
-        if (armed)
-            kaboom();
-        else
+        if (armed) {
+            //kaboom();
+        } else {
             timerReached();
+        }
         clearInterval(beepTimer);
     }
+}
+
+function timerReached() {
+    stopTimer();
 }
 
 function advanceClock() {
@@ -220,4 +231,6 @@ window.onload = function() {
                 }
             });
     });
+    
+    poll();
 }

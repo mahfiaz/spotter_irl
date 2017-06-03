@@ -207,6 +207,7 @@ function pollData(data) {
             if (eventname == 'reset') {
                 endGame();
                 initGame();
+                window.location = window.location;
             }
             if (eventname == 'planted' && eventdata['origin'] != bombsite) {
                 play('planted');

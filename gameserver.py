@@ -305,18 +305,19 @@ class App:
             return "403 Connection Forbidden"
         print('unlocking', site, 'with', code)
         data = {}
-        # TODO check if player is alive
-        print(user)
-        if False:
+        # Check if player is alive
+        uid = Player._getIdByName(user)
+        dead = Event.isPlayerJailed(uid)
+        if dead:
             return App.playing_template()
         # Actually unlock if code matches
         result = game.sites[site].unlock(code)
-        return result
+        return App.playing_template()
 
     @app.route("/pollsite", methods=["GET"])
     def pollsite():
         site = request.args.get("site")
-        if site not in ['A', 'B', 'C']:
+        if site not in ['A', 'B', 'C', 'CT', 'TR']:
             return "403 Connection Forbidden"
         data = {}
         site = game.sites[site]
@@ -506,7 +507,12 @@ class App:
             if len(code) == 3:
                 # This is site unlocking code
                 senderId = Player.getMobileOwnerId(mobile)
-                # TODO check if sender is alive
+                # Check if player is alive
+                dead = Event.isPlayerJailed(senderId)
+                if dead:
+                    # Player is dead, send SMS, do nothing
+                    send(mobile, 'Kahjuks sa pole enam elus :(')
+                    continue
                 for site in game.sites:
                     site.unlock(code)
             else:
@@ -531,7 +537,10 @@ class App:
         if len(code) == 3:
             # This is site unlocking code
             senderId = Player.getMobileOwnerId(mobile)
-            # TODO check if sender is alive
+            # Check if player is alive
+            dead = Event.isPlayerJailed(senderId)
+            if dead:
+                return "dead"
             for name in game.sites:
                 site = game.sites[name]
                 site.unlock(code)
