@@ -301,6 +301,17 @@ class App:
         if s.starting:
             data['startround'] = True
             s.starting = False
+
+    @app.route("/sitesettings")
+    def sitesettings():
+        data = {}
+        data['roundlength'] = game.config['game']['roundlength']
+        data['bombtimer'] = game.config['game']['bombtimer']
+        data['armingsteps'] = game.config['game']['armingsteps']
+        data['disarmingsteps'] = game.config['game']['disarmingsteps']
+        data['link'] = game.config['game']['link']
+        return jsonify(data)
+
         return jsonify(data)
 
     @app.route("/masterout")

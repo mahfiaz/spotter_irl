@@ -1,4 +1,6 @@
 // GENERAL SETTINGS
+var team = 'CT';
+
 var roundLength = 1.5 * 60;
 var bombTimer = 30;
 var codeLength = 4; // chars
@@ -20,7 +22,7 @@ var qrcode = NaN;
 function poll() {
     setTimeout(function () {
         $.ajax({
-            url: "/pollbase?site=" + bombsite,
+            url: "/pollbase?team=" + team,
             type: "GET",
             success: pollData,
             dataType: "json",
@@ -106,11 +108,6 @@ function clearOverlay() {
     $('#overlay').addClass('notvisible');
 }
 
-// Finally start game
-window.onload = function() {
-    // Setup game
-}
-
 // Add user
 function addUser() {
     var team = "";
@@ -141,4 +138,10 @@ function getEvents() {
         }
         $(".eventlist").html(events);
     });
+}
+
+// Finally start game
+window.onload = function() {
+    // Setup game
+    
 }

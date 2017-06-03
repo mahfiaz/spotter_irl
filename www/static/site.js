@@ -1,6 +1,6 @@
 // GENERAL SETTINGS
 var debug = false;
-var bombsite = 'B';
+var bombsite = 'A';
 var roundLength = 1.5 * 60;
 var bombTimer = 30;
 var codeLength = 4; // chars
@@ -26,12 +26,22 @@ var round = 0;
 function initGame(site) {
     bombsite = site;
 
+    $.ajax('sitesettings').done(initEnd);
+}
+
+function initEnd(data) {
+    roundLength = parseInt(data['roundlength']);
+    bombTimer = parseInt(data['bombtimer']);
+    armingSteps = parseInt(data['armingsteps']);
+    disarmingSteps = parseInt(data['disarmingsteps']);
+    gameLink = data['link'];
+    
     // Set bombsite characters
-    $('.sitename').text(site);
+    $('.sitename').text(bombsite);
 
     // Set main image
     $('body').removeClass('site-a site-b');
-    $('body').addClass('site-' + site.toLowerCase());
+    $('body').addClass('site-' + bombsite.toLowerCase());
 
     // Setup QR code
     var qrElement = document.getElementById("qrcode");
@@ -45,7 +55,7 @@ function initGame(site) {
     });
 
     // Load sounds
-    initSounds(site);
+    initSounds(bombsite);
 
     // Unhide debug if necessary
     if (debug) {
@@ -155,7 +165,7 @@ function endGame() {
     locked = true;
     showOverlay(winner + ' won', '');
     stop('wind');
-    play('background');
+    //play('background');
     gameOver = true;
     round += 1;
 }
@@ -175,7 +185,6 @@ function poll() {
 }
 
 function pollData(data) {
-    console.log(data);
     if (locked && !data['lock']) {
         unlock();
     }
@@ -405,7 +414,7 @@ function unlock() {
 }
 
 function qrLink() {
-    return link = gameLink + 'unlock?s=' + bombsite + '&c=' + unlockCode;
+    return link = 'http://' + gameLink + '/unlock?site=' + bombsite + '&code=' + unlockCode;
 }
 
 function flashLock() {
