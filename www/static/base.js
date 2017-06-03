@@ -130,8 +130,8 @@ function getEvents() {
     $.ajax({
         url: "/"//TODO
     }).done(function(data) {
-        for (var i in data) {
-            var event = data[i];
+        for (var i in data["events"]) {
+            var event = data["events"][i];
             if (event["type"] == "personal") {
                 events += "<p>"+event["time"]+" "+event["commiter"]+" "+event["event"]+" "+event["target"]+"</p>";
             } else {
@@ -146,5 +146,9 @@ function getEvents() {
 window.onload = function() {
     // Setup game
     addUser();
+    getEvents();
+    var allEvents = setInterval(function() {
+        getEvents();
+    }, 2000);
     
 }
