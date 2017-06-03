@@ -110,8 +110,8 @@ function clearOverlay() {
 
 // Add user
 function addUser() {
-    $("#ct").click(function() {team = "ct";console.log("ctd");});
-    $("#tr").click(function() {team = "tr";console.log("trd");});
+    $("#ct").click(function() {team = "CT";console.log("CTd");});
+    $("#tr").click(function() {team = "TR";console.log("TRd");});
     $("input[name=send]").click(function() {
         console.log("Registered");
         console.log($("input[name=username]").val());
