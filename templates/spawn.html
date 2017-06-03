@@ -46,12 +46,12 @@
         }
 
         function to2(playerId) {
-            xhr.open("GET", "/addToTeam?teamName="teams[1]"&playerId="+playerId, true);
+            xhr.open("GET", "/addToTeam?teamName="+teams[1]+"&playerId="+playerId, true);
             xhr.send();
         }
 
         function to1(playerId) {
-            xhr.open("GET", "/addToTeam?teamName="teams[0]"&playerId="+playerId, true);
+            xhr.open("GET", "/addToTeam?teamName="+teams[0]+"&playerId="+playerId, true);
             xhr.send();
         }
 
