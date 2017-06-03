@@ -110,12 +110,14 @@ function clearOverlay() {
 
 // Add user
 function addUser() {
-    var team = "";
-    $("#ct").addEventListener("click", function() {team = "ct";}
-    $("#tr").addEventListener("click", function() {team = "tr";}
-    $("#send").addEventListener("click", function() {
+    $("#ct").click(function() {team = "ct";console.log("ctd");});
+    $("#tr").click(function() {team = "tr";console.log("trd");});
+    $("input[name=send]").click(function() {
+        console.log("Registered");
+        console.log($("input[name=username]").val());
+        console.log($("input[name=mobile]").val());
         $.ajax({
-            url: /*TODO*/"?username="+$("#username").val()+"&phone="+$("#phone").val()+"&team="+team;
+            url: "ap?username="+$("input[name=username]").val()+"&phone="+$("input[name=mobile]").val()+"&team="+team
         }).done(function(response) {
             $("#response").html(response);
         });
@@ -143,5 +145,6 @@ function getEvents() {
 // Finally start game
 window.onload = function() {
     // Setup game
+    addUser();
     
 }

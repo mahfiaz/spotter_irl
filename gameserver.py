@@ -226,6 +226,23 @@ class App:
     # Getting data
     # END BLOCK
 
+    @app.route("/ap")
+    def ap():
+        user = request.args.get("username")
+        phone = request.args.get("phone")
+        team = request.args.get("team")
+        if user and team and phone:
+            Action.addPlayer(user, phone, '')
+            Action.addPlayerToTeam(user, team)
+            return "Success"
+        else:
+            return "Error"
+
+    @app.route("/b1")
+    def b1():
+        return render_template("base1.html")
+
+
 
     # START BLOCK
     # Spawnmaster screen
