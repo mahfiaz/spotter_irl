@@ -110,3 +110,40 @@ function clearOverlay() {
 window.onload = function() {
     // Setup game
 }
+
+
+// Hit somebody
+function hit() {
+    $("#send").addEventListener("click", function() {
+        $.ajax({
+            url: /*TODO*/+$("#code").val()
+        }).done(function(response) {
+            $("#response").html(response);
+        });
+    })
+}
+
+// Get data from json to fill table contents
+function getDataTable() {
+    var score = "";
+    $.ajax({
+        url: //TODO
+    }).done(function(data) {
+        for (var i in data["teams"]) {
+            var team = data["teams"][i];
+            score += "<div id='score-"+team["tag"]+"'>";
+            score += "<table class='team-"+team["tag"]+"'>";
+            score += "<thead><td width='20%'>"+team["tag"].toUpperCase()+"</td><td width='40%'>Player</td><td width='40%'>Hits</td></thead>";
+            for (var j in team["players"]) {
+                var player = team["players"][j];
+                if (player["is_down"]) {
+                    score += "<tr class='down'><td class='color'></td><td class='name'>"+player["name"]+"</td><td class='hits'>"+player["hits"]+"</td></tr>";
+                } else {
+                    score += "<tr><td class='color'></td><td class='name'>"+player["name"]+"</td><td class='hits'>"+player["hits"]+"</td></tr>";
+                }
+            }
+            score += "</table></div>";
+        }
+        console.log(score)
+    });
+}
