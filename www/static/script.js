@@ -8,7 +8,7 @@ function getAllTeams() {
     $.ajax({
         url:"teams"
     }).done(function(data){
-        teams = data;
+        teams = data['teams'];
     })
 }
 

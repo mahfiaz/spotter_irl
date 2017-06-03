@@ -221,7 +221,7 @@ class App:
         all_teams = []
         for team in game_config.teams:
             all_teams.append(team['name'])
-        return jsonify(all_teams)
+        return jsonify({'teams': all_teams})
 
     # Getting data
     # END BLOCK
