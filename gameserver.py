@@ -279,15 +279,22 @@ class App:
 
     @app.route("/unlock", methods=["GET"])
     def unlock():
-        # expects request /getcode?site=A
-        site = request.args.get("s")
-        code = request.args.get("c")
-        if site not in ['A', 'B']:
+        # expects request /unlock?site=A&code=1234567
+        user=request.cookies.get("user")
+        phone=request.cookies.get("phone")
+        site = request.args.get("site")
+        code = request.args.get("code")
+        if site not in ['A', 'B', 'C']:
             return "403 Connection Forbidden"
-        print(site, code)
+        print('unlocking', site, 'with', code)
         data = {}
-        data['response'] = game.sites[site].unlock(code)
-        return jsonify(data)
+        # TODO check if player is alive
+        print(user)
+        if False:
+            return App.playing_template()
+        # Actually unlock if code matches
+        result = game.sites[site].unlock(code)
+        return result
 
     @app.route("/pollsite", methods=["GET"])
     def pollsite():
@@ -295,12 +302,29 @@ class App:
         if site not in ['A', 'B', 'C']:
             return "403 Connection Forbidden"
         data = {}
-        s = game.sites[site]
+        site = game.sites[site]
         # Check if keypad was unlocked
-        data['lock'] = s.locked
-        if s.starting:
-            data['startround'] = True
-            s.starting = False
+        data['lock'] = site.locked
+        # Send all events and delete
+        data['events'] = site.events
+        site.events = []
+        return jsonify(data)
+
+    @app.route("/notifyserver", methods=["GET"])
+    def notifyserver():
+        site = request.args.get("site")
+        event = request.args.get("event")
+        winner = request.args.get("winner")
+        if site not in ['A', 'B', 'C']:
+            return "403 Connection Forbidden"
+        # Pass it on
+        if event in ['disarmed', 'exploded', 'timer']:
+            game.ended = True
+            game.started = False
+            game.won = winner
+        elif event == 'planted':
+            game.planted = True
+        return 'true'
 
     @app.route("/sitesettings")
     def sitesettings():
@@ -312,6 +336,31 @@ class App:
         data['link'] = game.config['game']['link']
         return jsonify(data)
 
+    @app.route("/pollbase", methods=["GET"])
+    def pollbase():
+        site = request.args.get("site")
+        if site not in ['A', 'B', 'C']:
+            return "403 Connection Forbidden"
+        data = {}
+        site = game.sites[site]
+        # Check if keypad was unlocked
+        data['lock'] = site.locked
+        # Get all events for site
+        data['events'] = s.events
+        s.events = []
+        return jsonify(data)
+
+    @app.route("/teamready", methods=["GET"])
+    def teamready():
+        team = request.args.get("team")
+        state = request.args.get("state")
+        if team not in ['CT', 'TR']:
+            return "403 Connection Forbidden"
+        ready = False
+        if state == 'true':
+            ready = True
+        data = {'state': ready}
+        game.teams[team].setReady(ready)
         return jsonify(data)
 
     @app.route("/masterout")
@@ -436,7 +485,15 @@ class App:
             # {'number': 512314, 'contents': 'Welcome here',
             #  'sent': sent, 'received': received}
             #print(message)
-            Action.handleSms(message['number'], message['contents'])
+            code = re.sub('[^0-9]+', '', message['contents'])
+            if len(code) == 3:
+                # This is site unlocking code
+                senderId = Player.getMobileOwnerId(mobile)
+                # TODO check if sender is alive
+                for site in game.sites:
+                    site.unlock(code)
+            else:
+                Action.handleSms(message['number'], code)
         # Mark all the old enough messages ready for SMSing
         Action.messages_timeout_check()
         out = []
@@ -447,6 +504,23 @@ class App:
         except queue.Empty:
             pass
         return jsonify({'outgoing': out})
+
+    # Routes for SMS
+    @app.route("/smsreceive", methods=['GET'])
+    def smsreceive():
+        mobile = str(request.args.get('mobile'))
+        contents = str(request.args.get('contents'))
+        code = re.sub('[^0-9]+', '', contents)
+        if len(code) == 3:
+            # This is site unlocking code
+            senderId = Player.getMobileOwnerId(mobile)
+            # TODO check if sender is alive
+            for name in game.sites:
+                site = game.sites[name]
+                site.unlock(code)
+        else:
+            Action.handleSms(mobile, code)
+        return "true"
 
 
     # Routes for printing
@@ -486,6 +560,7 @@ if __name__ == "__main__":
     printer_queue = queue.Queue()
 
     game = Game(config, cursor)
+    #game.starting()
 
     Action.initAllConnect(cursor, sms_queue, printer_queue)
     time = datetime.datetime.now()
@@ -501,7 +576,7 @@ if __name__ == "__main__":
     Stats.updateStats()
     Stats.printPlayersDetailed()
 
-    debug = False
+    debug = True
     if debug:
         App.app.run(debug=True)
     else:
