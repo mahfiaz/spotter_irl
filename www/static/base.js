@@ -110,12 +110,14 @@ function clearOverlay() {
 
 // Add user
 function addUser() {
-    var team = "";
-    $("#ct").addEventListener("click", function() {team = "ct";}
-    $("#tr").addEventListener("click", function() {team = "tr";}
-    $("#send").addEventListener("click", function() {
+    $("#ct").click(function() {team = "CT";console.log("CTd");});
+    $("#tr").click(function() {team = "TR";console.log("TRd");});
+    $("input[name=send]").click(function() {
+        console.log("Registered");
+        console.log($("input[name=username]").val());
+        console.log($("input[name=mobile]").val());
         $.ajax({
-            url: /*TODO*/"?username="+$("#username").val()+"&phone="+$("#phone").val()+"&team="+team;
+            url: "ap?username="+$("input[name=username]").val()+"&phone="+$("input[name=mobile]").val()+"&team="+team
         }).done(function(response) {
             $("#response").html(response);
         });
@@ -128,8 +130,8 @@ function getEvents() {
     $.ajax({
         url: "/"//TODO
     }).done(function(data) {
-        for (var i in data) {
-            var event = data[i];
+        for (var i in data["events"]) {
+            var event = data["events"][i];
             if (event["type"] == "personal") {
                 events += "<p>"+event["time"]+" "+event["commiter"]+" "+event["event"]+" "+event["target"]+"</p>";
             } else {
@@ -143,5 +145,10 @@ function getEvents() {
 // Finally start game
 window.onload = function() {
     // Setup game
+    addUser();
+    getEvents();
+    var allEvents = setInterval(function() {
+        getEvents();
+    }, 2000);
     
 }
