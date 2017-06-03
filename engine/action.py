@@ -83,7 +83,7 @@ class Site:
     def lock(self):
         self.locked = True
         self.code = self.generate_code(7)
-        self.shortcode = self.generate_code(4)
+        self.shortcode = self.generate_code(3)
         return (self.code, self.shortcode)
 
     def unlock(self, code):
