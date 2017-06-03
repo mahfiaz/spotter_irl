@@ -124,12 +124,8 @@ class App:
     @app.route("/wrongInfo")
     def wrong_info():
         if App.logged_in():
-            phone = request.args.get("phone")
-            if phone == request.cookies.get("phone"):
-                Player.delPlayer(request.cookies.get("user"))
-                return App.delete_cookies()
-            else:
-                return "User data preserved"
+            Player.delPlayer(request.cookies.get("user"))
+            return App.delete_cookies()
         else:
             return "403 Connection Forbidden"
 

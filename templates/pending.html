@@ -24,19 +24,11 @@
             }, 2000);
         }
 
-
         function logout() {
-            if(confirm("Kas oled kindel, et tahad kasutaja ja kõik tulemused kustutada?")) {
-                var phone = prompt("Kinnitamiseks sisesta telefoni number");
-                xhr.open("GET", "/wrongInfo?phone="+phone, true);
-                xhr.send();
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        console.log(xhr.responseText)
-                        window.location.assign("/")
-                    }
-                }
-            }
+            $.ajax("/wrongInfo")
+                .done(function(data) {
+                    window.location.assign("/")
+                });
         }
 
         function checkStatus() {
@@ -50,7 +42,7 @@
         <p>kasutaja <span id="username" class="large">{{ user }}</span></p>
         <p>telefon <span id="phone" class="large">{{ phone }}</span></p>
         <div id="messages"></div>
-        <p class="large">Saad kohe SMSi. Edasine @Keila päevade noorteala</p>
+        <p class="large">Saad kohe SMSi. Oota raundi algust.</p>
         <div id="isJailed" hidden></div>
         <p><input id="invalidRegistration" type="submit" class="button red" value="Tegid vea, tahad muuta?" onclick="logout()"></p>
     </div>
