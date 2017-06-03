@@ -356,11 +356,11 @@ class App:
         state = request.args.get("state")
         if team not in ['CT', 'TR']:
             return "403 Connection Forbidden"
-        ready = False
+        rdy = False
         if state == 'true':
-            ready = True
-        data = {'state': ready}
-        game.teams[team].setReady(ready)
+            rdy = True
+        data = {'state': rdy}
+        game.teams[team].setReady(rdy)
         return jsonify(data)
 
     @app.route("/masterout")

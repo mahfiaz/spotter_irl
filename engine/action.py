@@ -15,6 +15,8 @@ from threading import Timer
 
 
 class Game:
+    started = False
+
     def __init__(self, config, cursor):
         self.config = config
         self.cursor = cursor
@@ -22,6 +24,37 @@ class Game:
         self.B = Site(self, 'B')
         self.C = Site(self, 'C')
         self.sites = {'A': self.A, 'B': self.B, 'C': self.C}
+
+        self.teams = {}
+        self.teams['CT'] = TeamNew(self, 'CT')
+        self.teams['TR'] = TeamNew(self, 'TR')
+        
+        self.reset()
+
+    def reset(self):
+        for name in self.sites:
+            site = self.sites[name]
+            site.events.append('reset')
+            print('appended to', name, site.events)
+
+    def start(self):
+        self.started = True
+        for name in self.sites:
+            site = self.sites[name]
+            site.events.append('started')
+
+class TeamNew:
+    ready = False
+
+    def __init__(self, parent, name):
+        self.parent = parent
+        self.name = name
+
+    def setReady(self, value):
+        self.ready = value
+        if self.parent.teams['CT'].ready and \
+            self.parent.teams['TR'].ready:
+            self.parent.start()
 
 
 class Site:
@@ -35,6 +68,7 @@ class Site:
         self.parent = parent
         self.name = name
         self.lock()
+        self.events = []
 
     def lock(self):
         self.locked = True
