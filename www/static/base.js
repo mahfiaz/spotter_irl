@@ -17,6 +17,7 @@ var locked = true;
 var winner = NaN;
 var gameOver = false;
 var qrcode = NaN;
+var teamready = false;
 
 // Polling
 function poll() {
@@ -142,13 +143,42 @@ function getEvents() {
     });
 }
 
+// Get query parameters
+function getQueryParams(qs) {
+    qs = qs.split("+").join(" ");
+    var params = {},
+        tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+
+    while (tokens = re.exec(qs)) {
+        params[decodeURIComponent(tokens[1])]
+            = decodeURIComponent(tokens[2]);
+    }
+
+    return params;
+}
+
 // Finally start game
 window.onload = function() {
+    GET = getQueryParams(document.location.search);
+    team = GET['team'];
+    
     // Setup game
     addUser();
     getEvents();
     var allEvents = setInterval(function() {
         getEvents();
     }, 2000);
-    
+    $('#readybutton').click(function () {
+        teamready = !teamready;
+        $.ajax('teamready?team='+team+'&state='+teamready)
+            .done(function () {
+                console.log(teamready);
+                if (teamready) {
+                    $('#readybutton').addClass('green').removeClass('gray');
+                } else {
+                    $('#readybutton').removeClass('green').addClass('gray');
+                }
+            });
+    });
 }
