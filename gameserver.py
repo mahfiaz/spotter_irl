@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from engine.game import Game
 from engine.event import *
 from engine.action import *
 from engine.code import *
@@ -599,9 +600,7 @@ if __name__ == "__main__":
     time = datetime.datetime.now()
     end = datetime.datetime.now()+datetime.timedelta(days=365)
     timestr = format(time, "%Y-%m-%d %H:%M:%S")
-    print(timestr)
     endstr = format(end, "%Y-%m-%d %H:%M:%S")
-    print(endstr)
     Round.add('round', timestr, endstr)
     Round.updateActiveId()
     Action.addTeamsToAllRounds()
