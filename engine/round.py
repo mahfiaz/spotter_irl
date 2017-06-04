@@ -31,18 +31,18 @@ class Round:
             round_end TIMESTAMP)""")
 
 # modify
-    def add(name, round_start, round_end):
+    def add(name, start, end):
         Round.cur.execute("""SELECT name
             FROM rounds
             WHERE (round_start = %s OR (round_start < %s AND round_end > %s)) OR
-            (round_end = %s AND (round_start < %s AND endtime > %s))""",
-            (round_start, time_start, time_start, round_end, time_end, time_end))
+            (round_end = %s AND (round_start < %s AND round_end > %s))""",
+            (start, start, start, end, end, end))
         if not Round.cur.fetchone():
             Round.cur.execute("""INSERT INTO rounds (name, round_start, round_end)
-                VALUES (%s, %s, %s)""", (name, round_start, round_end))
+                VALUES (%s, %s, %s)""", (name, start, end))
             return True
         else:
-            print("Error: New round has overlapping time. not added", name, round_start, round_end)
+            print("Error: New round has overlapping time. not added", name, start, end)
 
     def addRealRounds():
         for round in game_config.round_data:

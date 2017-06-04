@@ -521,9 +521,9 @@ class Stats:
 
 # print
     def printPlayersDetailed():
-        Player.cur.execute("""SELECT player.pid, player_data.name, player_data.mobile, player_data.cookie, player_data.fleeing_code, codes.spot_code, code_list.touch_code
+        Player.cur.execute("""SELECT players.pid, players.name, players.mobile, players.cookie, players.fleeing_code, codes.spot_code, codes.touch_code
             FROM players
-                JOIN codes ON (player.cid = code_list.code_id)
+                JOIN codes ON (players.cid = codes.cid)
             """)
         rows = Player.cur.fetchall()
         print(" - ID MOB HASH  JAIL SPOT TOUCH   STATE  TEAM    NAME")
