@@ -13,17 +13,17 @@ class Team:
         Team.cur = cursor
 
     def _createTeamTable():
-        Team.cur.execute("""DROP TABLE IF EXISTS team_list""")
-        Team.cur.execute("""CREATE TABLE team_list (
+        Team.cur.execute("""DROP TABLE IF EXISTS teams""")
+        Team.cur.execute("""CREATE TABLE teams (
             team_id serial PRIMARY KEY,
-            team_name VARCHAR(30) NOT NULL,
-            team_color CHAR(6),
+            name VARCHAR(30) NOT NULL,
+            color CHAR(6),
             round_id int)""")
 
     def _createTeamPlayersTable():
         Team.cur.execute("""DROP TABLE IF EXISTS team_players""")
         Team.cur.execute("""CREATE TABLE team_players (
-            player_id int,
+            pid int,
             team_id int,
             added timestamp DEFAULT statement_timestamp() )""")
 
@@ -33,7 +33,7 @@ class Team:
             print("Warning. Team", teamName, "not added, because roundId", roundId, "doesn't exist.")
             return
         if not Team._getIdByName(teamName, roundId):
-            Team.cur.execute("""INSERT INTO team_list (team_name, round_id, team_color)
+            Team.cur.execute("""INSERT INTO teams (name, round_id, color)
                 VALUES (%s, %s, %s)""", (teamName, roundId, color))
             print("Team", teamName, "added to round", Round.getName(roundId))
             return Team._getIdByName(teamName, roundId)
@@ -43,7 +43,7 @@ class Team:
     def addPlayer(playerId, teamId):
         if not Team.removePlayer(playerId, teamId):
             return
-        Team.cur.execute("""INSERT INTO team_players (player_id, team_id)
+        Team.cur.execute("""INSERT INTO team_players (pid, team_id)
             VALUES (%s, %s)""", (playerId, teamId))
         print(Player.getNameById(playerId), "added to team", Team.getNameById(teamId))
         return True
@@ -56,25 +56,25 @@ class Team:
         oldTeamId = Team.getPlayerTeamId(playerId, roundId)
         if oldTeamId:
             Team.cur.execute("""DELETE FROM team_players
-                WHERE team_id = %s AND player_id = %s""", (oldTeamId, playerId))
+                WHERE team_id = %s AND pid = %s""", (oldTeamId, playerId))
         return True
 
 # gets
     def _getIdByName(teamName, roundId):
         Team.cur.execute("""SELECT team_id
-            FROM team_list
-            WHERE round_id = %s AND team_name = %s""", (roundId, teamName))
+            FROM teams
+            WHERE round_id = %s AND name = %s""", (roundId, teamName))
         return iterateZero(Team.cur.fetchone())
 
     def getNameById(teamId):
-        Team.cur.execute("""SELECT team_name
-            FROM team_list
+        Team.cur.execute("""SELECT name
+            FROM teams
             WHERE team_id = %s""", [teamId])
         return iterateZero(Team.cur.fetchone())
 
     def getColorById(teamId):
-        Team.cur.execute("""SELECT team_color
-            FROM team_list
+        Team.cur.execute("""SELECT color
+            FROM teams
             WHERE team_id = %s""", [teamId])
         color = iterateZero(Team.cur.fetchone())
         if not color:
@@ -83,15 +83,15 @@ class Team:
 
     def _getRoundIdByTeamId(teamId):
         Team.cur.execute("""SELECT round_id
-            FROM team_list
+            FROM teams
             WHERE team_id = %s""", [teamId])
         return iterateZero(Team.cur.fetchone())
 
     def getPlayerTeamId(playerId, roundId):
         Team.cur.execute("""SELECT team_id
             FROM team_players
-            WHERE player_id = %s AND team_id IN
-            (SELECT team_id FROM team_list WHERE round_id = %s)""", (playerId, roundId))
+            WHERE pid = %s AND team_id IN
+            (SELECT team_id FROM teams WHERE round_id = %s)""", (playerId, roundId))
         return iterateZero(Team.cur.fetchone())
 
     def getTeamlessPlayerIdList(roundId):
@@ -103,7 +103,7 @@ class Team:
 
 # get lists
     def getTeamPlayerIdList(teamId):
-        Team.cur.execute("""SELECT player_id
+        Team.cur.execute("""SELECT pid
             FROM team_players
             WHERE team_id = %s""", [teamId])
         playerIds = Team.cur.fetchall()
@@ -111,7 +111,7 @@ class Team:
 
     def getTeamsIdList(roundId):
         Team.cur.execute("""SELECT team_id
-            FROM team_list
+            FROM teams
             WHERE round_id = %s""", [roundId])
         teamIds = Team.cur.fetchall()
         return sum(teamIds, ())

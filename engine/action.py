@@ -617,9 +617,9 @@ class Stats:
 
 # print
     def printPlayersDetailed():
-        Player.cur.execute("""SELECT player_data.player_id, player_data.player_name, player_data.player_mobile, player_data.player_web_hash, player_data.player_fleeing_code, code_list.spot_code, code_list.touch_code
-            FROM player_data
-                JOIN code_list ON (player_data.player_code_id = code_list.code_id)
+        Player.cur.execute("""SELECT player.pid, player_data.name, player_data.mobile, player_data.cookie, player_data.fleeing_code, codes.spot_code, code_list.touch_code
+            FROM players
+                JOIN codes ON (player.cid = code_list.code_id)
             """)
         rows = Player.cur.fetchall()
         print(" - ID MOB HASH  JAIL SPOT TOUCH   STATE  TEAM    NAME")
@@ -634,9 +634,9 @@ class Stats:
 
 # get
     def playersDetailed():
-        Player.cur.execute("""SELECT player_data.player_id, player_data.player_name, player_data.player_mobile, player_data.player_web_hash, player_data.player_fleeing_code, code_list.spot_code, code_list.touch_code
-            FROM player_data
-                LEFT JOIN code_list ON (player_data.player_code_id = code_list.code_id)
+        Player.cur.execute("""SELECT player.pid, player_data.name, player_data.mobile, player_data.cookie, player_data.fleeing_code, codes.spot_code, code_list.touch_code
+            FROM players
+                LEFT JOIN codes ON (player.cid = code_list.code_id)
             """)
         rows = Player.cur.fetchall()
         players = []

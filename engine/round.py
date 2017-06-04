@@ -23,26 +23,26 @@ class Round:
         Round.cur = cursor
 
     def _createDataTable():
-        Round.cur.execute("""DROP TABLE IF EXISTS round_data""")
-        Round.cur.execute("""CREATE TABLE round_data (
+        Round.cur.execute("""DROP TABLE IF EXISTS rounds""")
+        Round.cur.execute("""CREATE TABLE rounds (
             round_id serial PRIMARY KEY,
-            round_name VARCHAR(30) NOT NULL,
+            name VARCHAR(30) NOT NULL,
             round_start TIMESTAMP,
             round_end TIMESTAMP)""")
 
 # modify
-    def add(name, time_start, time_end):
-        Round.cur.execute("""SELECT round_name
-            FROM round_data
+    def add(name, round_start, round_end):
+        Round.cur.execute("""SELECT name
+            FROM rounds
             WHERE (round_start = %s OR (round_start < %s AND round_end > %s)) OR
-            (round_end = %s AND (round_start < %s AND round_end > %s))""",
-            (time_start, time_start, time_start, time_end, time_end, time_end))
+            (round_end = %s AND (round_start < %s AND endtime > %s))""",
+            (round_start, time_start, time_start, round_end, time_end, time_end))
         if not Round.cur.fetchone():
-            Round.cur.execute("""INSERT INTO round_data (round_name, round_start, round_end)
-                VALUES (%s, %s, %s)""", (name, time_start, time_end))
+            Round.cur.execute("""INSERT INTO rounds (name, round_start, round_end)
+                VALUES (%s, %s, %s)""", (name, round_start, round_end))
             return True
         else:
-            print("Error: New round has overlapping time. not added", name, time_start, time_end)
+            print("Error: New round has overlapping time. not added", name, round_start, round_end)
 
     def addRealRounds():
         for round in game_config.round_data:
@@ -63,14 +63,14 @@ class Round:
 
     def existingId(roundId):
         Round.cur.execute("""SELECT round_id
-            FROM round_data
+            FROM rounds
             WHERE round_id = %s""", [roundId])
         if Round.cur.fetchone():
             return True
 
     def getName(roundId):
-        Round.cur.execute("""SELECT round_name
-            FROM round_data
+        Round.cur.execute("""SELECT name
+            FROM rounds
             WHERE round_id = %s""", [roundId])
         return iterateZero(Round.cur.fetchone())
 
@@ -83,33 +83,33 @@ class Round:
 
     def _getStartTimeOfNext():
         Round.cur.execute("""SELECT round_start
-            FROM round_data
+            FROM rounds
             WHERE (round_start > statement_timestamp())
             ORDER BY round_start ASC""")
         return iterateZero(Round.cur.fetchone())
 
     def _getEndTimeOfActive():
         Round.cur.execute("""SELECT round_end
-            FROM round_data
+            FROM rounds
             WHERE round_id = %s""", [Round.getActiveId()])
         return iterateZero(Round.cur.fetchone())
 
     def getStartTime(id):
         Round.cur.execute("""SELECT round_start
-            FROM round_data
+            FROM rounds
             WHERE round_id = %s""", (id,))
         return iterateZero(Round.cur.fetchone())
 
     def getEndTime(id):
         Round.cur.execute("""SELECT round_end
-            FROM round_data
+            FROM rounds
             WHERE round_id = %s""", (id,))
         return iterateZero(Round.cur.fetchone())
 
 # round automatic restarting and finishing
     def updateActiveId():
         Round.cur.execute("""SELECT round_id
-            FROM round_data
+            FROM rounds
             WHERE (round_start <= statement_timestamp() AND round_end > statement_timestamp())""")
         activeId = iterateZero(Round.cur.fetchone())
         Round._checkRoundChange(activeId)
@@ -152,7 +152,7 @@ class Round:
 # list
     def getRoundIdList():
         Round.cur.execute("""SELECT round_id
-            FROM round_data""")
+            FROM rounds""")
         roundIds = Round.cur.fetchall()
         return sum(roundIds, ())
 
@@ -178,8 +178,8 @@ class Round:
 
 # print
     def print():
-        Round.cur.execute("""SELECT round_id, round_name, round_start, round_end
-            FROM round_data """)
+        Round.cur.execute("""SELECT round_id, name, round_start, round_end
+            FROM rounds """)
         rows = Round.cur.fetchall()
         active = Round.getActiveId()
         print("Rounds:")
@@ -193,8 +193,8 @@ class Round:
 
 # rounds
     def getRounds():
-        Round.cur.execute("""SELECT round_id, round_name, round_start, round_end
-            FROM round_data """)
+        Round.cur.execute("""SELECT round_id, name, round_start, round_end
+            FROM rounds """)
         rows = Round.cur.fetchall()
         active = Round.getActiveId()
         #print("Rounds:")
