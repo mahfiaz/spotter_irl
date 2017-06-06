@@ -9,16 +9,39 @@ from .helper import iterateZero
 
 
 class PlayerNew:
+    # Database cursor
+    cur = None
+    updated = False
 
-    def __init__(self, cursor, id):
-        self.cur = cursor
+    # Main data
+    id = None
+    name = ''
+    mobile = ''
+
+    # State
+    #state = State.new
+
+    # Other
+    team = None
+    codes = None
+    cookie = None
+
+    def __init__(self, parent, id=None, name=None, mobile=None):
+        self.parent = parent
+        self.cur = parent.cursor
         self.id = id
 
     def __del__(self):
+        print("Player #%d %s is being deleted" % (self.id, self.name))
         pass
 
-    def update(self):
+    def load(self):
         self.cur.execute("SELECT * FROM players WHERE pid = %s", (self.id,))
+        data = Player.cur.fetchone()
+        self.id, self.name, self.mobile, self.email, self.cid, self.chat_banned, self.fleeing_code, self.web_hash, self.created = data
+
+    def save(self):
+        self.cur.execute("UPDATE players SET WHERE pid = %s", (self.id,))
         data = Player.cur.fetchone()
         self.id, self.name, self.mobile, self.email, self.cid, self.chat_banned, self.fleeing_code, self.web_hash, self.created = data
 
@@ -27,7 +50,7 @@ class PlayerNew:
         while unique:
             code_max = math.pow(10, game_config.player_fleeingCodeDigits)
             fleeing_code = random.randint(codeMax / 10, codeMax - 1)
-            cursor.execute("""SELECT * FROM players
+            self.cur.execute("""SELECT * FROM players
                 WHERE fleeing_code = %s""",(fleeing_code,))
             if not cursor.fetchone():
                 Player.cur.execute("""UPDATE players
@@ -36,14 +59,18 @@ class PlayerNew:
                 self.update()
                 return
 
-    def ban_chat(self):
+    def ban(self, now = False):
         self.cur.execute("""UPDATE players SET banned = %s
             WHERE pid = %s""", ('true', self.id))
         self.update()
+        if now:
+            self.save()
 
-    def unban_chat(self):
+    def unban(self, now = False):
         self.cur.execute("""UPDATE players SET banned = %s
             WHERE pid = %s""", ('false', self.id))
+        if now:
+            self.save()
 
 
 class Players:
