@@ -4,11 +4,14 @@ import math
 import hashlib
 import psycopg2
 
-from .helper import iterateZero
 
+class Player:
+    NEW = 0
+    SPAWNED = 1
+    KILLED = 2
+    # State NEW
+    state = 0
 
-
-class PlayerNew:
     # Database cursor
     cur = None
     updated = False
@@ -17,266 +20,148 @@ class PlayerNew:
     id = None
     name = ''
     mobile = ''
-
-    # State
-    #state = State.new
+    banned = None
 
     # Other
     team = None
     codes = None
     cookie = None
 
-    def __init__(self, parent, id=None, name=None, mobile=None):
+    def __init__(self, parent, pid=None, name=None, mobile=None):
         self.parent = parent
-        self.cur = parent.cursor
-        self.id = id
+        self.log = parent.log
+        self.cur = parent.cur
 
-    def __del__(self):
-        print("Player #%d %s is being deleted" % (self.id, self.name))
-        pass
+        if pid:
+            self.log.info("Loading player with id=%d" % pid)
+            self.id = pid
+            self.load()
+        else:
+            self.log.info("Creating new player with name=%s, mobile=%s" % (name, mobile))
+            self.create(name, mobile)
+            print("Created")
+
+    def create(self, name, mobile):
+        self.name = name
+        self.mobile = mobile
+        self.cookie = self.generate_hash(name)
+        try:
+            self.cur.execute("""INSERT INTO player
+                (name, mobile, cookie)
+                VALUES (%s, %s, %s) RETURNING pid""",
+                (name, mobile, self.cookie))
+            result = self.cur.fetchone()
+            self.id = result[0]
+        except psycopg2.IntegrityError:
+            self.log.warning("User already exists name=%s mobile=%s", name, mobile)
+            pass
+        self.log.info("Added user %s" % self)
 
     def load(self):
-        self.cur.execute("SELECT * FROM players WHERE pid = %s", (self.id,))
-        data = Player.cur.fetchone()
-        self.id, self.name, self.mobile, self.email, self.cid, self.chat_banned, self.fleeing_code, self.web_hash, self.created = data
+        self.cur.execute("SELECT * FROM player WHERE pid = %s", (self.id,))
+        data = self.cur.fetchone()
+        if data:
+            self.id, self.name, self.mobile, self.email, self.cid, self.chat_banned, self.web_hash, self.created = data
 
     def save(self):
-        self.cur.execute("UPDATE players SET WHERE pid = %s", (self.id,))
+        self.cur.execute("UPDATE player SET WHERE pid = %s", (self.id,))
         data = Player.cur.fetchone()
-        self.id, self.name, self.mobile, self.email, self.cid, self.chat_banned, self.fleeing_code, self.web_hash, self.created = data
-
-    def _generate_fleeing_code(self):
-        unique = True
-        while unique:
-            code_max = math.pow(10, game_config.player_fleeingCodeDigits)
-            fleeing_code = random.randint(codeMax / 10, codeMax - 1)
-            self.cur.execute("""SELECT * FROM players
-                WHERE fleeing_code = %s""",(fleeing_code,))
-            if not cursor.fetchone():
-                Player.cur.execute("""UPDATE players
-                    SET fleeing_code = %s
-                    WHERE pid = %s""", (fleeing_code, self.id))
-                self.update()
-                return
+        self.id, self.name, self.mobile, self.email, self.cid, self.chat_banned, self.web_hash, self.created = data
 
     def ban(self, now = False):
-        self.cur.execute("""UPDATE players SET banned = %s
+        self.cur.execute("""UPDATE player SET banned = %s
             WHERE pid = %s""", ('true', self.id))
         self.update()
         if now:
             self.save()
 
     def unban(self, now = False):
-        self.cur.execute("""UPDATE players SET banned = %s
+        self.cur.execute("""UPDATE player SET banned = %s
             WHERE pid = %s""", ('false', self.id))
         if now:
             self.save()
 
+    def delete(self):
+        self.log.info("Deleted %s" % self)
+        self.cur.execute("""DELETE FROM player WHERE pid = %s""", (self.id,))
+        self.cur.execute("""DELETE FROM team_players
+            WHERE pid = %s""", (self.id,))
+        # TODO also delete from every other table
+        del self
+
+    def generate_hash(self, name):
+        hash_ = hashlib.sha224(name.encode('utf-8')).hexdigest()[-6:]
+        return hash_
+
+    def __str__(self):
+        """ Makes printing object easy """
+        return "<Player #%s, name=%s, mobile=%s, banned=%s>" % \
+            (self.id, self.name, self.mobile, self.banned)
+
 
 class Players:
+    def __init__(self, parent):
+        self.parent = parent
+        self.cur = parent.cur
+        self.log = parent.log
 
-    def __init__(self, cursor):
-        self.cur = cursor
         self.all = []
-        for id in data:
-            someone = PlayerNew(self.cur, id)
-            someone.update()
-            self.all.append(someone)
+        self.load_all()
 
-    def add(name, mobile, email):
-        self.cur.execute("""SELECT name, mobile, email
-            FROM players
-            WHERE name = %s OR mobile = %s""",
-            (name, mobile))
-        if not self.cur.fetchone():
-            hash = self._generate_hash(name)
-            self.cur.execute("""INSERT INTO players (name, mobile, email, cookie)
-                VALUES (%s, %s, %s, %s)""", (name, mobile, email, hash))
+    def add(self, name, mobile):
+        self.log.info("Adding player with name=%s, mobile=%s", name, mobile)
+        player = Player(self.parent, name=name, mobile=mobile)
+        self.all.append(player)
+        return player
 
-            self.cur.execute("""SELECT pid FROM players
-                WHERE name = %s""", [name])
-            id = iterateZero(self.cur.fetchone())
-            newby = PlayerNew(cursor, id)
-            newby._generate_fleeing_code()
-            self.all.append(newby)
-            return newby
+    def find(self, name=None, mobile=None, cookie=None, code=None):
+        if name:
+            for someone in self.all:
+                if someone.name == name:
+                    return someone
+                else:
+                    self.cur.execute("""SELECT pid FROM player
+                        WHERE name = %s""", (name,))
+                    return iterateZero(self.cur.fetchone())
+        elif mobile:
+            for someone in self.all:
+                if someone.mobile == mobile:
+                    return someone
+                else:
+                    self.cur.execute("""SELECT pid FROM player
+                        WHERE mobile = %s""", (mobile,))
+                    self.pid = self.cur.fetchone()[0]
+                    return iterateZero(self.cur.fetchone())
+        elif cookie:
+            for someone in self.all:
+                if someone.hash == hash:
+                    return someone
+                else:
+                    Player.cur.execute("""SELECT pid FROM player
+                        WHERE cookie = %s""", (hash,))
+                    return iterateZero(Player.cur.fetchone())
+        elif code:
+            for someone in self.all:
+                if someone.fleeing_code == code:
+                    return someone
 
-    def delete(somebody):
-        for someone in self.all:
-            if someone == somebody:
-                self.all.remove(somebody)
-                self.cur.execute("DELETE FROM players WHERE pid = %s",(somebody.id,))
-                somebody.__del__()
+    def load_all(self):
+        self.cur.execute("""SELECT pid FROM player ORDER BY pid""")
+        for pid in self.cur.fetchall():
+            self.all.append(Player(self.parent, pid=pid))
 
-    def by_name(self, name):
-        for someone in self.all:
-            if someone.name == name:
-                return someone
+    def print_all(self):
+        for player in self.all:
+            print(player)
 
-    def by_mobile(self, mobile):
-        for someone in self.all:
-            if someone.mobile == mobile:
-                return someone
-
-    def by_hash(self, hash):
-        for someone in self.all:
-            if someone.hash == hash:
-                return someone
-
-    def by_fleeing_code(self, code):
-        for someone in self.all:
-            if someone.fleeing_code == code:
-                return someone
-
-    def _generate_hash(self, name):
-        unique = True
-        while unique:
-            hash = hashlib.sha224(name.encode('utf-8')).hexdigest()[-6:]
-            self.cur.execute("""SELECT * FROM players
-                WHERE cookie = %s""",(hash,))
-            if not self.cur.fetchone():
-                return hash
-
-
-
-
-class Player:
-
-# init
-    def initDB(cursor):
-        Player.cur = cursor
-        Player._createDataTable()
-
-    def initConnect(cursor):
-        Player.cur = cursor
-
-    def _createDataTable():
-        Player.cur.execute("""DROP TABLE IF EXISTS players""")
-        Player.cur.execute("""CREATE TABLE players (
+    def init_database(cursor):
+        cursor.execute("""DROP TABLE IF EXISTS player""")
+        cursor.execute("""CREATE TABLE player (
             pid serial PRIMARY KEY,
             name varchar(32) UNIQUE,
             mobile varchar(16) UNIQUE,
             email varchar(64),
-            cid int DEFAULT 0,
+            code_id int DEFAULT 0,
             banned boolean DEFAULT false,
-            fleeing_code int DEFAULT 0,
             cookie char(6) UNIQUE,
-            created timestamp DEFAULT statement_timestamp() )""")
-
-
-# Delete player, who added wrong data to avoid phonenumber and username conflicts
-    def delPlayer(playerName):
-        Player.cur.execute("""DELETE FROM players WHERE name = %s""",(playerName,))
-
-
-
-# modify
-    def add(name, mobile, email):
-        Player.cur.execute("""SELECT name, mobile, email
-            FROM players
-            WHERE name = %s OR mobile = %s""",
-            (name, mobile))
-        if not Player.cur.fetchone():
-            hash = Player._generateHash(name)
-            Player.cur.execute("""INSERT INTO players (name, mobile, email, cookie)
-                VALUES (%s, %s, %s, %s)""", (name, mobile, email, hash))
-            newId = Player._getIdByName(name)
-            Player._generateFleeingCode(newId)
-            return newId
-
-    def _generateHash(name):
-        unique = True
-        while unique:
-            hash = hashlib.sha224(name.encode('utf-8')).hexdigest()[-6:]
-            Player.cur.execute("""SELECT * FROM players
-                WHERE name = %s""",(hash,))
-            if not Player.cur.fetchone():
-                return hash
-
-# gets
-    def _getIdByName(playerName):
-        Player.cur.execute("""SELECT pid FROM players
-            WHERE name = %s""", [playerName])
-        return iterateZero(Player.cur.fetchone())
-
-    def getIdByHash(hash):
-        Player.cur.execute("""SELECT pid FROM players
-            WHERE cookie = %s""", [hash])
-        return iterateZero(Player.cur.fetchone())
-
-    def getHashById(playerId):
-        Player.cur.execute("""SELECT cookie FROM players
-            WHERE pid = %s""", (playerId,))
-        return iterateZero(Player.cur.fetchone())
-
-    def getNameById(playerId):
-        Player.cur.execute("""SELECT name FROM players
-            WHERE pid = %s""", (playerId,))
-        return iterateZero(Player.cur.fetchone())
-
-    def getMobileOwnerId(mobile):
-        Player.cur.execute("""SELECT pid FROM players
-            WHERE mobile = %s""", [mobile])
-        return iterateZero(Player.cur.fetchone())
-
-    def getMobileById(playerId):
-        Player.cur.execute("""SELECT mobile FROM players
-            WHERE pid = %s""", [playerId])
-        return iterateZero(Player.cur.fetchone())
-
-    def getMasterId():
-        return Player._getIdByName(game_config.master_player['name'])
-
-# flee
-    def _generateFleeingCode(playerId):
-        codeMax = math.pow(10, game_config.player_fleeingCodeDigits)
-        Player.cur.execute("""UPDATE players
-            SET fleeing_code = %s
-            WHERE pid = %s""", (random.randint(codeMax / 10, codeMax - 1), playerId))
-
-    def checkFleeingCode(code):
-        Player.cur.execute("""SELECT pid FROM players
-            WHERE fleeing_code = %s""", [code])
-        return iterateZero(Player.cur.fetchone())
-
-    def getFleeingCode(playerId):
-        Player.cur.execute("""SELECT fleeing_code FROM players
-            WHERE pid = %s""", [playerId])
-        return iterateZero(Player.cur.fetchone())
-
-# ban chat
-    def banChat(playerId):
-        Player.cur.execute("""UPDATE players SET banned = %s
-            WHERE pid = %s""", ('true', playerId))
-
-    def unbanChat(playerId):
-        Player.cur.execute("""UPDATE players SET banned = %s
-            WHERE pid = %s""", ('false', playerId))
-
-    def isBannedChat(playerId):
-        Player.cur.execute("""SELECT banned FROM players
-            WHERE pid = %s""", (playerId,))
-        if(Player.cur.fetchone()[0]):
-            return True
-
-
-# list
-    def getAllPlayerIds():
-        Player.cur.execute("""SELECT pid FROM players """)
-        playerIds = Player.cur.fetchall()
-        return sum(playerIds, ())
-
-    def getPlayerMobilesNamesList():
-        playerList = []
-        for id in Player.getAllPlayerIds():
-            data = Player.getMobileById(id), Player.getNameById(id)
-            playerList.append(data)
-        return playerList
-
-
-    def print():
-        Player.cur.execute("""SELECT * FROM players """)
-        rows = Player.cur.fetchall()
-        print("Players:")
-        for player in rows:
-            print(" - ", player[1], player[2], player[3])
+            created timestamp DEFAULT statement_timestamp())""")

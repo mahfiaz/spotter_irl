@@ -1,16 +1,11 @@
 #!/usr/bin/python3
 
 from engine.game import Game
-from engine.event import *
-from engine.action import *
-from engine.code import *
-from engine.player import *
-from engine.round import *
-from engine.team import *
 
 import configparser
 from flask import Flask, json, jsonify, make_response, session, render_template, request, send_file
 import json
+import logging
 import os
 import psycopg2
 import queue
@@ -21,9 +16,7 @@ class App:
     app.config.from_object(__name__)
     app.secret_key = "ExtraSecretSessionKey"#os.urandom(24)
 
-    # START BLOCK
     # Player registration
-
     def registration_template(error):
         return render_template("registration.html", error=error)
 
@@ -136,8 +129,6 @@ class App:
 
     # START BLOCK
     # Player actions
-
-
     @app.route("/flee")
     def flee_jail():
         fleeing_code = request.args.get("fleeingCode")
@@ -145,7 +136,6 @@ class App:
             return "You got out"
         else:
             return "Your escape failed"
-
 
     @app.route("/tag")
     def tag():
@@ -157,7 +147,6 @@ class App:
                 return "Your attempt to catch them failed"
         else:
             return "403 Connection Forbidden"
-
 
     @app.route("/messageTeam", methods=["GET"])
     def messageTeam():
@@ -174,10 +163,8 @@ class App:
         else:
             return "403 Connection Forbidden"
 
-
     # Player actions
     # END BLOCK
-
 
     # START BLOCK
     # Getting data
@@ -248,8 +235,6 @@ class App:
     @app.route("/p1")
     def p1():
         return render_template("user.html")
-
-
 
     # START BLOCK
     # Spawnmaster screen
@@ -498,6 +483,26 @@ class App:
 
 
     # Routes for SMS
+    @app.route("/smsreceive", methods=['GET'])
+    def smsreceive():
+        mobile = str(request.args.get('mobile'))
+        contents = str(request.args.get('contents'))
+        code = re.sub('[^0-9]+', '', contents)
+        if len(code) == 3:
+            # This is site unlocking code
+            senderId = Player.getMobileOwnerId(mobile)
+            # Check if player is alive
+            dead = Event.isPlayerJailed(senderId)
+            if dead:
+                return "dead"
+            for name in game.sites:
+                site = game.sites[name]
+                site.unlock(code)
+        else:
+            Action.handleSms(mobile, code)
+        return "true"
+
+    # Routes for SMS
     @app.route("/sms", methods=['GET'])
     def smsserver():
         # Check the stupid "password"
@@ -536,28 +541,7 @@ class App:
             pass
         return jsonify({'outgoing': out})
 
-    # Routes for SMS
-    @app.route("/smsreceive", methods=['GET'])
-    def smsreceive():
-        mobile = str(request.args.get('mobile'))
-        contents = str(request.args.get('contents'))
-        code = re.sub('[^0-9]+', '', contents)
-        if len(code) == 3:
-            # This is site unlocking code
-            senderId = Player.getMobileOwnerId(mobile)
-            # Check if player is alive
-            dead = Event.isPlayerJailed(senderId)
-            if dead:
-                return "dead"
-            for name in game.sites:
-                site = game.sites[name]
-                site.unlock(code)
-        else:
-            Action.handleSms(mobile, code)
-        return "true"
-
-
-    # Routes for printing
+    # Pass on printing data JSON encoded
     @app.route("/print", methods=['GET'])
     def printserver():
         if request.args.get('pass') != 'htpT2U8UMpApV852DGSncBP7':
@@ -577,42 +561,38 @@ if __name__ == "__main__":
     config = configparser.ConfigParser()
     config.read('config.ini')
 
+    # Start logger
+    log = logging.getLogger(__name__)
+    log.setLevel(logging.DEBUG)
+
+    handler = logging.FileHandler('debug.log')
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+
     # Connect to database
     try:
         db = config['database']
-        parameters = "host='%s' dbname='%s' user='%s' password='%s'" % (
-            db['host'], db['dbname'], db['user'], db['password'])
+        parameters = "host='%s' dbname='%s' user='%s' password='%s'" % \
+            (db['host'], db['dbname'], db['user'], db['password'])
         connection = psycopg2.connect(parameters)
         connection.set_session(autocommit=True)
         cursor = connection.cursor()
     except:
-        print ("Error. Unable to connect to the database. If losing data is acceptable, try running 'python reset_db.py'")
+        log.error("Cannot connect to database")
         exit()
 
     # Queues
     sms_queue = queue.Queue()
     printer_queue = queue.Queue()
 
-    game = Game(config, cursor)
-    #game.starting()
-
-    Action.initAllConnect(cursor, sms_queue, printer_queue)
-    time = datetime.datetime.now()
-    end = datetime.datetime.now()+datetime.timedelta(days=365)
-    timestr = format(time, "%Y-%m-%d %H:%M:%S")
-    endstr = format(end, "%Y-%m-%d %H:%M:%S")
-    Round.add('round', timestr, endstr)
-    Round.updateActiveId()
-    Action.addTeamsToAllRounds()
-
-    Stats.updateStats()
-    Stats.printPlayersDetailed()
+    game = Game(config, log, cursor, sms_queue, printer_queue)
 
     debug = True
     if debug:
         App.app.run(debug=True)
     else:
-        import logging
         from threading import Thread
         from engine.cli import processInput
 

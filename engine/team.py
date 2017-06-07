@@ -1,31 +1,15 @@
-#import player
-from .player import Player
-from .round import Round
-from .helper import iterateZero
 
 class Team:
-    def initDB(cursor):
-        Team.cur = cursor
-        Team._createTeamTable()
-        Team._createTeamPlayersTable()
+    name = None
+    color = None
+    round = None
 
-    def initConnect(cursor):
-        Team.cur = cursor
+    ready = False
 
-    def _createTeamTable():
-        Team.cur.execute("""DROP TABLE IF EXISTS teams""")
-        Team.cur.execute("""CREATE TABLE teams (
-            team_id serial PRIMARY KEY,
-            name VARCHAR(30) NOT NULL,
-            color CHAR(6),
-            round_id int)""")
-
-    def _createTeamPlayersTable():
-        Team.cur.execute("""DROP TABLE IF EXISTS team_players""")
-        Team.cur.execute("""CREATE TABLE team_players (
-            pid int,
-            team_id int,
-            added timestamp DEFAULT statement_timestamp() )""")
+    def __init__(self, parent, name=None, color=None):
+        self.parent = parent
+        self.log = parent.log
+        self.cur = parent.cur
 
 # modify teams
     def add(teamName, color, roundId):
@@ -40,7 +24,7 @@ class Team:
         else:
             print("Warning! Team", teamName, "not added, it already exists.")
 
-    def addPlayer(playerId, teamId):
+    def add(self, player):
         if not Team.removePlayer(playerId, teamId):
             return
         Team.cur.execute("""INSERT INTO team_players (pid, team_id)
@@ -48,7 +32,7 @@ class Team:
         print(Player.getNameById(playerId), "added to team", Team.getNameById(teamId))
         return True
 
-    def removePlayer(playerId, teamId):
+    def remove(self, player):
         roundId = Team._getRoundIdByTeamId(teamId)
         if not roundId:
             print("Warning. addPlayer() round or team did not exist")
@@ -59,47 +43,28 @@ class Team:
                 WHERE team_id = %s AND pid = %s""", (oldTeamId, playerId))
         return True
 
-# gets
+class Teams:
+    current = None
+
+    def __init__(self, parent):
+        self.parent = parent
+        self.cur = parent.cur
+        self.log = parent.log
+
+        self.teams = {}
+
+        # Fixed teams. Good enough.
+        for teamname, color in [('CT', 'blue'), ('TR', 'red')]:
+            self.teams[teamname] = Team(self, teamname, color)
+
+    def find(self, name = None, round_id = None):
+        pass
+
     def _getIdByName(teamName, roundId):
         Team.cur.execute("""SELECT team_id
             FROM teams
             WHERE round_id = %s AND name = %s""", (roundId, teamName))
         return iterateZero(Team.cur.fetchone())
-
-    def getNameById(teamId):
-        Team.cur.execute("""SELECT name
-            FROM teams
-            WHERE team_id = %s""", [teamId])
-        return iterateZero(Team.cur.fetchone())
-
-    def getColorById(teamId):
-        Team.cur.execute("""SELECT color
-            FROM teams
-            WHERE team_id = %s""", [teamId])
-        color = iterateZero(Team.cur.fetchone())
-        if not color:
-            return 'FFFFFF'
-        return color
-
-    def _getRoundIdByTeamId(teamId):
-        Team.cur.execute("""SELECT round_id
-            FROM teams
-            WHERE team_id = %s""", [teamId])
-        return iterateZero(Team.cur.fetchone())
-
-    def getPlayerTeamId(playerId, roundId):
-        Team.cur.execute("""SELECT team_id
-            FROM team_players
-            WHERE pid = %s AND team_id IN
-            (SELECT team_id FROM teams WHERE round_id = %s)""", (playerId, roundId))
-        return iterateZero(Team.cur.fetchone())
-
-    def getTeamlessPlayerIdList(roundId):
-        teamlessPlayers = []
-        for id in Player.getAllPlayerIds():
-            if not Team.getPlayerTeamId(id, roundId):
-                teamlessPlayers.append(id)
-        return teamlessPlayers
 
 # get lists
     def getTeamPlayerIdList(teamId):
@@ -109,6 +74,13 @@ class Team:
         playerIds = Team.cur.fetchall()
         return sum(playerIds, ())
 
+    def getTeamlessPlayerIdList(roundId):
+        teamlessPlayers = []
+        for id in Player.getAllPlayerIds():
+            if not Team.getPlayerTeamId(id, roundId):
+                teamlessPlayers.append(id)
+        return teamlessPlayers
+
     def getTeamsIdList(roundId):
         Team.cur.execute("""SELECT team_id
             FROM teams
@@ -116,3 +88,15 @@ class Team:
         teamIds = Team.cur.fetchall()
         return sum(teamIds, ())
 
+    def init_database(cursor):
+        cursor.execute("""DROP TABLE IF EXISTS team""")
+        cursor.execute("""CREATE TABLE team (
+            team_id serial PRIMARY KEY,
+            name VARCHAR(30) NOT NULL,
+            color CHAR(6),
+            round_id int)""")
+        cursor.execute("""DROP TABLE IF EXISTS team_players""")
+        cursor.execute("""CREATE TABLE team_players (
+            pid int,
+            team_id int,
+            added timestamp DEFAULT statement_timestamp())""")

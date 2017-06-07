@@ -1,4 +1,4 @@
-from .code import Code
+from .code import *
 from .event import Event, EventType
 from .player import Player
 from .round import Round
@@ -15,29 +15,15 @@ from threading import Timer
 
 
 class Action:
-    compactPrint = pprint.PrettyPrinter(width=41, compact=True)
-    printer_queue = None
-# init
-    def initAllDB(cursor):
-        Round.initDB(cursor)
-        Player.initDB(cursor)
-        Code.initDB(cursor)
-        Team.initDB(cursor)
-        Event.initDB(cursor)
-        Stats.updateStats()
 
-    def initAllConnect(cursor, sms_queue, printer_queue):
-        Round.initConnect(cursor)
-        Player.initConnect(cursor)
-        Code.initConnect(cursor)
-        Team.initConnect(cursor)
-        Event.initConnect(cursor)
+    def initAllConnect(cursor, sms_queue, printer_queue, game):
 #        Round.setCallbacks(roundStarted = Action._roundStartedCall, roundEnding = Action._roundEndingCall, roundEnded = Action._roundEndedCall)
         Stats.updateStats()
         MessageChannel.queue = sms_queue
         Sms.setCallback(Stats.getTeamPlayerStatsStringByMobile)
         Action.printer_queue = printer_queue
         Action.checked_last = 0
+        Action.game = game
 
     def addPlayer(name, mobile, email):
         if not mobile.isdigit():

@@ -1,22 +1,15 @@
-import math
 import random
 
-import game_config
-from .helper import iterateZero
 
-class Code:
+class Codes:
+    def __init__(self, parent):
+        self.parent = parent
+        self.log = parent.log
+        self.cur = parent.cur
 
-# init
-    def initDB(cursor):
-        Code.cur = cursor
-        Code._createDataTable()
-
-    def initConnect(cursor):
-        Code.cur = cursor
-
-    def _createDataTable():
-        Code.cur.execute("""DROP TABLE IF EXISTS codes""")
-        Code.cur.execute("""CREATE TABLE codes (
+    def init_database(cursor):
+        cursor.execute("""DROP TABLE IF EXISTS codes""")
+        cursor.execute("""CREATE TABLE codes (
             cid serial PRIMARY KEY,
             spot_code int unique,
             touch_code int unique,
@@ -35,91 +28,36 @@ class Code:
             return playerId, Code._isActiveCode(playerId, codeId)
         return None, None
 
-    def getTouchCodeByPlayerId(playerId):
-        codeId = Code._getCodeIdByPlayerId(playerId)
-        return Code._getTouchCodeById(codeId)
-
-    def getSpotCodeByPlayerId(playerId):
-        codeId = Code._getCodeIdByPlayerId(playerId)
-        return Code._getSpotCodeById(codeId)
-
-# internals
-    def _isValidSpotCodeFormat(code):
-        codeMax = math.pow(10, game_config.code_spotCodeDigits)
-        assert isinstance(code, int)
-        return (code > (codeMax / 10) and code < (codeMax - 1))
-
-    def _isValidTouchCodeFormat(code):
-        codeMax = math.pow(10, game_config.code_touchCodeDigits)
-        return isinstance(code, int) and (code > (codeMax / 10) and code < (codeMax - 1))
-
-    def _getSpotCodeOwnerId(code):
-        Code.cur.execute("""SELECT pid, cid
-            FROM codes
-            WHERE spot_code = %s""", [code])
-        return Code.cur.fetchone()
-
-    def _getTouchCodeOwnerId(code):
-        Code.cur.execute("""SELECT pid, cid
-            FROM codes
-            WHERE touch_code = %s""", [code])
-        return Code.cur.fetchone()
-
     def _isActiveCode(playerId, codeId):
         otherCodeId = Code._getCodeIdByPlayerId(playerId)
         assert type(codeId) == type(otherCodeId)
         return otherCodeId == codeId
 
-    def _getCodeIdByPlayerId(playerId):
-        Code.cur.execute("""SELECT cid
-            FROM players
-            WHERE pid = %s""", [playerId])
-        return iterateZero(Code.cur.fetchone())
+    def generate_codes(self, player):
+        spot_code = self.spotcode()
+        touch_code = self.touchcode()
+        self.cur.execute("""INSERT INTO code
+            (spot_code, touch_code, pid)
+            VALUES (%s, %s, %s) RETURNING cid""",
+            (spotCode, touchCode, playerId))
+        code_id = self.cur.fetchone()[0]
+        self.cur.execute("""UPDATE players
+            SET cid = %s WHERE pid = %s""",
+            (code_id, player.id))
 
-    def _getSpotCodeId(code):
-        Code.cur.execute("""SELECT cid
-            FROM codes
-            WHERE spot_code = %s""", [code])
-        return iterateZero(Code.cur.fetchone())
+    def spotcode(self):
+        length = self.parent.config['code']['spot_code_length']
+        return self.generate_code(length)
 
-    def _getSpotCodeById(spotId):
-        Code.cur.execute("""SELECT spot_code
-            FROM codes
-            WHERE cid = %s""", [spotId])
-        return iterateZero(Code.cur.fetchone())
+    def touchcode(self):
+        length = self.parent.config['code']['touch_code_length']
+        return self.generate_code(length)
 
-    def _getTouchCodeById(touchId):
-        Code.cur.execute("""SELECT touch_code
-            FROM codes
-            WHERE cid = %s""", [touchId])
-        return iterateZero(Code.cur.fetchone())
-
-# generate
-    def generateNewCodes(playerId):
-        spotCode = Code._generateSpotCode()
-        touchCode = Code._generateTouchCode()
-        Code.cur.execute("""INSERT INTO codes (spot_code, touch_code, pid)
-            VALUES (%s, %s, %s)""", (spotCode, touchCode, playerId))
-        codeId = Code._getSpotCodeId(spotCode)
-        Code.cur.execute("""UPDATE players
-            SET cid = %s
-            WHERE pid = %s""", (codeId, playerId))
-        return codeId
-
-    def _generateSpotCode():
-        codeMax = math.pow(10, game_config.code_spotCodeDigits)
-        fail = True
-        while fail:
-            newCode = random.randint(codeMax / 10, codeMax - 1)
-            fail = Code._getSpotCodeOwnerId(newCode)
-        return newCode
-
-    def _generateTouchCode():
-        codeMax = math.pow(10, game_config.code_touchCodeDigits)
-        fail = True
-        while fail:
-            newCode = random.randint(codeMax / 10, codeMax - 1)
-            fail = Code._getTouchCodeOwnerId(newCode)
-        return newCode
-
-
+    def generate_code(self, length = 5):
+        min_code = 10 ** (length - 1)
+        max_code = 10 ** length - 1
+        while True:
+            code = random.randint(min_code, max_code)
+            # Ensure it's unique
+            if True:
+                return code

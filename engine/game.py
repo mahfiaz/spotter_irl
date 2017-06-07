@@ -1,23 +1,49 @@
+from .code import Codes
+from .player import Player, Players
+from .round import Round, Rounds
+from .team import Team, Teams
+
+import logging
 import random
 
 class Game:
     started = False
 
-    def __init__(self, config, cursor):
+    def __init__(self, config, log, cursor, sms_queue, printer_queue):
         self.config = config
-        self.cursor = cursor
+        self.log = log
+        self.cur = cursor
+
+        # Init database?
+        Game.init_database(cursor)
+
+        self.codes = Codes(self)
 
         # Create sites
         self.sites = {}
         for sitename in ['A', 'B', 'C']:
             self.sites[sitename] = Site(self, sitename)
 
+        # Create round
+        self.rounds = Rounds(self)
+        #self.rounds.new()
+
         # Create teams
-        self.teams = {}
-        for teamname in ['CT', 'TR']:
-            self.teams[teamname] = TeamNew(self, teamname)
+        self.teams = Teams(self)
+
+        # Create players
+        self.players = Players(self)
+        self.players.load_all()
+
+        # Testing
 
         self.reset()
+
+    def init_database(cursor):
+        Codes.init_database(cursor)
+        Players.init_database(cursor)
+        Teams.init_database(cursor)
+        Rounds.init_database(cursor)
 
     def reset(self):
         self.sendall('reset')
@@ -38,20 +64,6 @@ class Game:
         for name in self.sites:
             site = self.sites[name]
             site.events.append([message, data])
-
-
-class TeamNew:
-    ready = False
-
-    def __init__(self, parent, name):
-        self.parent = parent
-        self.name = name
-
-    def setReady(self, value):
-        self.ready = value
-        if self.parent.teams['CT'].ready and \
-            self.parent.teams['TR'].ready:
-            self.parent.start()
 
 
 class Site:

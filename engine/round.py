@@ -1,201 +1,78 @@
-import datetime
 import time
-from threading import Timer
 
-import game_config
-from .player import Player
-from .helper import iterateZero
-
-dateformat = game_config.database_dateformat
 
 class Round:
-    _activeId = 0
-    _callRoundStarted = None
-    _callRoundEnding = None
-    _callRoundEnded = None
+    id = None
+    name = None
+    start = None
+    end = None
 
-# init
-    def initDB(cursor):
-        Round.cur = cursor
-        Round._createDataTable()
+    def __init__(self, parent, id=None, name=None, start=None, end=None):
+        self.parent = parent
+        self.log = parent.log
+        self.cur = parent.cur
 
-    def initConnect(cursor):
-        Round.cur = cursor
+        if id:
+            self.id = id
+            self.load()
+        elif name or self.start:
+            # Create and save a new round
+            self.name = name
+            if not self.name:
+                self.name = ''
+            self.start = start
+            self.end = end
+            self.save()
 
-    def _createDataTable():
-        Round.cur.execute("""DROP TABLE IF EXISTS rounds""")
-        Round.cur.execute("""CREATE TABLE rounds (
-            round_id serial PRIMARY KEY,
-            name VARCHAR(30) NOT NULL,
-            round_start TIMESTAMP,
-            round_end TIMESTAMP)""")
+    def load(self):
+        self.log.debug("Loaded round with id=%d" % self.id)
+        self.cur.execute("""SELECT name, round_start, round_end FROM rounds
+            WHERE round_id = %s)""", (self.id))
+        self.name, self.start, self.end = self.cur.fetchone()
 
-# modify
-    def add(name, start, end):
-        Round.cur.execute("""SELECT name
-            FROM rounds
-            WHERE (round_start = %s OR (round_start < %s AND round_end > %s)) OR
-            (round_end = %s AND (round_start < %s AND round_end > %s))""",
-            (start, start, start, end, end, end))
-        if not Round.cur.fetchone():
-            Round.cur.execute("""INSERT INTO rounds (name, round_start, round_end)
-                VALUES (%s, %s, %s)""", (name, start, end))
-            return True
-        else:
-            print("Error: New round has overlapping time. not added", name, start, end)
+    def save(self):
+        self.log.debug("Saved round with id=%d" % self.id)
+        self.cur.execute("""UPDATE rounds SET
+            name=%s, round_start=%s, round_end=%s WHERE round_id=%s""",
+            (self.name, self.start, self.end, self.id))
 
-    def addRealRounds():
-        for round in game_config.round_data:
-            starts = datetime.datetime.strptime(game_config.round_day + ' ' + round['starts'] + ':00', game_config.database_dateformat)
-            ends = datetime.datetime.strptime(game_config.round_day + ' ' + round['ends'] + ':00', game_config.database_dateformat)
-            Round.add(round['name'], starts, ends)
-            print("Added Round",round['name'],"which starts", starts,"and ends", ends)
+    # Use if round.active: or set round.active = True or False
+    @property
+    def active(self):
+        if self.start and self.end:
+            time = time.now()
+            if self.start < time and time < self.end:
+                return True
+        return False
 
-# state
-    def getActiveId():
-        return Round._activeId
+    @active.setter
+    def active(self, value):
+        # The round is set active
+        pass
 
-    def isActive():
-        if Round.getActiveId():
-            return True
-        else:
-            return False
-
-    def existingId(roundId):
-        Round.cur.execute("""SELECT round_id
-            FROM rounds
-            WHERE round_id = %s""", [roundId])
-        if Round.cur.fetchone():
-            return True
-
-    def getName(roundId):
-        Round.cur.execute("""SELECT name
-            FROM rounds
-            WHERE round_id = %s""", [roundId])
-        return iterateZero(Round.cur.fetchone())
-
-
-# round time
-#    def getActiveSecondsLeft():
-#        ends = Round._getEndTimeOfActive()
-#        if ends:
-#            return (ends - datetime.datetime.now()).total_seconds()
-
-    def _getStartTimeOfNext():
-        Round.cur.execute("""SELECT round_start
-            FROM rounds
-            WHERE (round_start > statement_timestamp())
-            ORDER BY round_start ASC""")
-        return iterateZero(Round.cur.fetchone())
-
-    def _getEndTimeOfActive():
-        Round.cur.execute("""SELECT round_end
-            FROM rounds
-            WHERE round_id = %s""", [Round.getActiveId()])
-        return iterateZero(Round.cur.fetchone())
-
-    def getStartTime(id):
-        Round.cur.execute("""SELECT round_start
-            FROM rounds
-            WHERE round_id = %s""", (id,))
-        return iterateZero(Round.cur.fetchone())
-
-    def getEndTime(id):
-        Round.cur.execute("""SELECT round_end
-            FROM rounds
-            WHERE round_id = %s""", (id,))
-        return iterateZero(Round.cur.fetchone())
-
-# round automatic restarting and finishing
-    def updateActiveId():
-        Round.cur.execute("""SELECT round_id
-            FROM rounds
-            WHERE (round_start <= statement_timestamp() AND round_end > statement_timestamp())""")
-        activeId = iterateZero(Round.cur.fetchone())
-        Round._checkRoundChange(activeId)
-        return Round._activeId
-
-    def _checkRoundChange(newActiveId):
-        if Round._activeId != newActiveId:
-            if Round.existingId(newActiveId):
-                Round._roundStart(newActiveId)
-            else:
-                Round._roundEnd()
-
-    def _roundEnd():
-        next = Round._getStartTimeOfNext()
-        if next:
-            delay = next - datetime.datetime.now()
-            timer = Timer(delay.total_seconds() + 1, Round._roundStartCall, ())
-            timer.daemon=True
-            timer.start()
-
-
-    def _roundStart(newActiveId):
-        Round._activeId = newActiveId
-        ends = Round._getEndTimeOfActive()
-        early5 = ends - datetime.timedelta(seconds = 2)
-        early1 = ends - datetime.timedelta(seconds = 1)
-        if datetime.datetime.now() < early5:
-            timer = Timer((early5 - datetime.datetime.now()).total_seconds(), Round._minutesLeftCall, (2,))
-            timer.daemon=True
-            timer.start()
-        if datetime.datetime.now() < early1:
-            timer = Timer((early1 - datetime.datetime.now()).total_seconds(), Round._minutesLeftCall, (1,))
-            timer.daemon=True
-            timer.start()
-        if datetime.datetime.now() < ends:
-            timer = Timer((ends - datetime.datetime.now()).total_seconds(), Round._roundOverCall, ())
-            timer.daemon=True
-            timer.start()
-
-# list
-    def getRoundIdList():
-        Round.cur.execute("""SELECT round_id
-            FROM rounds""")
-        roundIds = Round.cur.fetchall()
-        return sum(roundIds, ())
-
-# callbacks
-    def setCallbacks(roundStarted, roundEnding, roundEnded):
-        Round._callRoundStarted = roundStarted
-        Round._callRoundEnding = roundEnding
-        Round._callRoundEnded = roundEnded
-
-    def _roundStartCall():
-        Round.updateActiveId()
-        if Round._callRoundStarted:
-            Round._callRoundStarted(Player.getPlayerMobilesNamesList(), Round.getName(Round.getActiveId()))
-
-    def _minutesLeftCall(left):
-        if Round._callRoundEnding:
-            Round._callRoundEnding(Player.getPlayerMobilesNamesList(), Round.getName(Round.getActiveId()), left)
-
-    def _roundOverCall():
-        Round.updateActiveId()
-        if Round._callRoundEnded:
-            Round._callRoundEnded(Player.getPlayerMobilesNamesList(), Round.getName(Round.getActiveId()))
-
-# print
     def print():
-        Round.cur.execute("""SELECT round_id, name, round_start, round_end
-            FROM rounds """)
-        rows = Round.cur.fetchall()
-        active = Round.getActiveId()
-        print("Rounds:")
-        for row in rows:
-            id, name, time1, time2 = row
-            indicator = " - "
-            if id == active:
-                indicator = " * "
-            print(indicator, id, name, time1, time2)
+        print("Round #%d %s, start %s, end %s, color %s" % \
+                (self.id, self.name, self.start, self.end))
 
+class Rounds:
+    current = None
 
-# rounds
-    def getRounds():
-        Round.cur.execute("""SELECT round_id, name, round_start, round_end
-            FROM rounds """)
-        rows = Round.cur.fetchall()
+    def __init__(self, parent):
+        self.parent = parent
+        self.cur = parent.cur
+
+        self.find_active()
+
+    def find_active(self):
+        now = time.time()
+        self.cur.execute("""SELECT round_id FROM rounds WHERE
+            round_start < statement_timestamp() AND round_end > statement_timestamp()""")
+        print(self.cur.fetchone())
+
+    def get_rounds(self):
+        self.cur.execute("""SELECT round_id, name, round_start, round_end
+            FROM rounds""")
+        rows = self.cur.fetchall()
         active = Round.getActiveId()
         #print("Rounds:")
         rounds = []
@@ -214,3 +91,17 @@ class Round:
             rounds.append(round)
         return rounds
 
+    def next(self):
+        self.cur.execute("""SELECT round_start
+            FROM rounds
+            WHERE (round_start > statement_timestamp())
+            ORDER BY round_start ASC""")
+        return iterateZero(self.cur.fetchone())
+
+    def init_database(cursor):
+        cursor.execute("""DROP TABLE IF EXISTS rounds""")
+        cursor.execute("""CREATE TABLE rounds (
+            round_id serial PRIMARY KEY,
+            name VARCHAR(30) NOT NULL,
+            round_start TIMESTAMP,
+            round_end TIMESTAMP)""")

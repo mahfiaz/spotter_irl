@@ -31,17 +31,9 @@ class EventType(Enum):
 
 class Event:
 
-# init
-    def initDB(cursor):
-        Event.cur = cursor
-        Event._createDataTable()
-
-    def initConnect(cursor):
-        Event.cur = cursor
-
-    def _createDataTable():
-        Event.cur.execute("""DROP TABLE IF EXISTS events""")
-        Event.cur.execute("""CREATE TABLE events (
+    def init_database(cursor):
+        cursor.execute("""DROP TABLE IF EXISTS events""")
+        cursor.execute("""CREATE TABLE events (
             round_id int,
             pid int,
             team_id_visible int DEFAULT 0,
